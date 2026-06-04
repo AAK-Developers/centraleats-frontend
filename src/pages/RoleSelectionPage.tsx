@@ -1,44 +1,112 @@
-// src/pages/RoleSelectionPage.tsx
-import { Flex, VStack, Heading, Text, Box, Button } from '@chakra-ui/react'
+import { Flex, VStack, Heading, Text, Box, Button, Image } from '@chakra-ui/react'
+import { FaGraduationCap, FaArrowRight } from 'react-icons/fa'
+import { WaveLayout } from '../components/layout/WaveLayout'
+import CentralEatsLogo from '../assets/CentralEatsLogo.png'
 
 export default function RoleSelectionPage() {
     const handleSelection = (role: 'student' | 'vendor') => {
         console.log(`Seleccionado: ${role}`)
-        // Aquí integraremos userService.updateUserRole(role) cuando tengas el endpoint
     }
 
     return (
-        <Flex minH="100vh" align="center" justify="center" p="4" bg="white" direction="column">
-            <VStack gap="8" w="full" maxW="md">
-                <VStack gap="2">
-                    <Heading color="primary.blue" size="lg">¡Bienvenido a CentralEats!</Heading>
-                    <Text color="gray.600">Por favor, selecciona tu entorno de interacción:</Text>
+        <WaveLayout>
+            <Flex minH="100vh" align="center" justify="center" p="4" bg="white" direction="column">
+                <VStack gap="8" w="full" maxW="md">
+                    <VStack gap="0" w="full" mt="-100px">
+                        <Image
+                            src={CentralEatsLogo}
+                            alt="CentralEatsLogo"
+                            boxSize="250px"
+                            objectFit="contain"
+                        />
+                        <Heading size="4xl" fontWeight="bold">
+                            <Text as="span" color="#042E63">¡Bienvenido a Central</Text>
+                            <Text as="span" color="#E65100">Eats!</Text>
+                        </Heading>
+                        <Text color="gray.600">Por favor, selecciona tu entorno de interacción:</Text>
+                    </VStack>
+
+                    <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
+                        <VStack gap="4">
+                            <Box
+                                p="4"
+                                bg="#b0f3f8"
+                                borderRadius="full"
+                                mb="2"
+                            >
+                                <FaGraduationCap size="30px" color="#30B2BC" />
+                            </Box>
+                            <Text fontWeight="bold">Entorno Estudiante</Text>
+                            <Text fontSize="sm" color="gray.500" textAlign="center">
+                                Busca locales, revisa menús y realiza tus pedidos.
+                            </Text>
+                            <Button
+                                variant="outline"
+                                borderColor="#042E63"
+                                color="#042E63"
+                                borderRadius="full"
+                                px="6"
+                                py="5"
+                                display="flex"
+                                alignItems="center"
+                                gap="3"
+                                _hover={{ bg: "#042E63", color: "white" }}
+                                onClick={() => handleSelection('student')}
+                            >
+                                Continuar
+                                <Box
+                                    as={FaArrowRight}
+                                    bg="#042E63"
+                                    color="white"
+                                    p="1.5"
+                                    borderRadius="full"
+                                    boxSize="25px"
+                                />
+                            </Button>
+                        </VStack>
+                    </Box>
+
+                    <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
+                        <VStack gap="4">
+                            <Box
+                                p="4"
+                                bg="#fad4a7"
+                                borderRadius="full"
+                                mb="2"
+                            >
+                                <FaGraduationCap size="30px" color="#FFA83F" />
+                            </Box>
+                            <Text fontWeight="bold">Panel de Vendedor</Text>
+                            <Text fontSize="sm" color="gray.500" textAlign="center">
+                                Gestiona tus platos en tiempo real, recibe pedidos y despacha comida.
+                            </Text>
+                            <Button
+                                variant="outline"
+                                borderColor="#042E63"
+                                color="#042E63"
+                                borderRadius="full"
+                                px="6"
+                                py="5"
+                                display="flex"
+                                alignItems="center"
+                                gap="3"
+                                _hover={{ bg: "#042E63", color: "white" }}
+                                onClick={() => handleSelection('student')}
+                            >
+                                Continuar
+                                <Box
+                                    as={FaArrowRight}
+                                    bg="#042E63"
+                                    color="white"
+                                    p="1.5"
+                                    borderRadius="full"
+                                    boxSize="25px"
+                                />
+                            </Button>
+                        </VStack>
+                    </Box>
                 </VStack>
-
-                <Box w="full" p="6" borderWidth="1px" borderRadius="lg" shadow="sm">
-                    <VStack gap="4">
-                        <Text fontWeight="bold">Entorno Estudiante</Text>
-                        <Text fontSize="sm" color="gray.500" textAlign="center">
-                            Busca locales, revisa menús y realiza tus pedidos.
-                        </Text>
-                        <Button w="full" colorScheme="blue" onClick={() => handleSelection('student')}>
-                            Continuar →
-                        </Button>
-                    </VStack>
-                </Box>
-
-                <Box w="full" p="6" borderWidth="1px" borderRadius="lg" shadow="sm">
-                    <VStack gap="4">
-                        <Text fontWeight="bold">Panel de Vendedor</Text>
-                        <Text fontSize="sm" color="gray.500" textAlign="center">
-                            Gestiona tus platos en tiempo real, recibe pedidos y despacha comida.
-                        </Text>
-                        <Button w="full" colorScheme="orange" onClick={() => handleSelection('vendor')}>
-                            Continuar →
-                        </Button>
-                    </VStack>
-                </Box>
-            </VStack>
-        </Flex>
+            </Flex>
+        </WaveLayout>
     )
 }

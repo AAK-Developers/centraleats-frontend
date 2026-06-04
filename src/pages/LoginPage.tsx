@@ -1,4 +1,3 @@
-// src/pages/LoginPage.tsx
 import { Image, VStack } from '@chakra-ui/react'
 import { SignIn } from '@clerk/clerk-react'
 import { WaveLayout } from '../components/layout/WaveLayout'

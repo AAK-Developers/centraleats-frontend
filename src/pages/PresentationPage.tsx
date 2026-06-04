@@ -1,8 +1,7 @@
-// src/pages/PresentationPage.tsx
 import { Flex, VStack, Spinner, Box, Image } from '@chakra-ui/react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import CentralEatsLogo from '../assets/CentralEats.png' // Importamos tu imagen
+import CentralEatsLogo from '../assets/CentralEats.png'
 
 export default function PresentationPage() {
     const navigate = useNavigate()
@@ -10,7 +9,7 @@ export default function PresentationPage() {
     useEffect(() => {
         const timer = setTimeout(() => {
             navigate('/login')
-        }, 30000)
+        }, 5000)
         return () => clearTimeout(timer)
     }, [navigate])
 
