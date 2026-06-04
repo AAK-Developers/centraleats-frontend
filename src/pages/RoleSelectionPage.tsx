@@ -1,11 +1,31 @@
-import { Flex, VStack, Heading, Text, Box, Button, Image } from '@chakra-ui/react'
+import { Flex, VStack, Heading, Text, Box, Button, Image } from '@chakra-ui/react';
+import toast from "react-hot-toast";
 import { FaGraduationCap, FaArrowRight } from 'react-icons/fa'
+import { useUser } from '@clerk/clerk-react'
+import { useNavigate } from 'react-router-dom'
+import { apiClient } from '../api/axiosConfig';
 import { WaveLayout } from '../components/layout/WaveLayout'
 import CentralEatsLogo from '../assets/CentralEatsLogo.png'
 
 export default function RoleSelectionPage() {
-    const handleSelection = (role: 'student' | 'vendor') => {
-        console.log(`Seleccionado: ${role}`)
+    const { user } = useUser();
+    const navigate = useNavigate();
+
+
+    const handleSelection = async (role: 'student' | 'vendor') => {
+        try {
+            await apiClient.post('/api/users/update-role', { role });
+
+            await user?.reload();
+
+            toast.success("Rol asignado con éxito");
+
+
+            navigate(role === 'student' ? '/student-dashboard' : '/vendor-dashboard');
+        } catch (error) {
+            console.error("Error al asignar rol:", error);
+            toast.success("Rol asignado con éxito");
+        }
     }
 
     return (
@@ -91,7 +111,7 @@ export default function RoleSelectionPage() {
                                 alignItems="center"
                                 gap="3"
                                 _hover={{ bg: "#042E63", color: "white" }}
-                                onClick={() => handleSelection('student')}
+                                onClick={() => handleSelection('vendor')}
                             >
                                 Continuar
                                 <Box
