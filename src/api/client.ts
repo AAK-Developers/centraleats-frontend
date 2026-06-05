@@ -1,7 +1,5 @@
-// src/api/client.ts
 import axios from 'axios';
 
-// Definimos una interfaz para el objeto window si es necesario
 declare global {
     interface Window {
         Clerk: any;
@@ -17,7 +15,6 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(async (config) => {
     try {
-        // Ahora TS reconoce window.Clerk
         const token = await window.Clerk?.session?.getToken();
 
         if (token) {
