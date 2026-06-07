@@ -7,7 +7,6 @@ Welcome to the official frontend repository of **CentralEats**, a digital "Click
 ## 👨‍💻 Project Lead & Responsibility
 
 - **Front-End Developer & UI-UX Lead:** Kevin Moyon
-- **Current Milestone:** This initial commit marks the completion of **Step 1: Establishing the Core Folder Architecture**. The directory structure has been meticulously crafted following professional engineering standards and clean-code principles, providing a beautiful and robust foundation for all subsequent feature implementations.
 
 The project is built with a strict **Mobile-First** approach, ensuring an ultra-fast, highly accessible, and seamless user experience for students and vendors navigating the application on campus.
 
