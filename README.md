@@ -34,17 +34,17 @@ The codebase inside the `/src` directory strictly implements the principles of *
 
 ```text
 src/
-├── api/            # Configuración de clientes Axios e interceptores de seguridad
-├── assets/         # Recursos estáticos (imágenes, fuentes, etc.)
-├── components/     # Componentes organizados por Atomic Design:
-│   ├── atoms/      # Componentes básicos (botones, inputs, etc.)
-│   ├── auth/       # Lógica y UI específica de autenticación
-│   ├── layout/     # Componentes estructurales (headers, footers, wrappers)
-│   ├── molecules/  # Combinaciones simples de átomos
-│   └── organisms/  # Componentes complejos y funcionales
-├── hooks/          # Hooks personalizados de React
-├── pages/          # Vistas de la aplicación (mapeadas a rutas)
-├── store/          # Manejo de estado global (Zustand)
-├── App.tsx         # Punto de entrada de la aplicación y rutas
-├── main.tsx        # Renderizado de React y configuración de proveedores
-└── theme.ts        # Configuración del sistema de diseño (Chakra UI)
+├── api/            # Axios client configuration and security interceptors
+├── assets/         # Static assets (images, fonts, etc.)
+├── components/     # Components organized by Atomic Design:
+│   ├── atoms/      # Basic components (buttons, inputs, etc.)
+│   ├── auth/       # Authentication-specific logic and UI
+│   ├── layout/     # Structural components (headers, footers, wrappers)
+│   ├── molecules/  # Simple combinations of atoms
+│   └── organisms/  # Complex and functional components
+├── hooks/          # Custom React hooks
+├── pages/          # Application views (mapped to routes)
+├── store/          # Global state management (Zustand)
+├── App.tsx         # Application entry point and routes
+├── main.tsx        # React rendering and provider configuration
+└── theme.ts        # Design system configuration (Chakra UI)
