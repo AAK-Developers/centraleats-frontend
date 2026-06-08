@@ -18,7 +18,7 @@ To meet the highest standards of performance, strict typing, and modern user exp
 
 - **Core Library:** [React 19](https://react.dev/) (Utilizing native *Actions* and asynchronous hooks to minimize UI latency and handle optimistic updates)
 - **Build Toolchain:** [Vite](https://vite.dev/) + [TypeScript](https://www.typescriptlang.org/) (Ensuring near-instantaneous Hot Module Replacement during development and a bulletproof type-safe environment)
-- **Hybrid Rendering Framework:** [Astro](https://astro.build/) (Integrated via *Islands Architecture* to serve lightning-fast static landing pages and public catalogs)
+- **Rendering:** Single-page application (React Router)
 - **Design System:** [Chakra UI](https://v2.chakra-ui.com/) (Providing accessible, WAI-ARIA compliant components styled to reflect our exact corporate brand identity, including our signature institutional blue `#004aad`)
 - **State Management:** 
   - [Zustand](https://zustand-demo.pmnd.rs/) (For lightweight, boilerplate-free global UI and shopping cart state)
