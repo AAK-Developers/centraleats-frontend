@@ -3,6 +3,16 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
+# Add build arguments for environment variables
+ARG VITE_API_URL
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ARG VITE_APP_ENV
+
+# Set environment variables for the build process
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_APP_ENV=$VITE_APP_ENV
+
 # Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
