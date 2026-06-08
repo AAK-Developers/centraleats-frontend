@@ -1,12 +1,8 @@
 services:
   app:
-    build: .
+    # Ahora usamos la imagen de Docker Hub en lugar de construir localmente en la EC2
+    image: ${DOCKERHUB_USERNAME}/centraleats-frontend:${IMAGE_TAG:-latest}
+    container_name: centraleats-frontend
     ports:
-      - "5173:5173"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    environment:
-      - VITE_APP_ENV=local
-    stdin_open: true
-    tty: true
+      - "80:80"
+    restart: always
