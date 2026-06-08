@@ -1,0 +1,8 @@
+services:
+  app:
+    # Ahora usamos la imagen de Docker Hub en lugar de construir localmente en la EC2
+    image: ${DOCKERHUB_USERNAME}/centraleats-frontend:${IMAGE_TAG:-latest}
+    container_name: centraleats-frontend
+    ports:
+      - "80:80"
+    restart: always
