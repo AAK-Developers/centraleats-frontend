@@ -56,5 +56,8 @@ jobs:
           script: |
             cd ~/centraleats-frontend
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            # Exportamos las variables necesarias para que docker-compose las reconozca
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export IMAGE_TAG=qa
             docker compose pull
             docker compose up -d
