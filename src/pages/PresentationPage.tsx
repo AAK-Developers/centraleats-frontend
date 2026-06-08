@@ -2,16 +2,26 @@ import { Flex, VStack, Spinner, Box, Image } from '@chakra-ui/react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CentralEatsLogo from '../assets/CentralEats.png'
+import { useUser } from '@clerk/clerk-react'
+
 
 export default function PresentationPage() {
     const navigate = useNavigate()
+    const { isLoaded, isSignedIn } = useUser()
 
     useEffect(() => {
+        if (!isLoaded) return
+
         const timer = setTimeout(() => {
-            navigate('/login')
-        }, 5000)
+            if (isSignedIn) {
+                navigate('/role-selection')
+            } else {
+                navigate('/login')
+            }
+        }, 1000)
+
         return () => clearTimeout(timer)
-    }, [navigate])
+    }, [isLoaded, isSignedIn, navigate])
 
     return (
         <Flex minH="100vh" bg="white" direction="column" justify="space-between" overflow="hidden">
@@ -29,7 +39,7 @@ export default function PresentationPage() {
                     boxSize="400px"
                     objectFit="contain"
                 />
-                <Spinner color="primary.cyan" boxSize="20" />
+                <Spinner color="primaryCyan" boxSize="20" />
             </VStack>
 
             <Box w="full" h="150px">

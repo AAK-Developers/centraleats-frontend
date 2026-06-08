@@ -6,7 +6,11 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
     const { getToken } = useAuth();
 
     useEffect(() => {
-        setupAxiosInterceptor(getToken);
+        const ejectInterceptor = setupAxiosInterceptor(getToken);
+
+        return () => {
+            ejectInterceptor();
+        };
     }, [getToken]);
 
     return <>{children}</>;
