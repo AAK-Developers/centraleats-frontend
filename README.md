@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# 🛒 CentralEats - Frontend 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the official frontend repository of **CentralEats**, a digital "Click & Collect" food management platform designed specifically for the community at the Universidad Central del Ecuador (UCE).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 👨‍💻 Project Lead & Responsibility
 
-## React Compiler
+- **Front-End Developer & UI-UX Lead:** Kevin Moyon
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The project is built with a strict **Mobile-First** approach, ensuring an ultra-fast, highly accessible, and seamless user experience for students and vendors navigating the application on campus.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Core Technology Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+To meet the highest standards of performance, strict typing, and modern user experience, the frontend leverages:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Core Library:** [React 19](https://react.dev/) (Utilizing native *Actions* and asynchronous hooks to minimize UI latency and handle optimistic updates)
+- **Build Toolchain:** [Vite](https://vite.dev/) + [TypeScript](https://www.typescriptlang.org/) (Ensuring near-instantaneous Hot Module Replacement during development and a bulletproof type-safe environment)
+- **Rendering:** Single-page application (React Router)
+- **Design System:** [Chakra UI](https://v2.chakra-ui.com/) (Providing accessible, WAI-ARIA compliant components styled to reflect our exact corporate brand identity, including our signature institutional blue `#004aad`)
+- **State Management:** 
+  - [Zustand](https://zustand-demo.pmnd.rs/) (For lightweight, boilerplate-free global UI and shopping cart state)
+  - [TanStack Query v5](https://tanstack.com/query/latest) (For automated server-state synchronization, caching, and background revalidations)
+- **Form Handling & Validation:** [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) (For high-performance, schema-driven form validations that avoid unnecessary re-renders)
+- **Authentication:** [Clerk Auth](https://clerk.com/) (Enabling fast, seamless social and institutional login for both students and vendors)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📐 Project Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The codebase inside the `/src` directory strictly implements the principles of **Atomic Design**, ensuring high component reusability and a strict separation of concerns:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+```text
+src/
+├── api/            # Axios client configuration and security interceptors
+├── assets/         # Static assets (images, fonts, etc.)
+├── components/     # Components organized by Atomic Design:
+│   ├── atoms/      # Basic components (buttons, inputs, etc.)
+│   ├── auth/       # Authentication-specific logic and UI
+│   ├── layout/     # Structural components (headers, footers, wrappers)
+│   ├── molecules/  # Simple combinations of atoms
+│   └── organisms/  # Complex and functional components
+├── hooks/          # Custom React hooks
+├── pages/          # Application views (mapped to routes)
+├── store/          # Global state management (Zustand)
+├── App.tsx         # Application entry point and routes
+├── main.tsx        # React rendering and provider configuration
+└── theme.ts        # Design system configuration (Chakra UI)
