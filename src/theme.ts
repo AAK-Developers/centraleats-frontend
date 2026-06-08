@@ -1,20 +1,16 @@
-import { createSystem, defaultConfig } from "@chakra-ui/react"
+import { createSystem, defaultConfig } from "@chakra-ui/react";
 
 const theme = createSystem(defaultConfig, {
     theme: {
         tokens: {
             colors: {
-                primary: {
-                    blue: { value: '#042E63' },
-                    cyan: { value: '#30B2BC' },
-                    orange: { value: '#E65100' },
-                    red: { value: '#FF0000' },
-                },
+                primaryBlue: { value: "#042E63" },
+                primaryCyan: { value: "#30B2BC" },
+                primaryOrange: { value: "#E65100" },
+                primaryRed: { value: "#FF0000" },
             },
         },
     },
-})
+});
 
-export default theme
-
-
+export default theme;

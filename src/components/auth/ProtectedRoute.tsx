@@ -1,9 +1,10 @@
 import React from 'react';
 import { useUser } from "@clerk/clerk-react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { isLoaded, isSignedIn, user } = useUser();
+    const location = useLocation();
 
     if (!isLoaded) return <div>Cargando...</div>;
 
@@ -11,9 +12,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         return <Navigate to="/login" replace />;
     }
 
-    const role = user.publicMetadata.role as string | undefined;
+    const role = user?.publicMetadata?.role as string | undefined;
 
-    if (!role && window.location.pathname !== "/role-selection") {
+    if (!role && location.pathname !== "/role-selection") {
         return <Navigate to="/role-selection" replace />;
     }
 

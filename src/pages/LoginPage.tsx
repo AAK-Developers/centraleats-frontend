@@ -14,6 +14,7 @@ export default function LoginPage() {
                     objectFit="contain"
                 />
                 <SignIn
+                    forceRedirectUrl="/role-selection"
                     appearance={{
                         variables: {
                             colorPrimary: '#E65100'

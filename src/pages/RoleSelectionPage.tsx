@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { Flex, VStack, Heading, Text, Box, Button, Image } from '@chakra-ui/react';
+import { Flex, VStack, Text, Box, Button, Image } from '@chakra-ui/react';
 import toast from "react-hot-toast";
-import { FaGraduationCap, FaArrowRight } from 'react-icons/fa'
-import { useUser } from '@clerk/clerk-react'
-import { useNavigate } from 'react-router-dom'
+import { FaGraduationCap, FaArrowRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
+
 import { apiClient } from '../api/axiosConfig';
-import { WaveLayout } from '../components/layout/WaveLayout'
-import CentralEatsLogo from '../assets/CentralEatsLogo.png'
+import { WaveLayout } from '../components/layout/WaveLayout';
+import CentralEatsLogo from '../assets/CentralEatsLogo.png';
 
 export default function RoleSelectionPage() {
-    const { user } = useUser();
     const navigate = useNavigate();
+    const { user } = useUser();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSelection = async (role: 'student' | 'vendor') => {
@@ -19,25 +20,33 @@ export default function RoleSelectionPage() {
         setIsSubmitting(true);
 
         try {
-            await apiClient.post('/api/users/update-role', { role });
-
-            await user?.reload();
+            await apiClient.post('/api/users/update-role', {
+                role,
+                clerkId: user?.id,
+            });
 
             toast.success("Rol asignado con éxito");
 
-            navigate(role === 'student' ? '/student-dashboard' : '/vendor-dashboard');
+            navigate(
+                role === "student"
+                    ? "/student-dashboard"
+                    : "/vendor-dashboard"
+            );
+
         } catch (error) {
             console.error("Error al asignar rol:", error);
-            toast.error("Hubo un error al asignar el rol. Por favor intenta de nuevo.");
+            toast.error("Hubo un error al asignar el rol");
         } finally {
             setIsSubmitting(false);
         }
-    }
+    };
 
     return (
         <WaveLayout>
             <Flex minH="100vh" align="center" justify="center" p="4" bg="white" direction="column">
+
                 <VStack gap="8" w="full" maxW="md">
+
                     <VStack gap="0" w="full" mt="-100px">
                         <Image
                             src={CentralEatsLogo}
@@ -45,10 +54,12 @@ export default function RoleSelectionPage() {
                             boxSize="250px"
                             objectFit="contain"
                         />
-                        <Heading size="4xl" fontWeight="bold">
+
+                        <Text fontSize="4xl" fontWeight="bold">
                             <Text as="span" color="#042E63">¡Bienvenido a Central</Text>
                             <Text as="span" color="#E65100">Eats!</Text>
-                        </Heading>
+                        </Text>
+
                         <Text color="gray.600">
                             Por favor, selecciona tu entorno de interacción:
                         </Text>
@@ -56,12 +67,7 @@ export default function RoleSelectionPage() {
 
                     <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
                         <VStack gap="4">
-                            <Box
-                                p="4"
-                                bg="#b0f3f8"
-                                borderRadius="full"
-                                mb="2"
-                            >
+                            <Box p="4" bg="#b0f3f8" borderRadius="full">
                                 <FaGraduationCap size="30px" color="#30B2BC" />
                             </Box>
 
@@ -83,32 +89,18 @@ export default function RoleSelectionPage() {
                                 gap="3"
                                 _hover={{ bg: "#042E63", color: "white" }}
                                 onClick={() => handleSelection('student')}
-                                disabled={isSubmitting}
                                 loading={isSubmitting}
                                 loadingText="Procesando..."
                             >
                                 Continuar
-
-                                <Box
-                                    as={FaArrowRight}
-                                    bg="#042E63"
-                                    color="white"
-                                    p="1.5"
-                                    borderRadius="full"
-                                    boxSize="25px"
-                                />
+                                <Box as={FaArrowRight} boxSize="25px" />
                             </Button>
                         </VStack>
                     </Box>
 
                     <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
                         <VStack gap="4">
-                            <Box
-                                p="4"
-                                bg="#fad4a7"
-                                borderRadius="full"
-                                mb="2"
-                            >
+                            <Box p="4" bg="#fad4a7" borderRadius="full">
                                 <FaGraduationCap size="30px" color="#FFA83F" />
                             </Box>
 
@@ -130,23 +122,15 @@ export default function RoleSelectionPage() {
                                 gap="3"
                                 _hover={{ bg: "#042E63", color: "white" }}
                                 onClick={() => handleSelection('vendor')}
-                                disabled={isSubmitting}
                                 loading={isSubmitting}
                                 loadingText="Procesando..."
                             >
                                 Continuar
-
-                                <Box
-                                    as={FaArrowRight}
-                                    bg="#042E63"
-                                    color="white"
-                                    p="1.5"
-                                    borderRadius="full"
-                                    boxSize="25px"
-                                />
+                                <Box as={FaArrowRight} boxSize="25px" />
                             </Button>
                         </VStack>
                     </Box>
+
                 </VStack>
             </Flex>
         </WaveLayout>
