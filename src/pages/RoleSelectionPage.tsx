@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { Flex, VStack, Text, Box, Button, Image } from '@chakra-ui/react';
+import { VStack, Text } from '@chakra-ui/react';
 import toast from "react-hot-toast";
-import { FaGraduationCap, FaArrowRight } from 'react-icons/fa';
+import { FaGraduationCap } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 
 import { apiClient } from '../api/axiosConfig';
 import { WaveLayout } from '../components/layout/WaveLayout';
+import { RoleCard } from '../components/molecules/RoleCard';
+import { AuthHeader } from '../components/organisms/AuthHeader';
 import CentralEatsLogo from '../assets/CentralEatsLogo.png';
+
 
 export default function RoleSelectionPage() {
     const navigate = useNavigate();
@@ -43,96 +46,37 @@ export default function RoleSelectionPage() {
 
     return (
         <WaveLayout>
-            <Flex minH="100vh" align="center" justify="center" p="4" bg="white" direction="column">
-
-                <VStack gap="8" w="full" maxW="md">
-
-                    <VStack gap="0" w="full" mt="-100px">
-                        <Image
-                            src={CentralEatsLogo}
-                            alt="CentralEatsLogo"
-                            boxSize="250px"
-                            objectFit="contain"
-                        />
-
-                        <Text fontSize="4xl" fontWeight="bold">
-                            <Text as="span" color="#042E63">¡Bienvenido a Central</Text>
-                            <Text as="span" color="#E65100">Eats!</Text>
-                        </Text>
-
-                        <Text color="gray.600">
-                            Por favor, selecciona tu entorno de interacción:
-                        </Text>
-                    </VStack>
-
-                    <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
-                        <VStack gap="4">
-                            <Box p="4" bg="#b0f3f8" borderRadius="full">
-                                <FaGraduationCap size="30px" color="#30B2BC" />
-                            </Box>
-
-                            <Text fontWeight="bold">Entorno Estudiante</Text>
-
-                            <Text fontSize="sm" color="gray.500" textAlign="center">
-                                Busca locales, revisa menús y realiza tus pedidos.
-                            </Text>
-
-                            <Button
-                                variant="outline"
-                                borderColor="#042E63"
-                                color="#042E63"
-                                borderRadius="full"
-                                px="6"
-                                py="5"
-                                display="flex"
-                                alignItems="center"
-                                gap="3"
-                                _hover={{ bg: "#042E63", color: "white" }}
-                                onClick={() => handleSelection('student')}
-                                loading={isSubmitting}
-                                loadingText="Procesando..."
-                            >
-                                Continuar
-                                <Box as={FaArrowRight} boxSize="25px" />
-                            </Button>
-                        </VStack>
-                    </Box>
-
-                    <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
-                        <VStack gap="4">
-                            <Box p="4" bg="#fad4a7" borderRadius="full">
-                                <FaGraduationCap size="30px" color="#FFA83F" />
-                            </Box>
-
-                            <Text fontWeight="bold">Panel de Vendedor</Text>
-
-                            <Text fontSize="sm" color="gray.500" textAlign="center">
-                                Gestiona tus platos en tiempo real, recibe pedidos y despacha comida.
-                            </Text>
-
-                            <Button
-                                variant="outline"
-                                borderColor="#042E63"
-                                color="#042E63"
-                                borderRadius="full"
-                                px="6"
-                                py="5"
-                                display="flex"
-                                alignItems="center"
-                                gap="3"
-                                _hover={{ bg: "#042E63", color: "white" }}
-                                onClick={() => handleSelection('vendor')}
-                                loading={isSubmitting}
-                                loadingText="Procesando..."
-                            >
-                                Continuar
-                                <Box as={FaArrowRight} boxSize="25px" />
-                            </Button>
-                        </VStack>
-                    </Box>
-
+            <AuthHeader logoImage={CentralEatsLogo} logoSize="250px">
+                <VStack gap="2" mb="4">
+                    <Text fontSize="4xl" fontWeight="bold" textAlign="center">
+                        <Text as="span" color="#042E63">¡Bienvenido a Central</Text>
+                        <Text as="span" color="#E65100">Eats!</Text>
+                    </Text>
+                    <Text color="gray.600">
+                        Por favor, selecciona tu entorno de interacción:
+                    </Text>
                 </VStack>
-            </Flex>
+                <RoleCard
+                    icon={FaGraduationCap}
+                    iconBg="#b0f3f8"
+                    iconColor="#30B2BC"
+                    title="Entorno Estudiante"
+                    description="Busca locales, revisa menús y realiza tus pedidos."
+                    onClick={() => handleSelection('student')}
+                    isLoading={isSubmitting}
+                />
+                <RoleCard
+                    icon={FaGraduationCap}
+                    iconBg="#fad4a7"
+                    iconColor="#FFA83F"
+                    title="Panel de Vendedor"
+                    description="Gestiona tus platos en tiempo real, recibe pedidos y despacha comida."
+                    onClick={() => handleSelection('vendor')}
+                    isLoading={isSubmitting}
+                />
+            </AuthHeader>
+
+
         </WaveLayout>
     );
 }
