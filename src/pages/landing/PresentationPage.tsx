@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import { WaveLayout } from '../../components/layout/WaveLayout'
 import { AuthHeader } from '../../components/organisms/AuthHeader'
+import { AppContainer } from '../../components/layout/AppContainer'
 
 
 export default function PresentationPage() {
@@ -26,9 +27,11 @@ export default function PresentationPage() {
 
     return (
         <WaveLayout>
-            <AuthHeader logoSize="400px">
-                <Spinner color="primaryCyan" boxSize="20" />
-            </AuthHeader>
+            <AppContainer>
+                <AuthHeader logoSize="400px">
+                    <Spinner color="primaryCyan" boxSize="20" />
+                </AuthHeader>
+            </AppContainer>
         </WaveLayout>
     )
 }

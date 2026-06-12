@@ -8,6 +8,7 @@ import LoginPage from './pages/auth/LoginPage';
 
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
+import NotificationsPage from './pages/student/StudentNotificationsPage';
 
 export default function App() {
   return (
@@ -41,6 +42,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <VendorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/student/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />
