@@ -2,12 +2,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthInitializer } from './components/auth/AuthInitializer';
 
-import PresentationPage from './pages/PresentationPage';
-import RoleSelectionPage from './pages/RoleSelectionPage';
-import LoginPage from './pages/LoginPage';
+import PresentationPage from './pages/landing/PresentationPage';
+import RoleSelectionPage from './pages/auth/RoleSelectionPage';
+import LoginPage from './pages/auth/LoginPage';
 
-import StudentDashboardPage from './pages/StudentDashboardPage';
-import VendorDashboardPage from './pages/VendorDashboardPage';
+import StudentDashboardPage from './pages/student/StudentDashboardPage';
+import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 
 export default function App() {
   return (
