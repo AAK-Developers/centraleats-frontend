@@ -31,7 +31,8 @@ react-hook-form zod axios react-hot-toast react-router-dom \
 ##  📐 Architecture (Atomic Design)
 The /src directory implements Atomic Design to maximize code reusability and maintainability:
 
-Plaintext
+```text
+
 src/
 ├── api/            # Axios instance and API services
 ├── assets/         # Branding and shared media
