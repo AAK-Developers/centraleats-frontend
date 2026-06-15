@@ -24,7 +24,7 @@ export default function RoleSelectionPage() {
         setIsSubmitting(true);
 
         try {
-            await apiClient.post('/api/users/update-role', {
+            await apiClient.post('/api/users', {
                 role,
                 clerkId: user?.id,
             });
