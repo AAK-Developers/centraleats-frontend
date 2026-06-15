@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiClient } from '../api/axiosConfig';
 
 interface Order {
     id: string;
@@ -18,21 +19,8 @@ export const useOrderHistory = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/student/order-history', { //backend
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // If you need to send an authentication token:
-                    // 'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al obtener el historial de pedidos');
-            }
-
-            const data = await response.json();
-            setOrders(data);
+            const response = await apiClient.get('/api/student/order-history');
+            setOrders(response.data);
         } catch (err: any) {
             setError(err.message || 'Error desconocido');
         } finally {

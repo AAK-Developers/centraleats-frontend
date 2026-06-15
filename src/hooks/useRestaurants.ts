@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiClient } from '../api/axiosConfig';
 
 export const useRestaurants = () => {
     const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -6,9 +7,8 @@ export const useRestaurants = () => {
     useEffect(() => {
         const fetchRestaurants = async () => {
             try {
-                const response = await fetch('https://tu-api.com/api/restaurants');
-                const data = await response.json();
-                setRestaurants(data);
+                const response = await apiClient.get('/api/restaurants');
+                setRestaurants(response.data);
             } catch (error) {
                 console.error("Error al cargar restaurantes:", error);
             }

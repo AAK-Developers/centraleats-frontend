@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiClient } from '../api/axiosConfig';
 
 export const useNotifications = () => {
     const [notifications, setNotifications] = useState([]);
@@ -6,9 +7,8 @@ export const useNotifications = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetch('https://tu-api.com/api/restaurants');
-            const data = await response.json();
-            setNotifications(data);
+            const response = await apiClient.get('/api/restaurants');
+            setNotifications(response.data);
         } catch (error) {
             console.error("Error cargando notificaciones:", error);
         } finally {

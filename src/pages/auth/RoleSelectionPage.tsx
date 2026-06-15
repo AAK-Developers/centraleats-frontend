@@ -21,13 +21,29 @@ export default function RoleSelectionPage() {
     const handleSelection = async (role: 'student' | 'vendor') => {
         if (isSubmitting) return;
 
+        console.log('--- Iniciando selección de rol ---');
+        console.log('Rol seleccionado:', role);
+        console.log('ID de Clerk (user.id):', user?.id);
+        console.log('URL Base de API:', import.meta.env.VITE_API_BASE_URL);
+
         setIsSubmitting(true);
 
         try {
-            await apiClient.post('/api/users', {
+            const payload = {
                 role,
                 clerkId: user?.id,
-            });
+            };
+            console.log('Enviando POST a /api/users con payload:', payload);
+
+            const response = await apiClient.post('/api/users', payload);
+            
+            console.log('Respuesta exitosa del servidor:', response.data);
+            
+            // Forzar recarga de los datos del usuario en Clerk para obtener los nuevos metadatos
+            if (user) {
+                console.log('Recargando datos de Clerk...');
+                await user.reload();
+            }
 
             toast.success("Rol asignado con éxito");
 
@@ -37,11 +53,24 @@ export default function RoleSelectionPage() {
                     : "/vendor-dashboard"
             );
 
-        } catch (error) {
-            console.error("Error al asignar rol:", error);
+        } catch (error: any) {
+            console.error("--- Error detallado al asignar rol ---");
+            if (error.response) {
+                // El servidor respondió con un código fuera del rango 2xx
+                console.error("Datos de respuesta del error:", error.response.data);
+                console.error("Status del error:", error.response.status);
+                console.error("Cabeceras de respuesta:", error.response.headers);
+            } else if (error.request) {
+                // La petición se hizo pero no hubo respuesta (ej: CORS o servidor caído)
+                console.error("No hubo respuesta del servidor. Error de red o CORS.");
+                console.log(error.request);
+            } else {
+                console.error("Error al configurar la petición:", error.message);
+            }
             toast.error("Hubo un error al asignar el rol");
         } finally {
             setIsSubmitting(false);
+            console.log('--- Fin del proceso de selección ---');
         }
     };
 

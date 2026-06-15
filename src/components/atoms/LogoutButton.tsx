@@ -1,9 +1,16 @@
 import { Button, HStack } from "@chakra-ui/react";
 import { useClerk } from "@clerk/clerk-react";
 import { LuLogOut } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 export const LogoutButton = () => {
     const { signOut } = useClerk();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await signOut();
+        navigate('/');
+    };
 
     return (
         <Button
@@ -15,7 +22,7 @@ export const LogoutButton = () => {
             size="lg"
             borderRadius="full"
             _hover={{ bg: "#db601e" }}
-            onClick={() => signOut()}
+            onClick={handleLogout}
         >
             <HStack gap={2}>
                 <LuLogOut />
