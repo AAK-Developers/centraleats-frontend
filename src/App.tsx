@@ -2,12 +2,16 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthInitializer } from './components/auth/AuthInitializer';
 
-import PresentationPage from './pages/PresentationPage';
-import RoleSelectionPage from './pages/RoleSelectionPage';
-import LoginPage from './pages/LoginPage';
+import PresentationPage from './pages/landing/PresentationPage';
+import RoleSelectionPage from './pages/auth/RoleSelectionPage';
+import LoginPage from './pages/auth/LoginPage';
 
-import StudentDashboardPage from './pages/StudentDashboardPage';
-import VendorDashboardPage from './pages/VendorDashboardPage';
+import StudentDashboardPage from './pages/student/StudentDashboardPage';
+import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
+import NotificationsPage from './pages/student/StudentNotificationsPage';
+import StudentProfilePage from './pages/student/StudentProfilePage';
+import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
+import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
 
 export default function App() {
   return (
@@ -37,10 +41,46 @@ export default function App() {
           />
 
           <Route
+            path="/student/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/student/profile" element={
+              <ProtectedRoute>
+                <StudentProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/vendor-dashboard"
             element={
               <ProtectedRoute>
                 <VendorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+
+          <Route
+            path="/register-restaurant"
+            element={
+              <ProtectedRoute>
+                <RestaurantRegistrationPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/register-menu"
+            element={
+              <ProtectedRoute>
+                <RegisterMenuPage />
               </ProtectedRoute>
             }
           />
