@@ -17,17 +17,29 @@ export const DashboardHeader = ({ userName }: Props) => {
                 </Heading>
             </Box>
 
-            <HStack gap={3}>
+            <HStack gap={1}>
                 <IconButton
                     aria-label="Notificaciones"
                     color="#FFA83F"
                     variant="ghost"
-                    size="sm"
+                    size="md"
                     onClick={() => navigate('/student/notifications')}
                 >
                     <FaBell />
                 </IconButton>
-                <Icon as={FaUser} boxSize={5} color="#042E63" />
+
+
+                <IconButton
+                    aria-label="Perfil"
+                    variant="ghost"
+                    onClick={() => navigate('/student/profile')}
+                >
+                    <Icon as={FaUser} boxSize={5} color="#042E63" />
+                </IconButton>
+
+
+
+
                 <Icon as={FaShoppingCart} boxSize={5} color="#E65100" />
             </HStack>
         </Flex>

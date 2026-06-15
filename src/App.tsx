@@ -9,6 +9,7 @@ import LoginPage from './pages/auth/LoginPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import NotificationsPage from './pages/student/StudentNotificationsPage';
+import StudentProfilePage from './pages/student/StudentProfilePage';
 
 export default function App() {
   return (
@@ -38,15 +39,6 @@ export default function App() {
           />
 
           <Route
-            path="/vendor-dashboard"
-            element={
-              <ProtectedRoute>
-                <VendorDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
             path="/student/notifications"
             element={
               <ProtectedRoute>
@@ -55,6 +47,22 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/student/profile" element={
+              <ProtectedRoute>
+                <StudentProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/vendor-dashboard"
+            element={
+              <ProtectedRoute>
+                <VendorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthInitializer>
     </BrowserRouter>
