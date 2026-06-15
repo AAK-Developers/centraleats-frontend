@@ -8,7 +8,8 @@ import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AuthHeader } from "../../components/organisms/AuthHeader";
 import { FilterBar } from "../../components/molecules/FilterBar";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { useRestaurants, Restaurant } from "../../hooks/useRestaurants";
+import { useRestaurants } from "../../hooks/useRestaurants";
+import type { Restaurant } from "../../hooks/useRestaurants";
 
 export default function StudentDashboardPage() {
     const { user } = useUser();

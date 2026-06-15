@@ -7,7 +7,8 @@ import { EmptyState } from '../../components/organisms/EmptyState';
 import { AuthHeader } from '../../components/organisms/AuthHeader';
 import { ClearButton } from '../../components/atoms/ClearButton';
 import { BackButton } from '../../components/atoms/BackButton';
-import { useNotifications, Notification } from '../../hooks/useNotifications';
+import { useNotifications } from '../../hooks/useNotifications';
+import type { Notification } from '../../hooks/useNotifications';
 
 export default function NotificationsPage() {
     const { notifications, clearAll } = useNotifications();
