@@ -1,50 +1,46 @@
 # 🛒 CentralEats - Frontend 🚀
 
-Welcome to the official frontend repository of **CentralEats**, a digital "Click & Collect" food management platform designed specifically for the community at the Universidad Central del Ecuador (UCE).
+CentralEats is a high-performance "Click & Collect" food management platform specifically designed for the community at the Universidad Central del Ecuador (UCE). Its Mobile-First architecture ensures ultra-fast loading times and a seamless user experience across the campus.
 
----
+## 👨‍💻 Project Lead
+**Lead Developer & UI/UX Architect:** Kevin Moyon
 
-## 👨‍💻 Project Lead & Responsibility
+## 🛠️ Tech Stack
+The project utilizes a modern, strongly-typed, and reactive stack designed to handle the high concurrency of university life:
 
-- **Front-End Developer & UI-UX Lead:** Kevin Moyon
+* **Runtime & Framework:** React 19, TypeScript, Vite.
+* **Design System:** Chakra UI (WAI-ARIA compliant, brand-aligned).
+* **State Management:**
+    * **Zustand:** High-performance global UI state (Cart, user preferences).
+    * **TanStack Query v5:** Server state synchronization, automatic caching, and background revalidation.
+* **Forms:** React Hook Form + Zod (schema-based validation).
+* **Auth Layer:** Clerk (Institutional and social authentication).
+* **Networking:** Axios (with security interceptors for token management).
 
-The project is built with a strict **Mobile-First** approach, ensuring an ultra-fast, highly accessible, and seamless user experience for students and vendors navigating the application on campus.
+## 📦 Installation
+To initialize the project environment, run the following command:
 
----
+```bash
+npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion \
+react-hook-form zod axios react-hot-toast react-router-dom \
+@clerk/clerk-react zustand @tanstack/react-query react-icons
 
-## 🛠️ Core Technology Stack
 
-To meet the highest standards of performance, strict typing, and modern user experience, the frontend leverages:
+📐 Architecture (Atomic Design)
+The /src directory implements Atomic Design to maximize code reusability and maintainability:
 
-- **Core Library:** [React 19](https://react.dev/) (Utilizing native *Actions* and asynchronous hooks to minimize UI latency and handle optimistic updates)
-- **Build Toolchain:** [Vite](https://vite.dev/) + [TypeScript](https://www.typescriptlang.org/) (Ensuring near-instantaneous Hot Module Replacement during development and a bulletproof type-safe environment)
-- **Rendering:** Single-page application (React Router)
-- **Design System:** [Chakra UI](https://v2.chakra-ui.com/) (Providing accessible, WAI-ARIA compliant components styled to reflect our exact corporate brand identity, including our signature institutional blue `#004aad`)
-- **State Management:** 
-  - [Zustand](https://zustand-demo.pmnd.rs/) (For lightweight, boilerplate-free global UI and shopping cart state)
-  - [TanStack Query v5](https://tanstack.com/query/latest) (For automated server-state synchronization, caching, and background revalidations)
-- **Form Handling & Validation:** [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) (For high-performance, schema-driven form validations that avoid unnecessary re-renders)
-- **Authentication:** [Clerk Auth](https://clerk.com/) (Enabling fast, seamless social and institutional login for both students and vendors)
-
----
-
-## 📐 Project Architecture
-
-The codebase inside the `/src` directory strictly implements the principles of **Atomic Design**, ensuring high component reusability and a strict separation of concerns:
-
-```text
+Plaintext
 src/
-├── api/            # Axios client configuration and security interceptors
-├── assets/         # Static assets (images, fonts, etc.)
-├── components/     # Components organized by Atomic Design:
-│   ├── atoms/      # Basic components (buttons, inputs, etc.)
-│   ├── auth/       # Authentication-specific logic and UI
-│   ├── layout/     # Structural components (headers, footers, wrappers)
-│   ├── molecules/  # Simple combinations of atoms
-│   └── organisms/  # Complex and functional components
-├── hooks/          # Custom React hooks
-├── pages/          # Application views (mapped to routes)
-├── store/          # Global state management (Zustand)
-├── App.tsx         # Application entry point and routes
-├── main.tsx        # React rendering and provider configuration
-└── theme.ts        # Design system configuration (Chakra UI)
+├── api/            # Axios instance and API services
+├── assets/         # Branding and shared media
+├── components/     # Design System:
+│   ├── atoms/      # Primitive components (AppButton, ImageUploadBox)
+│   ├── molecules/  # Functional units (FormSection, TimeRangeInput)
+│   ├── organisms/  # Complex blocks (AuthHeader, Navbars)
+│   └── layout/     # Structural wrappers (WaveLayout, AppContainer)
+├── hooks/          # Custom business logic (e.g., useAuthRedirect)
+├── pages/          # Route views (Registration, Dashboard, Menu)
+├── store/          # Global state slices (Zustand)
+├── App.tsx         # Route definitions and protection logic
+└── theme.ts        # Global Chakra UI theme configurations
+
