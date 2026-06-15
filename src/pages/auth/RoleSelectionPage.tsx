@@ -5,11 +5,11 @@ import { FaGraduationCap } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 
-import { apiClient } from '../api/axiosConfig';
-import { WaveLayout } from '../components/layout/WaveLayout';
-import { RoleCard } from '../components/molecules/RoleCard';
-import { AuthHeader } from '../components/organisms/AuthHeader';
-import CentralEatsLogo from '../assets/CentralEatsLogo.png';
+import { apiClient } from '../../api/axiosConfig';
+import { WaveLayout } from '../../components/layout/WaveLayout';
+import { RoleCard } from '../../components/molecules/RoleCard';
+import { AuthHeader } from '../../components/organisms/AuthHeader';
+import CentralEatsLogo from "../../assets/CentralEatsLogo.png";
 
 
 export default function RoleSelectionPage() {

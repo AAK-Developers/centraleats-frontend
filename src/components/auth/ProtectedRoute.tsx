@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PresentationPage from '../../pages/PresentationPage';
+import PresentationPage from '../../pages/landing/PresentationPage';
 
 import { useUser } from "@clerk/clerk-react";
 import { Navigate, useLocation } from "react-router-dom";
