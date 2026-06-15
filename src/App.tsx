@@ -10,6 +10,7 @@ import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import NotificationsPage from './pages/student/StudentNotificationsPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
+import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
 
 export default function App() {
   return (
@@ -60,6 +61,16 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <VendorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+
+          <Route
+            path="/register-restaurant"
+            element={
+              <ProtectedRoute>
+                <RestaurantRegistrationPage />
               </ProtectedRoute>
             }
           />
