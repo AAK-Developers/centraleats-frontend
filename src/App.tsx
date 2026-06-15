@@ -11,6 +11,7 @@ import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import NotificationsPage from './pages/student/StudentNotificationsPage';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
+import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
 
 export default function App() {
   return (
@@ -74,6 +75,16 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/register-menu"
+            element={
+              <ProtectedRoute>
+                <RegisterMenuPage />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </AuthInitializer>
     </BrowserRouter>
