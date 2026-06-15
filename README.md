@@ -25,8 +25,10 @@ npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion \
 react-hook-form zod axios react-hot-toast react-router-dom \
 @clerk/clerk-react zustand @tanstack/react-query react-icons
 
+```
 
-📐 Architecture (Atomic Design)
+
+##  📐 Architecture (Atomic Design)
 The /src directory implements Atomic Design to maximize code reusability and maintainability:
 
 Plaintext
