@@ -32,8 +32,8 @@ export default function NotificationsPage() {
 
                         {notifications.length > 0 ? (
                             <VStack align="stretch" gap={4}>
-                                {notifications.map((n: any) => (
-                                    <NotificationCard key={n.id} {...n} />
+                                {notifications.map((n: unknown) => (
+                                    <NotificationCard key={(n as { id: string }).id} {...(n as object)} />
                                 ))}
                             </VStack>
                         ) : (

@@ -15,13 +15,13 @@ export default function RegisterMenuPage() {
     const { register, handleSubmit, formState: { isSubmitting } } = useForm();
     const navigate = useNavigate();
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: Record<string, unknown>) => {
         try {
             // Here you will call your final dish creation point
             console.log("Datos del plato:", data);
             toast.success("¡Plato publicado con éxito!");
             navigate("/vendor-dashboard");
-        } catch (error) {
+        } catch {
             toast.error("Error al publicar el plato");
         }
     };

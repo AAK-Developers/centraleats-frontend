@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../api/axiosConfig';
 
 export const useRestaurants = () => {
-    const [restaurants, setRestaurants] = useState<any[]>([]);
+    const [restaurants, setRestaurants] = useState<unknown[]>([]);
 
     useEffect(() => {
         const fetchRestaurants = async () => {

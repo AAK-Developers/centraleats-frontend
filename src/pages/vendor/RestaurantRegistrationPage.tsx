@@ -19,7 +19,7 @@ export default function RestaurantRegistrationPage() {
     const navigate = useNavigate();
     const { user } = useUser();
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: Record<string, unknown>) => {
         try {
             await apiClient.post('/api/restaurants/register', {
                 ...data,

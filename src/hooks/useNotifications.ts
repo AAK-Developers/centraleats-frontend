@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../api/axiosConfig';
 
 export const useNotifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = useCallback(async () => {
         try {
             const response = await apiClient.get('/api/restaurants');
             setNotifications(response.data);
@@ -14,11 +14,11 @@ export const useNotifications = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchNotifications();
-    }, []);
+    }, [fetchNotifications]);
 
     const clearAll = async () => {
         setNotifications([]);

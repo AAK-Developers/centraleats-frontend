@@ -1,9 +1,9 @@
 // src/components/molecules/TimeRangeInput.tsx
 import { HStack, Input, Text } from "@chakra-ui/react";
-import type { UseFormRegister } from "react-hook-form";
+import type { UseFormRegister, FieldValues } from "react-hook-form";
 
 interface TimeRangeInputProps {
-    register: UseFormRegister<any>;
+    register: UseFormRegister<FieldValues>;
 }
 
 export const TimeRangeInput = ({ register }: TimeRangeInputProps) => {

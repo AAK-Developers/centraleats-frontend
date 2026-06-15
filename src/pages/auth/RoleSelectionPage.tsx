@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { FaGraduationCap } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
+import axios from 'axios';
 
 import { apiClient } from '../../api/axiosConfig';
 import { WaveLayout } from '../../components/layout/WaveLayout';
@@ -53,19 +54,22 @@ export default function RoleSelectionPage() {
                     : "/vendor-dashboard"
             );
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("--- Error detallado al asignar rol ---");
-            if (error.response) {
-                // El servidor respondió con un código fuera del rango 2xx
-                console.error("Datos de respuesta del error:", error.response.data);
-                console.error("Status del error:", error.response.status);
-                console.error("Cabeceras de respuesta:", error.response.headers);
-            } else if (error.request) {
-                // La petición se hizo pero no hubo respuesta (ej: CORS o servidor caído)
-                console.error("No hubo respuesta del servidor. Error de red o CORS.");
-                console.log(error.request);
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    // El servidor respondió con un código fuera del rango 2xx
+                    console.error("Datos de respuesta del error:", error.response.data);
+                    console.error("Status del error:", error.response.status);
+                    console.error("Cabeceras de respuesta:", error.response.headers);
+                } else if (error.request) {
+                    // La petición se hizo pero no hubo respuesta (ej: CORS o servidor caído)
+                    console.error("No hubo respuesta del servidor. Error de red o CORS.");
+                    console.log(error.request);
+                }
             } else {
-                console.error("Error al configurar la petición:", error.message);
+                const message = error instanceof Error ? error.message : "Error desconocido";
+                console.error("Error al configurar la petición:", message);
             }
             toast.error("Hubo un error al asignar el rol");
         } finally {
