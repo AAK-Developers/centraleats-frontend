@@ -7,7 +7,7 @@ import { EmptyState } from '../../components/organisms/EmptyState';
 import { AuthHeader } from '../../components/organisms/AuthHeader';
 import { ClearButton } from '../../components/atoms/ClearButton';
 import { BackButton } from '../../components/atoms/BackButton';
-import { useNotifications } from '../../hooks/useNotifications';
+import { useNotifications, Notification } from '../../hooks/useNotifications';
 
 export default function NotificationsPage() {
     const { notifications, clearAll } = useNotifications();
@@ -32,8 +32,8 @@ export default function NotificationsPage() {
 
                         {notifications.length > 0 ? (
                             <VStack align="stretch" gap={4}>
-                                {notifications.map((n: unknown) => (
-                                    <NotificationCard key={(n as { id: string }).id} {...(n as object)} />
+                                {notifications.map((n: Notification) => (
+                                    <NotificationCard key={n.id} {...n} />
                                 ))}
                             </VStack>
                         ) : (

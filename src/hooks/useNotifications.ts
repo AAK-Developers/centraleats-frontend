@@ -1,8 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../api/axiosConfig';
 
+export interface Notification {
+    id: string;
+    title: string;
+    restaurant: string;
+    status: string;
+}
+
 export const useNotifications = () => {
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchNotifications = useCallback(async () => {

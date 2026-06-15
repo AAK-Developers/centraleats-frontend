@@ -8,7 +8,7 @@ import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AuthHeader } from "../../components/organisms/AuthHeader";
 import { FilterBar } from "../../components/molecules/FilterBar";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { useRestaurants } from "../../hooks/useRestaurants";
+import { useRestaurants, Restaurant } from "../../hooks/useRestaurants";
 
 export default function StudentDashboardPage() {
     const { user } = useUser();
@@ -37,7 +37,7 @@ export default function StudentDashboardPage() {
                 />
 
                 <VStack align="stretch" gap={3}>
-                    {restaurants.map((rest, index) => (
+                    {restaurants.map((rest: Restaurant, index) => (
                         <RestaurantCard key={index} {...rest} />
                     ))}
                 </VStack>
