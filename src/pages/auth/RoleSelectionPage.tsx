@@ -51,7 +51,7 @@ export default function RoleSelectionPage() {
             navigate(
                 role === "student"
                     ? "/student-dashboard"
-                    : "/vendor-dashboard"
+                    : "/register-restaurant"
             );
 
         } catch (error: unknown) {
