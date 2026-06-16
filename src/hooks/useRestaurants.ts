@@ -16,9 +16,12 @@ export const useRestaurants = () => {
         const fetchRestaurants = async () => {
             try {
                 const response = await apiClient.get('/api/restaurants');
-                setRestaurants(response.data);
+                // Backend wraps responses in a { data: [...] } structure
+                const responseData = response.data.data || response.data;
+                setRestaurants(Array.isArray(responseData) ? responseData : []);
             } catch (error) {
-                console.error("Error al cargar restaurantes:", error);
+                console.error("Failed to load restaurants:", error);
+                setRestaurants([]);
             }
         };
 

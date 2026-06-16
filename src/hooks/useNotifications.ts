@@ -15,9 +15,12 @@ export const useNotifications = () => {
     const fetchNotifications = useCallback(async () => {
         try {
             const response = await apiClient.get('/api/restaurants');
-            setNotifications(response.data);
+            // Unwrap the data property from the backend DTO
+            const responseData = response.data.data || response.data;
+            setNotifications(Array.isArray(responseData) ? responseData : []);
         } catch (error) {
-            console.error("Error cargando notificaciones:", error);
+            console.error("Failed to load notifications:", error);
+            setNotifications([]);
         } finally {
             setIsLoading(false);
         }

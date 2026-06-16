@@ -12,14 +12,16 @@ export const useAuthMe = () => {
         setError(null);
         try {
             const response = await apiClient.get<UserProfile>('/api/auth/me');
-            setProfile(response.data);
-            return response.data;
+            // Backend returns { success: true, data: UserProfile }
+            const profileData = (response.data as any).data || response.data;
+            setProfile(profileData);
+            return profileData;
         } catch (err: unknown) {
-            let message = 'Error al obtener el perfil';
+            let message = 'Failed to fetch user profile';
             
             if (axios.isAxiosError(err)) {
                 message = err.response?.data?.message || message;
-                // Si el error es 404 o 403 (perfil no encontrado), limpiamos el perfil local
+                
                 if (err.response?.status === 404 || err.response?.status === 403) {
                     setProfile(null);
                 }

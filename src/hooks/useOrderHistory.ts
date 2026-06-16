@@ -20,10 +20,13 @@ export const useOrderHistory = () => {
         setError(null);
         try {
             const response = await apiClient.get('/api/student/order-history');
-            setOrders(response.data);
+            // Handle wrapped backend response
+            const responseData = response.data.data || response.data;
+            setOrders(Array.isArray(responseData) ? responseData : []);
         } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
             setError(errorMessage);
+            setOrders([]);
         } finally {
             setIsLoading(false);
         }
