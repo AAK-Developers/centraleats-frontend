@@ -4,6 +4,11 @@ import { apiClient } from '../api/axiosConfig';
 import { useAuthStore } from '../store/authStore';
 import type { UserProfile } from '../store/authStore';
 
+interface BackendResponse {
+    success: boolean;
+    data: UserProfile;
+}
+
 export const useAuthMe = () => {
     const { setProfile, setIsLoadingProfile, setError, profile, isLoadingProfile, error } = useAuthStore();
 
@@ -11,15 +16,20 @@ export const useAuthMe = () => {
         setIsLoadingProfile(true);
         setError(null);
         try {
-            const response = await apiClient.get<UserProfile>('/api/auth/me');
-            setProfile(response.data);
-            return response.data;
+            const response = await apiClient.get<BackendResponse | UserProfile>('/api/auth/me');
+            
+            // Backend might return the profile directly or wrapped in { data: UserProfile }
+            const responseData = response.data;
+            const profileData = (responseData as BackendResponse).data || (responseData as UserProfile);
+            
+            setProfile(profileData);
+            return profileData;
         } catch (err: unknown) {
-            let message = 'Error al obtener el perfil';
+            let message = 'Failed to fetch user profile';
             
             if (axios.isAxiosError(err)) {
                 message = err.response?.data?.message || message;
-                // Si el error es 404 o 403 (perfil no encontrado), limpiamos el perfil local
+                
                 if (err.response?.status === 404 || err.response?.status === 403) {
                     setProfile(null);
                 }

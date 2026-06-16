@@ -14,15 +14,15 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const location = useLocation();
 
     useEffect(() => {
-        // Solo intentamos sincronizar si no hay un error previo, para evitar bucles infinitos
+        // Only attempt to sync if no previous error occurred to avoid infinite request loops
         if (isClerkLoaded && isSignedIn && !profile && !isLoadingProfile && !error) {
             fetchProfile().catch(() => {
-                console.error("No se pudo sincronizar el perfil con el backend. Verifique la conexión.");
+                console.error("Profile synchronization failed. Please check your connection.");
             });
         }
     }, [isClerkLoaded, isSignedIn, profile, isLoadingProfile, fetchProfile, error]);
 
-    // Limpiar auth si Clerk no está firmado
+    // Clear local auth state if Clerk session is invalid
     useEffect(() => {
         if (isClerkLoaded && !isSignedIn) {
             clearAuth();
@@ -37,21 +37,22 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         return <Navigate to="/login" replace />;
     }
 
-    // Si tenemos el perfil del backend, usamos esa fuente de verdad
-    const role = profile?.role || (clerkUser?.publicMetadata?.role as string | undefined);
+    // Backend uses uppercase roles (STUDENT, VENDOR), normalize for consistency
+    const rawRole = profile?.role || (clerkUser?.publicMetadata?.role as string | undefined);
+    const normalizedRole = rawRole?.toUpperCase();
     const isActive = profile ? profile.isActive : true;
 
-    // Bloquear si la cuenta está desactivada en el backend
+    // Block access if account is deactivated in the backend
     if (profile && !isActive) {
         return (
-            <div style={{ textAlign: 'center', marginTop: '50px' }}>
-                <h2>Cuenta Desactivada</h2>
-                <p>Por favor contacta al administrador.</p>
+            <div style={{ textAlign: 'center', marginTop: '100px', padding: '20px' }}>
+                <h2 style={{ color: '#E65100', fontSize: '2rem' }}>Account Deactivated</h2>
+                <p style={{ color: '#042E63' }}>Please contact the system administrator for assistance.</p>
             </div>
         );
     }
 
-    if (!role && location.pathname !== "/role-selection") {
+    if (!normalizedRole && location.pathname !== "/role-selection") {
         return <Navigate to="/role-selection" replace />;
     }
 
