@@ -27,10 +27,12 @@ FROM nginx:alpine
 # Copy built assets from the build stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom Nginx configuration
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Copy custom Nginx configuration template
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 
 # Expose port 80
 EXPOSE 80
 
+# The official nginx image supports environment variables in templates
+# It will replace ${BACKEND_ADDR} with the actual value at runtime
 CMD ["nginx", "-g", "daemon off;"]

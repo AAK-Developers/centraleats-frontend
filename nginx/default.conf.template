@@ -10,7 +10,7 @@ server {
 
     # Proxy to backend to avoid Mixed Content (HTTPS to HTTP)
     location /api {
-        proxy_pass http://98.81.131.147:3001;
+        proxy_pass ${BACKEND_ADDR};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
