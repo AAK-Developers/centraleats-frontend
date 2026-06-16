@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { apiClient } from '../api/axiosConfig';
-import { useAuthStore, UserProfile } from '../store/authStore';
+import { useAuthStore } from '../store/authStore';
+import type { UserProfile } from '../store/authStore';
 
 export const useAuthMe = () => {
     const { setProfile, setIsLoadingProfile, setError, profile, isLoadingProfile } = useAuthStore();
