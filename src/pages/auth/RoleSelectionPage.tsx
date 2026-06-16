@@ -14,9 +14,13 @@ import CentralEatsLogo from "../../assets/CentralEatsLogo.png";
 import { AppContainer } from '../../components/layout/AppContainer';
 
 
+import { useAuthMe } from '../../hooks/useAuthMe';
+
+
 export default function RoleSelectionPage() {
     const navigate = useNavigate();
     const { user } = useUser();
+    const { fetchProfile } = useAuthMe();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSelection = async (role: 'student' | 'vendor') => {
@@ -37,14 +41,18 @@ export default function RoleSelectionPage() {
             console.log('Enviando POST a /api/users con payload:', payload);
 
             const response = await apiClient.post('/api/users', payload);
-            
+
             console.log('Respuesta exitosa del servidor:', response.data);
-            
-            // Forzar recarga de los datos del usuario en Clerk para obtener los nuevos metadatos
+
+            // 1. Sincronizar con Clerk
             if (user) {
                 console.log('Recargando datos de Clerk...');
                 await user.reload();
             }
+
+            // 2. Sincronizar con el backend de CentralEats
+            console.log('Sincronizando perfil con el backend...');
+            await fetchProfile().catch(() => console.error("Error al sincronizar perfil tras selección"));
 
             toast.success("Rol asignado con éxito");
 
