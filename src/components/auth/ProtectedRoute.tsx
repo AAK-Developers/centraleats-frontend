@@ -9,17 +9,18 @@ import { useAuthStore } from '../../store/authStore';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { isLoaded: isClerkLoaded, isSignedIn, user: clerkUser } = useUser();
-    const { profile, isLoadingProfile, fetchProfile } = useAuthMe();
+    const { profile, isLoadingProfile, fetchProfile, error } = useAuthMe();
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const location = useLocation();
 
     useEffect(() => {
-        if (isClerkLoaded && isSignedIn && !profile && !isLoadingProfile) {
+        // Solo intentamos sincronizar si no hay un error previo, para evitar bucles infinitos
+        if (isClerkLoaded && isSignedIn && !profile && !isLoadingProfile && !error) {
             fetchProfile().catch(() => {
-                console.error("No se pudo sincronizar el perfil con el backend");
+                console.error("No se pudo sincronizar el perfil con el backend. Verifique la conexión.");
             });
         }
-    }, [isClerkLoaded, isSignedIn, profile, isLoadingProfile, fetchProfile]);
+    }, [isClerkLoaded, isSignedIn, profile, isLoadingProfile, fetchProfile, error]);
 
     // Limpiar auth si Clerk no está firmado
     useEffect(() => {
