@@ -6,5 +6,5 @@ services:
     ports:
       - "80:80"
     environment:
-      - BACKEND_ADDR=http://98.81.131.147:3001
+      - BACKEND_ADDR=${BACKEND_ADDR}
     restart: always

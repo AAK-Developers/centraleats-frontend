@@ -57,5 +57,6 @@ jobs:
             # Exportamos las variables necesarias para que docker-compose las reconozca
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             export IMAGE_TAG=qa
+            export BACKEND_ADDR=${{ secrets.BACKEND_ADDR_QA }}
             docker compose pull
             docker compose up -d
