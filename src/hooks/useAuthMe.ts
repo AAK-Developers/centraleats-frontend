@@ -5,7 +5,7 @@ import { useAuthStore } from '../store/authStore';
 import type { UserProfile } from '../store/authStore';
 
 export const useAuthMe = () => {
-    const { setProfile, setIsLoadingProfile, setError, profile, isLoadingProfile } = useAuthStore();
+    const { setProfile, setIsLoadingProfile, setError, profile, isLoadingProfile, error } = useAuthStore();
 
     const fetchProfile = useCallback(async () => {
         setIsLoadingProfile(true);
@@ -37,6 +37,7 @@ export const useAuthMe = () => {
     return {
         profile,
         isLoadingProfile,
+        error,
         fetchProfile,
     };
 };
