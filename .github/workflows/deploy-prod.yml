@@ -56,5 +56,6 @@ jobs:
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             export IMAGE_TAG=latest
+            export BACKEND_ADDR=${{ secrets.BACKEND_ADDR_PROD }}
             docker compose pull
             docker compose up -d

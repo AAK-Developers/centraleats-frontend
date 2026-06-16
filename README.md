@@ -1,50 +1,83 @@
 # 🛒 CentralEats - Frontend 🚀
 
-Welcome to the official frontend repository of **CentralEats**, a digital "Click & Collect" food management platform designed specifically for the community at the Universidad Central del Ecuador (UCE).
+CentralEats is a high-performance "Click & Collect" food management platform specifically designed for the community at the Universidad Central del Ecuador (UCE). Its Mobile-First architecture ensures ultra-fast loading times and a seamless user experience across the campus.
+
+## 👨‍💻 Project Lead
+**Lead Developer & UI/UX Architect:** Kevin Moyon
+
+## 🛠️ Tech Stack
+The project utilizes a modern, strongly-typed, and reactive stack designed to handle the high concurrency of university life:
+
+* **Runtime & Framework:** React 19, TypeScript, Vite.
+* **Design System:** Chakra UI.
+* **Auth Layer:** Clerk (Institutional and social authentication).
+* **Networking:** Axios (with Nginx Reverse Proxy in QA/Prod).
+
+## 🚀 Guía de Instalación y Desarrollo Local
+
+Para que los miembros del equipo puedan correr el proyecto en sus máquinas:
+
+### 1. Requisitos Previos
+*   **Node.js:** Versión 22 o superior.
+*   **Gestor de paquetes:** npm.
+
+### 2. Configuración del Entorno (`.env`)
+Crea un archivo `.env` en la raíz del proyecto basado en `.env.example`:
+
+```env
+VITE_CLERK_PUBLISHABLE_KEY=tu_clave_de_clerk
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+### 3. Instalación
+```bash
+npm install
+```
+
+### 4. Ejecución
+```bash
+npm run dev
+```
 
 ---
 
-## 👨‍💻 Project Lead & Responsibility
+## 🌐 Despliegue y Conectividad (QA / Prod)
 
-- **Front-End Developer & UI-UX Lead:** Kevin Moyon
+Este proyecto utiliza un **Proxy Inverso con Nginx** para evitar problemas de CORS y Mixed Content (HTTP/HTTPS) en entornos de red reales.
 
-The project is built with a strict **Mobile-First** approach, ensuring an ultra-fast, highly accessible, and seamless user experience for students and vendors navigating the application on campus.
+### Configuración en GitHub Secrets
+Para que los flujos de Actions funcionen correctamente, asegúrate de tener estas variables configuradas en GitHub:
+
+*   **`VITE_API_URL_QA`**: `https://centraleatsqa.programacionwebuce.net` (URL del frontend, el proxy redirige al backend).
+*   **`VITE_API_URL_PROD`**: URL final de producción.
+*   **`BACKEND_ADDR_QA`**: `http://98.81.131.147:3001` (La IP real del backend de QA, se inyecta de forma segura).
+*   **`BACKEND_ADDR_PROD`**: La IP real del backend de producción.
+*   **`VITE_CLERK_PUBLISHABLE_KEY`**: Tu clave de Clerk.
+
+### Configuración del Servidor (Docker Compose)
+En el servidor de QA/Prod, el archivo `docker-compose.yml` maneja la IP del backend mediante una variable de entorno inyectada por GitHub Actions, manteniendo la IP fuera del repositorio público:
+
+```yaml
+services:
+  app:
+    environment:
+      - BACKEND_ADDR=${BACKEND_ADDR}
+```
 
 ---
 
-## 🛠️ Core Technology Stack
-
-To meet the highest standards of performance, strict typing, and modern user experience, the frontend leverages:
-
-- **Core Library:** [React 19](https://react.dev/) (Utilizing native *Actions* and asynchronous hooks to minimize UI latency and handle optimistic updates)
-- **Build Toolchain:** [Vite](https://vite.dev/) + [TypeScript](https://www.typescriptlang.org/) (Ensuring near-instantaneous Hot Module Replacement during development and a bulletproof type-safe environment)
-- **Rendering:** Single-page application (React Router)
-- **Design System:** [Chakra UI](https://v2.chakra-ui.com/) (Providing accessible, WAI-ARIA compliant components styled to reflect our exact corporate brand identity, including our signature institutional blue `#004aad`)
-- **State Management:** 
-  - [Zustand](https://zustand-demo.pmnd.rs/) (For lightweight, boilerplate-free global UI and shopping cart state)
-  - [TanStack Query v5](https://tanstack.com/query/latest) (For automated server-state synchronization, caching, and background revalidations)
-- **Form Handling & Validation:** [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) (For high-performance, schema-driven form validations that avoid unnecessary re-renders)
-- **Authentication:** [Clerk Auth](https://clerk.com/) (Enabling fast, seamless social and institutional login for both students and vendors)
-
----
-
-## 📐 Project Architecture
-
-The codebase inside the `/src` directory strictly implements the principles of **Atomic Design**, ensuring high component reusability and a strict separation of concerns:
+## 📐 Arquitectura (Atomic Design)
+El directorio `/src` implementa Atomic Design para maximizar la reutilización y el mantenimiento:
 
 ```text
 src/
-├── api/            # Axios client configuration and security interceptors
-├── assets/         # Static assets (images, fonts, etc.)
-├── components/     # Components organized by Atomic Design:
-│   ├── atoms/      # Basic components (buttons, inputs, etc.)
-│   ├── auth/       # Authentication-specific logic and UI
-│   ├── layout/     # Structural components (headers, footers, wrappers)
-│   ├── molecules/  # Simple combinations of atoms
-│   └── organisms/  # Complex and functional components
-├── hooks/          # Custom React hooks
-├── pages/          # Application views (mapped to routes)
-├── store/          # Global state management (Zustand)
-├── App.tsx         # Application entry point and routes
-├── main.tsx        # React rendering and provider configuration
-└── theme.ts        # Design system configuration (Chakra UI)
+├── api/            # Instancia de Axios y configuración de interceptores
+├── components/     # Átomos, Moléculas, Organismos y Layouts
+├── hooks/          # Lógica de negocio y llamadas a la API (refactorizadas a Axios)
+├── pages/          # Vistas principales (Auth, Dashboard, Registro)
+└── App.tsx         # Definición de rutas y lógica de protección (ProtectedRoute)
+```
+
+## ✅ Estándares de Código y CI
+*   **Linting:** Se utiliza ESLint para asegurar la calidad del código. Ejecuta `npm run lint` antes de subir cambios.
+*   **Build:** El proyecto se compila con `tsc -b && vite build`. Es obligatorio pasar el build para que el CI valide la rama `dev`.

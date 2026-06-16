@@ -5,4 +5,6 @@ services:
     container_name: centraleats-frontend
     ports:
       - "80:80"
+    environment:
+      - BACKEND_ADDR=${BACKEND_ADDR}
     restart: always
