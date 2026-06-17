@@ -7,11 +7,12 @@ export default function LoginPage() {
     return (
         <WaveLayout>
             <AppContainer>
-                <AuthHeader logoSize="250px" >
+                <AuthHeader logoSize="350px" >
                     <SignIn forceRedirectUrl="/role-selection"
                         appearance={{
                             variables: {
-                                colorPrimary: '#E65100'
+                                colorPrimary: '#E65100',
+                                fontSize: '14px'
                             }
                         }} />
                 </AuthHeader>

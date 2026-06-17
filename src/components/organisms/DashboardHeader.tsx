@@ -1,47 +1,88 @@
-import { Flex, Heading, HStack, Icon, Box, IconButton } from "@chakra-ui/react";
-import { FaBell, FaUser, FaShoppingCart } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { Flex, HStack, Text, Button, IconButton, Image } from "@chakra-ui/react";
+import { FaBell, FaShoppingCart, FaUser } from "react-icons/fa";
+import CentralEats from "../../assets/CentralEats.png";
 
-type Props = {
+import { NotificationPanel } from '../organisms/NotificationPanel';
+import { ProfilePanel } from '../organisms/ProfilePanel';
+import { useNotifications } from '../../hooks/useNotifications';
+
+type DashboardHeaderProps = {
     userName: string;
+    onCartClick?: () => void;
 };
 
-export const DashboardHeader = ({ userName }: Props) => {
-    const navigate = useNavigate();
+export const DashboardHeader = ({
+    userName,
+    onCartClick,
+}: DashboardHeaderProps) => {
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+    const { notifications, clearAll } = useNotifications();
 
     return (
-        <Flex justify="space-between" align="center" mb={6}>
-            <Box>
-                <Heading size="md" color="#042E63">
-                    Hola, {userName}
-                </Heading>
-            </Box>
+        <>
+            <Flex justify="space-between" align="center" mb={8} mt={4}>
+                <Image
+                    src={CentralEats}
+                    alt="Logo"
+                    w="250px"
+                />
 
-            <HStack gap={1}>
-                <IconButton
-                    aria-label="Notificaciones"
-                    color="#FFA83F"
-                    variant="ghost"
-                    size="md"
-                    onClick={() => navigate('/student/notifications')}
-                >
-                    <FaBell />
-                </IconButton>
+                <HStack gap={4}>
+                    <IconButton
+                        aria-label="Notificaciones"
+                        borderRadius="full"
+                        size="2xl"
+                        bg="#30B2BC"
+                        color="white"
+                        _hover={{ bg: "#2899a1" }}
+                        onClick={() => setIsNotificationOpen(true)}
+                    >
+                        <FaBell size="24px" />
+                    </IconButton>
 
+                    <IconButton
+                        aria-label="Carrito"
+                        borderRadius="full"
+                        size="2xl"
+                        bg="#30B2BC"
+                        color="white"
+                        _hover={{ bg: "#2899a1" }}
+                        onClick={onCartClick}
+                    >
+                        <FaShoppingCart size="24px" />
+                    </IconButton>
 
-                <IconButton
-                    aria-label="Perfil"
-                    variant="ghost"
-                    onClick={() => navigate('/student/profile')}
-                >
-                    <Icon as={FaUser} boxSize={5} color="#042E63" />
-                </IconButton>
+                    <Button
+                        borderRadius="full"
+                        colorPalette="orange"
+                        px={6}
+                        size="2xl"
+                        onClick={() => setIsProfileOpen(true)}
+                    >
+                        <HStack gap={3}>
+                            <FaUser size="20px" />
+                            <Text fontSize="lg" fontWeight="semibold">
+                                Hola, {userName}
+                            </Text>
+                        </HStack>
+                    </Button>
+                </HStack>
+            </Flex>
 
+            <NotificationPanel
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                notifications={notifications}
+                onClearAll={clearAll}
+            />
 
-
-
-                <Icon as={FaShoppingCart} boxSize={5} color="#E65100" />
-            </HStack>
-        </Flex>
+            <ProfilePanel
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+            />
+        </>
     );
 };
