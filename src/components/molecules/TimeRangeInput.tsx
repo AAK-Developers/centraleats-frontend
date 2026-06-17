@@ -1,4 +1,3 @@
-// src/components/molecules/TimeRangeInput.tsx
 import { HStack, Input, Text } from "@chakra-ui/react";
 import type { UseFormRegister, FieldValues } from "react-hook-form";
 
@@ -12,15 +11,17 @@ export const TimeRangeInput = ({ register }: TimeRangeInputProps) => {
             <Input
                 {...register("openTime", { required: true })}
                 type="time"
-                size="md"
+                fontSize="xl"
+                size="lg"
             />
-            <Text fontWeight="bold" color="gray.500">
+            <Text fontWeight="bold" color="gray.500" fontSize="xl">
                 -
             </Text>
             <Input
                 {...register("closeTime", { required: true })}
                 type="time"
-                size="md"
+                fontSize="xl"
+                size="lg"
             />
         </HStack>
     );

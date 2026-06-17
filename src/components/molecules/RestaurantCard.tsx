@@ -19,17 +19,19 @@ export const RestaurantCard = ({
     return (
         <Box
             borderWidth="1px"
+            minH="150px"
             borderColor="gray.200"
             borderRadius="2xl"
-            p={3}
-            boxShadow="sm"
+            p={6}
+            boxShadow="lg"
             bg="white"
+            maxW="100%"
             mb={2}
             w="full"
         >
             <HStack gap={4} align="center">
                 <Image
-                    boxSize="70px"
+                    boxSize="100px"
                     borderRadius="xl"
                     src={image}
                     alt={name}
@@ -39,14 +41,14 @@ export const RestaurantCard = ({
                 <VStack align="center" gap={1} flex={1} w="full">
                     <Text
                         fontWeight="bold"
-                        fontSize="md"
+                        fontSize="xl"
                         color="#042E63"
                         lineHeight="short"
                     >
                         {name}
                     </Text>
 
-                    <Text fontSize="sm" color="gray.500" lineHeight="short">
+                    <Text fontSize="md" color="gray.500" lineHeight="short">
                         • {category}
                     </Text>
 

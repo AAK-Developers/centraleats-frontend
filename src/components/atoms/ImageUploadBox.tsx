@@ -31,7 +31,7 @@ export const ImageUploadBox = ({ label, onFileSelect }: ImageUploadBoxProps) => 
             _hover={{ bg: "gray.50" }}
             transition="background 0.2s"
         >
-            <Text fontSize="sm" color="gray.500">{label}</Text>
+            <Text fontSize="xl" color="gray.500">{label}</Text>
             <input
                 type="file"
                 ref={fileInputRef}

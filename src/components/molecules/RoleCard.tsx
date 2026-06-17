@@ -1,45 +1,38 @@
-import { VStack, Text, Box } from '@chakra-ui/react';
+import { VStack, Box, Flex } from '@chakra-ui/react';
 import { ActionButton } from '../atoms/ActionButton';
-import type { IconType } from 'react-icons';
+import { SubtitleTag } from '../atoms/SubtitleTag';
+import { CardText } from '../atoms/CardText';
 
 interface RoleCardProps {
-    icon: IconType;
-    iconBg: string;
-    iconColor: string;
+    bgImage: string;
+    subtitle: string;
     title: string;
     description: string;
     onClick: () => void;
     isLoading: boolean;
 }
 
-export const RoleCard = ({
-    icon: Icon,
-    iconBg,
-    iconColor,
-    title,
-    description,
-    onClick,
-    isLoading
-}: RoleCardProps) => {
+export const RoleCard = ({ bgImage, subtitle, title, description, onClick, isLoading }: RoleCardProps) => {
     return (
-        <Box w="full" p="6" borderWidth="1px" borderRadius="xl" shadow="md">
-            <VStack gap="4">
-                <Box p="4" bg={iconBg} borderRadius="full">
-                    <Icon size="30px" color={iconColor} />
+        <Box
+            w="full" h="400px" borderRadius="2xl" overflow="hidden" position="relative"
+            bgImage={`url(${bgImage})`} bgSize="cover" backgroundPosition="center"
+        >
+            <Box position="absolute" inset="0" bg="blackAlpha.600" />
+
+            <Flex position="relative" zIndex={1} h="full" direction="column" justify="space-between" p="8">
+
+                <Box alignSelf="flex-start" mt={-8}>
+                    <SubtitleTag>{subtitle}</SubtitleTag>
                 </Box>
 
-                <Text fontWeight="bold">{title}</Text>
+                <VStack align="flex-start" gap={2}>
+                    <CardText variant="description">{description}</CardText>
+                    <CardText variant="title">{title}</CardText>
 
-                <Text fontSize="sm" color="gray.500" textAlign="center">
-                    {description}
-                </Text>
-
-                <ActionButton
-                    label="Continuar"
-                    onClick={onClick}
-                    isLoading={isLoading}
-                />
-            </VStack>
+                    <ActionButton label="Iniciar" onClick={onClick} isLoading={isLoading} />
+                </VStack>
+            </Flex>
         </Box>
     );
 };
