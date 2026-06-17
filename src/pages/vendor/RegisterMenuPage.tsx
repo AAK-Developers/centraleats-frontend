@@ -1,4 +1,4 @@
-import { VStack, Input, Textarea, Text } from "@chakra-ui/react";
+import { VStack, Input, Textarea, Text, Box, SimpleGrid, Flex } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { WaveLayout } from '../../components/layout/WaveLayout';
 import { AppContainer } from '../../components/layout/AppContainer';
 import { AuthHeader } from '../../components/organisms/AuthHeader';
-import { FormSection } from "../../components/molecules/FormSection";
 import { ImageUploadBox } from "../../components/atoms/ImageUploadBox";
 import { AppButton } from "../../components/atoms/AppButton";
 import CentralEats from "../../assets/CentralEats.png";
+import { FormCard } from "../../components/molecules/FormCard";
 
 export default function RegisterMenuPage() {
     const { register, handleSubmit, formState: { isSubmitting } } = useForm();
@@ -17,7 +17,6 @@ export default function RegisterMenuPage() {
 
     const onSubmit = async (data: Record<string, unknown>) => {
         try {
-            // Here you will call your final dish creation point
             console.log("Datos del plato:", data);
             toast.success("¡Plato publicado con éxito!");
             navigate("/vendor-dashboard");
@@ -29,31 +28,43 @@ export default function RegisterMenuPage() {
     return (
         <WaveLayout>
             <AppContainer>
-                <AuthHeader logoImage={CentralEats} logoSize="200px" />
+                <AuthHeader logoImage={CentralEats} logoSize="300px" />
 
                 <VStack gap={2} mb={6} textAlign="center">
-                    <Text color="#042E63" fontSize="md">Personaliza el menú que más a promocionar</Text>
+                    <Text color="#042E63" fontSize="lg">Personaliza el menú que vas a promocionar</Text>
                 </VStack>
 
-                <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
-                    <VStack gap={6} w="full" px={4} pb={8}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <FormCard>
+                        <SimpleGrid columns={{ base: 1, md: 2 }} gap={8}>
+                            <Box>
+                                <Text fontWeight="bold" color="#042E63" fontSize="xl" mb={4}>
+                                    Paso 1: Foto y Nombre
+                                </Text>
+                                <ImageUploadBox label="Sube una foto atractiva del plato" onFileSelect={(f) => console.log(f)} />
+                                <Input {...register("name")} placeholder="Nombre del Plato (ej. Hamburguesa Especial)" mt={4} fontSize="xl" />
+                            </Box>
 
-                        <FormSection title="Paso 1: Foto y Nombre (Obligatorio)">
-                            <ImageUploadBox label="Foto atractiva del Plato" onFileSelect={(f) => console.log(f)} />
-                            <Input {...register("name")} placeholder="Nombre del Plato (ej. Hamburguesa Tuka)" mt={3} />
-                        </FormSection>
+                            <Box>
+                                <Text fontWeight="bold" color="#042E63" fontSize="xl" mb={4}>
+                                    Paso 2: Detalles y Precio
+                                </Text>
+                                <VStack gap={4}>
+                                    <Textarea {...register("description")} placeholder="Descripción e Ingredientes" minH="120px" fontSize="xl" />
+                                    <Input {...register("price")} placeholder="Precio" type="number" fontSize="lg" />
+                                    <Input {...register("category")} placeholder="Categoría (Opcional)" fontSize="lg" />
+                                </VStack>
+                            </Box>
+                        </SimpleGrid>
 
-                        <FormSection title="Paso 2: Detalles y Precio">
-                            <Textarea {...register("description")} placeholder="Descripción e Ingredientes" mb={3} />
-                            <Input {...register("price")} placeholder="Precio" type="number" mb={3} />
-                            <Input {...register("category")} placeholder="Categoría (Opcional)" />
-                        </FormSection>
-
-                        <AppButton
-                            text="Publicar Plato"
-                            isLoading={isSubmitting}
-                        />
-                    </VStack>
+                        <Flex justify="center" mt={8}>
+                            <AppButton
+                                text="Publicar Plato"
+                                isLoading={isSubmitting}
+                                fontSize="2xl"
+                            />
+                        </Flex>
+                    </FormCard>
                 </form>
             </AppContainer>
         </WaveLayout>

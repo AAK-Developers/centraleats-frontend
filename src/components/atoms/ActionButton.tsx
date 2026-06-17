@@ -1,5 +1,4 @@
-import { Button, type ButtonProps, Box } from '@chakra-ui/react';
-import { FaArrowRight } from 'react-icons/fa';
+import { Button, type ButtonProps } from "@chakra-ui/react";
 
 interface ActionButtonProps extends ButtonProps {
     label: string;
@@ -9,22 +8,16 @@ interface ActionButtonProps extends ButtonProps {
 export const ActionButton = ({ label, isLoading, ...props }: ActionButtonProps) => {
     return (
         <Button
-            variant="outline"
-            borderColor="#042E63"
-            color="#042E63"
-            borderRadius="full"
-            px="6"
-            py="5"
-            display="flex"
-            alignItems="center"
-            gap="3"
-            _hover={{ bg: "#042E63", color: "white" }}
+            bg="#30B2BC"
+            color="white"
             loading={isLoading}
-            loadingText="Procesando..."
-            {...props}
+            fontSize="lg"
+            borderRadius="full"
+            px={10}
+            _hover={{ bg: "#1a958e" }}
+            {...props} 
         >
             {label}
-            <Box as={FaArrowRight} boxSize="25px" />
         </Button>
     );
 };

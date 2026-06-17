@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { VStack, Text } from '@chakra-ui/react';
 import toast from "react-hot-toast";
-import { FaGraduationCap } from 'react-icons/fa';
+import { SimpleGrid } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
@@ -44,13 +44,11 @@ export default function RoleSelectionPage() {
 
             console.log('Respuesta exitosa del servidor:', response.data);
 
-            // 1. Sincronizar con Clerk
             if (user) {
                 console.log('Recargando datos de Clerk...');
                 await user.reload();
             }
 
-            // 2. Sincronizar con el backend de CentralEats
             console.log('Sincronizando perfil con el backend...');
             await fetchProfile().catch(() => console.error("Error al sincronizar perfil tras selección"));
 
@@ -66,12 +64,10 @@ export default function RoleSelectionPage() {
             console.error("--- Error detallado al asignar rol ---");
             if (axios.isAxiosError(error)) {
                 if (error.response) {
-                    // El servidor respondió con un código fuera del rango 2xx
                     console.error("Datos de respuesta del error:", error.response.data);
                     console.error("Status del error:", error.response.status);
                     console.error("Cabeceras de respuesta:", error.response.headers);
                 } else if (error.request) {
-                    // La petición se hizo pero no hubo respuesta (ej: CORS o servidor caído)
                     console.error("No hubo respuesta del servidor. Error de red o CORS.");
                     console.log(error.request);
                 }
@@ -89,9 +85,9 @@ export default function RoleSelectionPage() {
     return (
         <WaveLayout>
             <AppContainer>
-                <AuthHeader logoImage={CentralEatsLogo} logoSize="250px">
-                    <VStack gap="2" mb="4">
-                        <Text fontSize="4xl" fontWeight="bold" textAlign="center">
+                <AuthHeader logoImage={CentralEatsLogo} logoSize="300px">
+                    <VStack gap={4} mt={-12}>
+                        <Text fontSize="6xl" fontWeight="bold" textAlign="center">
                             <Text as="span" color="#042E63">¡Bienvenido a Central</Text>
                             <Text as="span" color="#E65100">Eats!</Text>
                         </Text>
@@ -99,24 +95,24 @@ export default function RoleSelectionPage() {
                             Por favor, selecciona tu entorno de interacción:
                         </Text>
                     </VStack>
-                    <RoleCard
-                        icon={FaGraduationCap}
-                        iconBg="#b0f3f8"
-                        iconColor="#30B2BC"
-                        title="Entorno Estudiante"
-                        description="Busca locales, revisa menús y realiza tus pedidos."
-                        onClick={() => handleSelection('student')}
-                        isLoading={isSubmitting}
-                    />
-                    <RoleCard
-                        icon={FaGraduationCap}
-                        iconBg="#fad4a7"
-                        iconColor="#FFA83F"
-                        title="Panel de Vendedor"
-                        description="Gestiona tus platos en tiempo real, recibe pedidos y despacha comida."
-                        onClick={() => handleSelection('vendor')}
-                        isLoading={isSubmitting}
-                    />
+                    <SimpleGrid columns={{ base: 1, md: 2 }} gap={8} w="full" px={{ base: 4, md: 0 }}>
+                        <RoleCard
+                            bgImage="src/assets/Student.png"
+                            subtitle="Diviértete y Disfruta"
+                            title="Pide con Nosotros"
+                            description="Regístrate como estudiante"
+                            onClick={() => handleSelection('student')}
+                            isLoading={isSubmitting}
+                        />
+                        <RoleCard
+                            bgImage="src/assets/Vendor.jpg"
+                            subtitle="Emprende y Gana"
+                            title="Trabaja con Nosotros"
+                            description="Regístrate como restaurante"
+                            onClick={() => handleSelection('vendor')}
+                            isLoading={isSubmitting}
+                        />
+                    </SimpleGrid>
                 </AuthHeader>
             </AppContainer>
         </WaveLayout>

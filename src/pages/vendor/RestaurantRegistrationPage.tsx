@@ -1,4 +1,4 @@
-import { VStack, Text, Input } from "@chakra-ui/react";
+import { VStack, Text, Input, Box, SimpleGrid, Flex } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -9,10 +9,10 @@ import { WaveLayout } from '../../components/layout/WaveLayout';
 import { AppContainer } from '../../components/layout/AppContainer';
 import { AuthHeader } from '../../components/organisms/AuthHeader';
 import CentralEats from "../../assets/CentralEats.png";
-import { FormSection } from "../../components/molecules/FormSection";
 import { ImageUploadBox } from "../../components/atoms/ImageUploadBox";
 import { TimeRangeInput } from "../../components/molecules/TimeRangeInput";
 import { AppButton } from "../../components/atoms/AppButton";
+import { FormCard } from "../../components/molecules/FormCard";
 
 export default function RestaurantRegistrationPage() {
     const { register, handleSubmit, formState: { isSubmitting } } = useForm();
@@ -27,7 +27,7 @@ export default function RestaurantRegistrationPage() {
             });
 
             toast.success("¡Restaurante registrado con éxito!");
-            navigate("/vendor-dashboard");
+            navigate("/register-menu");
         } catch (error) {
             console.error("Error al registrar:", error);
             toast.error("Hubo un error al registrar el restaurante");
@@ -37,47 +37,101 @@ export default function RestaurantRegistrationPage() {
     return (
         <WaveLayout>
             <AppContainer>
-                <AuthHeader logoImage={CentralEats} logoSize="200px" />
+                <AuthHeader logoImage={CentralEats} logoSize="300px" />
 
                 <VStack gap={2} mb={6} textAlign="center">
-                    <Text color="#042E63" fontSize="md">
+                    <Text color="#042E63" fontSize="lg">
                         Crea tu perfil para continuar con la experiencia
                     </Text>
                 </VStack>
 
-                <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
-                    <VStack gap={6} w="full" px={4} pb={8}>
-                        <FormSection title="Paso 1: Información Básica">
-                            <Input {...register("name", { required: true })} placeholder="Nombre del Restaurante" mb={3} />
-                            <Input {...register("cuisineType", { required: true })} placeholder="Tipo de cocina (ej. Almuerzos, Pizza)" mb={3} />
-                            <Input {...register("address", { required: true })} placeholder="Dirección Completa" mb={3} />
-                            <Input {...register("phone", { required: true })} placeholder="Teléfono de contacto" />
-                        </FormSection>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <FormCard>
+                        <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+                            <Box>
+                                <Text
+                                    fontWeight="bold"
+                                    color="#042E63"
+                                    fontSize="xl"
+                                    mb={3}
+                                >
+                                    Paso 1: Información Básica
+                                </Text>
 
-                        <FormSection title="Paso 2: Carga de Logo">
-                            <ImageUploadBox
-                                label="Sube la foto principal de tu Restaurante"
-                                onFileSelect={(file) => {
-                                    console.log("Archivo seleccionado:", file);
-                                }}
+                                <VStack gap={3} w="full">
+                                    <Input
+                                        {...register("name", { required: true })}
+                                        placeholder="Nombre del Restaurante"
+                                        fontSize="xl"
+                                    />
+
+                                    <Input
+                                        {...register("cuisineType", { required: true })}
+                                        placeholder="Tipo de cocina (ej. Almuerzos, Pizza)"
+                                        fontSize="xl"
+                                    />
+
+                                    <Input
+                                        {...register("address", { required: true })}
+                                        placeholder="Dirección Completa"
+                                        fontSize="xl"
+                                    />
+
+                                    <Input
+                                        {...register("phone", { required: true })}
+                                        placeholder="Teléfono de contacto"
+                                        fontSize="xl"
+                                    />
+                                </VStack>
+                            </Box>
+
+                            <VStack align="stretch" gap={6}>
+                                <Box>
+                                    <Text
+                                        fontWeight="bold"
+                                        color="#042E63"
+                                        fontSize="xl"
+                                        mb={3}
+                                    >
+                                        Paso 2: Imagen
+                                    </Text>
+
+                                    <ImageUploadBox
+                                        label="Sube la foto principal del plato"
+                                        onFileSelect={(f) => console.log(f)}
+                                    />
+                                </Box>
+                                <Box>
+                                    <Text
+                                        fontWeight="bold"
+                                        color="#042E63"
+                                        fontSize="xl"
+                                        mb={3}
+                                    >
+                                        Paso 3: Horarios
+                                    </Text>
+
+                                    <TimeRangeInput register={register} />
+
+                                    <Input
+                                        {...register("deliveryTime", { required: true })}
+                                        placeholder="Tiempo estimado (minutos)"
+                                        fontSize="xl"
+                                        mt={3}
+                                        type="number"
+                                    />
+                                </Box>
+                            </VStack>
+                        </SimpleGrid>
+
+                        <Flex justify="center" mt={8}>
+                            <AppButton
+                                text="Registrar Restaurante"
+                                fontSize="2xl"
+                                isLoading={isSubmitting}
                             />
-                        </FormSection>
-
-                        <FormSection title="Paso 3: Horarios">
-                            <TimeRangeInput register={register} />
-                            <Input
-                                {...register("deliveryTime", { required: true })}
-                                placeholder="Tiempo estimado (minutos)"
-                                mt={3}
-                                type="number"
-                            />
-                        </FormSection>
-
-                        <AppButton
-                            text="Registrar Restaurante"
-                            isLoading={isSubmitting}
-                        />
-                    </VStack>
+                        </Flex>
+                    </FormCard>
                 </form>
             </AppContainer>
         </WaveLayout>

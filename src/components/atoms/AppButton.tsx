@@ -12,10 +12,10 @@ export const AppButton = ({
     ...props
 }: AppButtonProps) => (
     <Button
-        w="full"
+        w="550px"
         bg="#E65100"
         color="white"
-        size="lg"
+        size="2xl"
         borderRadius="full"
         type="submit"
         loading={isLoading}
