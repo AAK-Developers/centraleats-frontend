@@ -33,14 +33,12 @@ export const NotificationPanel = ({
                 zIndex={998}
                 onClick={onClose}
             />
-
             <Box
                 position="fixed"
-                top="90px"
-                right="24px"
-                maxW="90vw"
-                w={{ base: "100vw", md: "400px" }}
-                h={{ base: "100vh", md: "650px" }}
+                top={{ base: "60px", md: "60px" }}
+                bottom={{ base: "20px", md: "60px" }}
+                right={{ base: "4px", md: "24px" }}
+                w={{ base: "calc(100% - 8px)", md: "400px" }}
                 bg="white"
                 borderRadius="3xl"
                 boxShadow="2xl"
