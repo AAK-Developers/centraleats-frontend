@@ -15,8 +15,8 @@ interface RoleCardProps {
 export const RoleCard = ({ bgImage, subtitle, title, description, onClick, isLoading }: RoleCardProps) => {
     return (
         <Box
-            w="full" h="400px" borderRadius="2xl" overflow="hidden" position="relative"
-            bgImage={`url(${bgImage})`} bgSize="cover" backgroundPosition="center"
+            w="full" maxW={{ base: "100%", md: "500px" }} h="400px" borderRadius="2xl" overflow="hidden" position="relative"
+            bgImage={`url(${bgImage})`} bgSize="cover" backgroundPosition="center" mx="auto"
         >
             <Box position="absolute" inset="0" bg="blackAlpha.600" />
 

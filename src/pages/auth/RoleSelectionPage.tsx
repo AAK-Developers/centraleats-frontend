@@ -12,6 +12,8 @@ import { RoleCard } from '../../components/molecules/RoleCard';
 import { AuthHeader } from '../../components/organisms/AuthHeader';
 import CentralEatsLogo from "../../assets/CentralEatsLogo.png";
 import { AppContainer } from '../../components/layout/AppContainer';
+import studentImg from '../../assets/Student.png';
+import vendorImg from '../../assets/Vendor.jpg';
 
 
 import { useAuthMe } from '../../hooks/useAuthMe';
@@ -97,7 +99,7 @@ export default function RoleSelectionPage() {
                     </VStack>
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={8} w="full" px={{ base: 4, md: 0 }}>
                         <RoleCard
-                            bgImage="src/assets/Student.png"
+                            bgImage={studentImg}
                             subtitle="Diviértete y Disfruta"
                             title="Pide con Nosotros"
                             description="Regístrate como estudiante"
@@ -105,7 +107,7 @@ export default function RoleSelectionPage() {
                             isLoading={isSubmitting}
                         />
                         <RoleCard
-                            bgImage="src/assets/Vendor.jpg"
+                            bgImage={vendorImg}
                             subtitle="Emprende y Gana"
                             title="Trabaja con Nosotros"
                             description="Regístrate como restaurante"
