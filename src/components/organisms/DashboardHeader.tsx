@@ -23,18 +23,18 @@ export const DashboardHeader = ({
 
     return (
         <>
-            <Flex justify="space-between" align="center" mb={8} mt={4}>
+            <Flex justify="space-between" align="center" mb={8} mt={4} wrap="wrap" gap={4} px={4}>
                 <Image
                     src={CentralEats}
                     alt="Logo"
-                    w="250px"
+                    w={{ base: "150px", md: "250px" }}
                 />
 
                 <HStack gap={4}>
                     <IconButton
                         aria-label="Notificaciones"
                         borderRadius="full"
-                        size="2xl"
+                        size={{ base: "lg", md: "2xl" }}
                         bg="#30B2BC"
                         color="white"
                         _hover={{ bg: "#2899a1" }}
@@ -46,7 +46,7 @@ export const DashboardHeader = ({
                     <IconButton
                         aria-label="Carrito"
                         borderRadius="full"
-                        size="2xl"
+                        size={{ base: "lg", md: "2xl" }}
                         bg="#30B2BC"
                         color="white"
                         _hover={{ bg: "#2899a1" }}
@@ -58,13 +58,13 @@ export const DashboardHeader = ({
                     <Button
                         borderRadius="full"
                         colorPalette="orange"
-                        px={6}
-                        size="2xl"
+                        px={{ base: 4, md: 6 }}
+                        size={{ base: "lg", md: "2xl" }}
                         onClick={() => setIsProfileOpen(true)}
                     >
                         <HStack gap={3}>
                             <FaUser size="20px" />
-                            <Text fontSize="lg" fontWeight="semibold">
+                            <Text fontSize={{ base: "xs", md: "lg" }} fontWeight="semibold">
                                 Hola, {userName}
                             </Text>
                         </HStack>
