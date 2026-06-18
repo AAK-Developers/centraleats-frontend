@@ -23,14 +23,14 @@ export const DashboardHeader = ({
 
     return (
         <>
-            <Flex justify="space-between" align="center" mb={8} mt={4} wrap="wrap" gap={4} px={4}>
+            <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" mb={8} mt={4} wrap="wrap" gap={4} px={4}>
                 <Image
                     src={CentralEats}
                     alt="Logo"
-                    w={{ base: "150px", md: "250px" }}
+                    w={{ base: "200px", md: "250px" }}
                 />
 
-                <HStack gap={4}>
+                <HStack justify="center" wrap="wrap" gap={4}>
                     <IconButton
                         aria-label="Notificaciones"
                         borderRadius="full"
