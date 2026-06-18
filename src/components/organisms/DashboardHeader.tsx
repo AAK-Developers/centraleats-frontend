@@ -23,11 +23,11 @@ export const DashboardHeader = ({
 
     return (
         <>
-            <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" mb={8} mt={4} wrap="wrap" gap={4} px={4}>
+            <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" mb={8} mt={-50} wrap="wrap" gap={4} px={4}>
                 <Image
                     src={CentralEats}
                     alt="Logo"
-                    w={{ base: "200px", md: "250px" }}
+                    w={{ base: "225px", md: "250px" }}
                 />
 
                 <HStack justify="center" wrap="wrap" gap={4}>
