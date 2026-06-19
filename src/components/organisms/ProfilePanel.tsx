@@ -31,7 +31,7 @@ export const ProfilePanel = ({ isOpen, onClose }: ProfilePanelProps) => {
             <Box
                 position="fixed"
                 top={{ base: "60px", md: "60px" }}
-                bottom={{ base: "20px", md: "60px" }}
+                bottom={{ base: "60px", md: "60px" }}
                 right={{ base: "4px", md: "24px" }}
                 w={{ base: "calc(100% - 8px)", md: "400px" }}
                 bg="white"
