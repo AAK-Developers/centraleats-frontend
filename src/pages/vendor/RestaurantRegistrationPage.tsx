@@ -52,7 +52,7 @@ export default function RestaurantRegistrationPage() {
                                 <Text
                                     fontWeight="bold"
                                     color="#042E63"
-                                    fontSize="xl"
+                                    fontSize="lg"
                                     mb={3}
                                 >
                                     Paso 1: Información Básica
@@ -62,25 +62,25 @@ export default function RestaurantRegistrationPage() {
                                     <Input
                                         {...register("name", { required: true })}
                                         placeholder="Nombre del Restaurante"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                     />
 
                                     <Input
                                         {...register("cuisineType", { required: true })}
                                         placeholder="Tipo de cocina (ej. Almuerzos, Pizza)"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                     />
 
                                     <Input
                                         {...register("address", { required: true })}
                                         placeholder="Dirección Completa"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                     />
 
                                     <Input
                                         {...register("phone", { required: true })}
                                         placeholder="Teléfono de contacto"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                     />
                                 </VStack>
                             </Box>
@@ -90,7 +90,7 @@ export default function RestaurantRegistrationPage() {
                                     <Text
                                         fontWeight="bold"
                                         color="#042E63"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                         mb={3}
                                     >
                                         Paso 2: Imagen
@@ -105,7 +105,7 @@ export default function RestaurantRegistrationPage() {
                                     <Text
                                         fontWeight="bold"
                                         color="#042E63"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                         mb={3}
                                     >
                                         Paso 3: Horarios
@@ -116,7 +116,7 @@ export default function RestaurantRegistrationPage() {
                                     <Input
                                         {...register("deliveryTime", { required: true })}
                                         placeholder="Tiempo estimado (minutos)"
-                                        fontSize="xl"
+                                        fontSize="lg"
                                         mt={3}
                                         type="number"
                                     />
