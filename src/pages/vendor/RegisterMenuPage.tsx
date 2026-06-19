@@ -38,25 +38,24 @@ export default function RegisterMenuPage() {
                     <FormCard>
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap={8}>
                             <Box>
-                                <Text fontWeight="bold" color="#042E63" fontSize="xl" mb={4}>
+                                <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={4}>
                                     Paso 1: Foto y Nombre
                                 </Text>
                                 <ImageUploadBox label="Sube una foto atractiva del plato" onFileSelect={(f) => console.log(f)} />
-                                <Input {...register("name")} placeholder="Nombre del Plato (ej. Hamburguesa Especial)" mt={4} fontSize="xl" />
+                                <Input {...register("name", { required: true })} placeholder="Nombre del Plato (ej. Hamburguesa Especial)" mt={4} fontSize="lg" />
                             </Box>
 
                             <Box>
-                                <Text fontWeight="bold" color="#042E63" fontSize="xl" mb={4}>
+                                <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={4}>
                                     Paso 2: Detalles y Precio
                                 </Text>
                                 <VStack gap={4}>
-                                    <Textarea {...register("description")} placeholder="Descripción e Ingredientes" minH="120px" fontSize="xl" />
-                                    <Input {...register("price")} placeholder="Precio" type="number" fontSize="lg" />
-                                    <Input {...register("category")} placeholder="Categoría (Opcional)" fontSize="lg" />
+                                    <Textarea {...register("description", { required: true })} placeholder="Descripción e Ingredientes" minH="120px" fontSize="lg" />
+                                    <Input {...register("price", { required: true })} placeholder="Precio" type="number" fontSize="lg" />
+                                    <Input {...register("category", { required: true })} placeholder="Categoría (Opcional)" fontSize="lg" />
                                 </VStack>
                             </Box>
                         </SimpleGrid>
-
                         <Flex justify="center" mt={8}>
                             <AppButton
                                 text="Publicar Plato"

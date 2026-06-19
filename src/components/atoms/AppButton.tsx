@@ -12,7 +12,7 @@ export const AppButton = ({
     ...props
 }: AppButtonProps) => (
     <Button
-        w="550px"
+        w={{ base: "80%", md: "450px" }}
         bg="#E65100"
         color="white"
         size="2xl"
