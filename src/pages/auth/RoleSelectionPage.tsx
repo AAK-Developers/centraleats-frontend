@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 
-import { apiClient } from '../../api/axiosConfig';
 import { WaveLayout } from '../../components/layout/WaveLayout';
 import { RoleCard } from '../../components/molecules/RoleCard';
 import { AuthHeader } from '../../components/organisms/AuthHeader';
@@ -30,7 +29,7 @@ export default function RoleSelectionPage() {
 
         console.log('--- Iniciando selección de rol ---');
         console.log('Rol seleccionado:', role);
-        console.log('ID de Clerk (user.id):', user?.id);
+        console.log('ID de Clerk (user.id):', 'Privado ########');
         console.log('URL Base de API:', import.meta.env.VITE_API_BASE_URL);
 
         setIsSubmitting(true);
@@ -38,13 +37,14 @@ export default function RoleSelectionPage() {
         try {
             const payload = {
                 role,
-                clerkId: user?.id,
+
+                // tests : clerkId: user?.id,
             };
             console.log('Enviando POST a /api/users con payload:', payload);
 
-            const response = await apiClient.post('/api/users', payload);
 
-            console.log('Respuesta exitosa del servidor:', response.data);
+
+            console.log('Respuesta exitosa del servidor:', 'No se muestra response.data por seguirdad'/*response.data*/);
 
             if (user) {
                 console.log('Recargando datos de Clerk...');

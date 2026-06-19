@@ -127,7 +127,7 @@ export default function RestaurantRegistrationPage() {
                         <Flex justify="center" mt={8}>
                             <AppButton
                                 text="Registrar Restaurante"
-                                fontSize="2xl"
+                                fontSize="lg"
                                 isLoading={isSubmitting}
                             />
                         </Flex>

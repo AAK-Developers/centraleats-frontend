@@ -60,7 +60,7 @@ export default function RegisterMenuPage() {
                             <AppButton
                                 text="Publicar Plato"
                                 isLoading={isSubmitting}
-                                fontSize="2xl"
+                                fontSize="lg"
                             />
                         </Flex>
                     </FormCard>
