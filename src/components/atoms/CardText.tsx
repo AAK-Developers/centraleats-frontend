@@ -1,4 +1,3 @@
-// src/components/atoms/CardText.tsx
 import { Text, type TextProps } from "@chakra-ui/react";
 
 interface CardTextProps extends TextProps {

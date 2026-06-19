@@ -1,4 +1,3 @@
-// src/components/atoms/SubtitleTag.tsx
 import { Text, type TextProps } from "@chakra-ui/react";
 
 export const SubtitleTag = ({ children, ...props }: TextProps) => {
