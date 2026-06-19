@@ -21,7 +21,7 @@ export const OrderCard = ({ id, restaurant, price, date, status, imageUrl }: Ord
             bg="white"
         >
             <Image
-                src={imageUrl || "/placeholder-food.png"}//backend
+                src={imageUrl || "/placeholder-food.png"}
                 alt={restaurant}
                 boxSize="65px"
                 borderRadius="full"
