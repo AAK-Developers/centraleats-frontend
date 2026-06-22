@@ -104,7 +104,9 @@ jobs:
         generate_release_notes: true
 
     - name: Send Discord Notification (Success)
-      if: success() && secrets.DISCORD_WEBHOOK != ''
+      if: success() && env.DISCORD_WEBHOOK != ''
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       run: |
         curl -H "Content-Type: application/json" -X POST -d '{
           "username": "GitHub Actions",
@@ -120,10 +122,12 @@ jobs:
               "text": "Ejecutado por ${{ github.actor }}"
             }
           }]
-        }' "${{ secrets.DISCORD_WEBHOOK }}"
+        }' "$DISCORD_WEBHOOK"
 
     - name: Send Discord Notification (Failure)
-      if: failure() && secrets.DISCORD_WEBHOOK != ''
+      if: failure() && env.DISCORD_WEBHOOK != ''
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       run: |
         curl -H "Content-Type: application/json" -X POST -d '{
           "username": "GitHub Actions",
@@ -139,4 +143,4 @@ jobs:
               "text": "Ejecutado por ${{ github.actor }}"
             }
           }]
-        }' "${{ secrets.DISCORD_WEBHOOK }}"
+        }' "$DISCORD_WEBHOOK"
