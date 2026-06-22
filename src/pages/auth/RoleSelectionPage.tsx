@@ -42,7 +42,7 @@ export default function RoleSelectionPage() {
             };
             console.log('Enviando POST a /api/users con payload:', payload);
 
-            const response = await apiClient.post('/api/users', payload);
+            await apiClient.post('/api/users', payload);
 
             console.log('Respuesta exitosa del servidor:', 'No se muestra response.data por seguirdad'/*response.data*/);
 
