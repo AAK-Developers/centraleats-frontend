@@ -35,8 +35,8 @@ jobs:
         context: .
         push: true
         build-args: |
-          VITE_API_BASE_URL=${{ secrets.QA_API_BASE_URL }}
-          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.QA_CLERK_PUBLISHABLE_KEY }}
+          VITE_API_BASE_URL=${{ secrets.VITE_API_URL_QA }}
+          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_QA }}
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
           ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa-${{ github.sha }}
@@ -46,9 +46,9 @@ jobs:
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.QA_EC2_HOST }}
-        username: ${{ secrets.QA_EC2_USER }}
-        key: ${{ secrets.QA_EC2_SSH_KEY }}
+        host: ${{ secrets.AWS_HOST_QA }}
+        username: ${{ secrets.AWS_SSH_USER_QA }}
+        key: ${{ secrets.AWS_SSH_KEY_QA }}
         script: |
           echo "==== Iniciando despliegue de centraleats-frontend (QA) ===="
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
@@ -66,6 +66,7 @@ jobs:
           echo "Levantando nuevo contenedor de Frontend en puerto 80..."
           docker run -d --name centraleats-frontend-qa \
             -p 80:80 \
+            -e BACKEND_ADDR="${{ secrets.BACKEND_ADDR_QA }}" \
             ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
             
           # Smoke Test simple del Frontend en QA

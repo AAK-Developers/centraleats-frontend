@@ -47,8 +47,8 @@ jobs:
         context: .
         push: true
         build-args: |
-          VITE_API_BASE_URL=${{ secrets.PROD_API_BASE_URL }}
-          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.PROD_CLERK_PUBLISHABLE_KEY }}
+          VITE_API_BASE_URL=${{ secrets.VITE_API_URL_PROD }}
+          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
         tags: ${{ steps.set-tags.outputs.docker_tags }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -56,9 +56,9 @@ jobs:
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.PROD_EC2_HOST }}
-        username: ${{ secrets.PROD_EC2_USER }}
-        key: ${{ secrets.PROD_EC2_SSH_KEY }}
+        host: ${{ secrets.AWS_HOST_PROD }}
+        username: ${{ secrets.AWS_SSH_USER_PROD }}
+        key: ${{ secrets.AWS_SSH_KEY_PROD }}
         script: |
           echo "==== Iniciando despliegue de centraleats-frontend ===="
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest
@@ -76,6 +76,7 @@ jobs:
           echo "Levantando nuevo contenedor de Frontend en puerto 8080..."
           docker run -d --name centraleats-frontend-prod \
             -p 8080:80 \
+            -e BACKEND_ADDR="${{ secrets.BACKEND_ADDR_PROD }}" \
             ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest
             
           # Smoke Test simple del Frontend
