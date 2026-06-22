@@ -10,6 +10,7 @@ server {
 
     # Proxy to backend to avoid Mixed Content (HTTPS to HTTP)
     location /api {
+        rewrite ^/api(.*)$ /api$1 break;
         proxy_pass ${BACKEND_ADDR};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
