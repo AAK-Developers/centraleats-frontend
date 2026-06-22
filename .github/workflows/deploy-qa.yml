@@ -5,7 +5,7 @@ on:
     branches:
       - QA
   repository_dispatch:
-    types: [deploy-qa]
+    types: [deploy-qa, backend-deployed-qa]
   workflow_dispatch:
 
 jobs:
@@ -31,6 +31,7 @@ jobs:
       environment: qa
       image_tag: qa
       smoke_test_url: http://localhost:80
+      frontend_port: '80'
     secrets:
       AWS_HOST: ${{ secrets.AWS_HOST_QA }}
       AWS_SSH_USER: ${{ secrets.AWS_SSH_USER_QA }}

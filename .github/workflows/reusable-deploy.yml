@@ -12,6 +12,10 @@ on:
       smoke_test_url:
         required: true
         type: string
+      frontend_port:
+        required: false
+        type: string
+        default: '80'
     secrets:
       AWS_HOST:
         required: true
@@ -66,6 +70,7 @@ jobs:
             export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
             export IMAGE_TAG="${{ inputs.image_tag }}"
             export BACKEND_ADDR="${{ secrets.BACKEND_ADDR }}"
+            export FRONTEND_PORT="${{ inputs.frontend_port }}"
             
             # Pull y despliegue de la nueva versión
             echo "Pulling new image..."

@@ -7,7 +7,7 @@ on:
     tags:
       - 'v*'
   repository_dispatch:
-    types: [deploy-prod]
+    types: [deploy-prod, backend-deployed]
   workflow_dispatch:
 
 jobs:
@@ -50,7 +50,8 @@ jobs:
     with:
       environment: production
       image_tag: ${{ needs.prepare.outputs.deploy_tag }}
-      smoke_test_url: http://localhost:80
+      smoke_test_url: http://localhost:8080
+      frontend_port: '8080'
     secrets:
       AWS_HOST: ${{ secrets.AWS_HOST_PROD }}
       AWS_SSH_USER: ${{ secrets.AWS_SSH_USER_PROD }}
