@@ -1,0 +1,142 @@
+name: CD - Frontend Production Environment
+
+on:
+  repository_dispatch:
+    types: [ backend-deployed ] # Escucha el evento disparado por el backend en producción
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-frontend-prod:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Calculate Release and Image Tags
+      id: set-tags
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          TAG_NAME="${{ github.ref_name }}"
+          echo "docker_tags=${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest,${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:${TAG_NAME}" >> $GITHUB_OUTPUT
+        else
+          echo "docker_tags=${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest,${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:sha-${{ github.sha }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build and Push Frontend Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        build-args: |
+          VITE_API_BASE_URL=${{ secrets.VITE_API_URL_PROD }}
+          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
+        tags: ${{ steps.set-tags.outputs.docker_tags }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.AWS_HOST_PROD }}
+        username: ${{ secrets.AWS_SSH_USER_PROD }}
+        key: ${{ secrets.AWS_SSH_KEY_PROD }}
+        script: |
+          echo "==== Iniciando despliegue de centraleats-frontend ===="
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest
+          
+          # Respaldar y renovar contenedor del frontend
+          if docker ps -a --format '{{.Names}}' | grep -Eq "^centraleats-frontend-prod$"; then
+            docker rm -f centraleats-frontend-prod-old || true
+            docker stop centraleats-frontend-prod || true
+            docker rename centraleats-frontend-prod centraleats-frontend-prod-old || true
+            HAS_OLD=true
+          else
+            HAS_OLD=false
+          fi
+          
+          echo "Levantando nuevo contenedor de Frontend en puerto 8080..."
+          docker run -d --name centraleats-frontend-prod \
+            -p 8080:80 \
+            -e BACKEND_ADDR="${{ secrets.BACKEND_ADDR_PROD }}" \
+            ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest
+            
+          # Smoke Test simple del Frontend
+          sleep 5
+          if curl -s -f http://localhost:8080/ > /dev/null; then
+            echo "==== DESPLIEGUE DE FRONTEND EXITOSO ===="
+            if [ "$HAS_OLD" = "true" ]; then
+              docker rm -f centraleats-frontend-prod-old || true
+            fi
+          else
+            echo "==== ERROR EN EL FRONTEND. Revirtiendo... ===="
+            docker stop centraleats-frontend-prod || true
+            docker rm -f centraleats-frontend-prod || true
+            if [ "$HAS_OLD" = "true" ]; then
+              docker rename centraleats-frontend-prod-old centraleats-frontend-prod || true
+              docker start centraleats-frontend-prod || true
+            fi
+            exit 1
+          fi
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+
+    - name: Send Discord Notification (Success)
+      if: success() && secrets.DISCORD_WEBHOOK != ''
+      run: |
+        curl -H "Content-Type: application/json" -X POST -d '{
+          "username": "GitHub Actions",
+          "embeds": [{
+            "title": "Despliegue Exitoso :white_check_mark:",
+            "description": "El frontend de **CentralEats** se ha desplegado correctamente en el entorno de Producción.",
+            "color": 3066993,
+            "fields": [
+              {"name": "Entorno", "value": "producción", "inline": true},
+              {"name": "Commit SHA", "value": "${{ github.sha }}", "inline": false}
+            ],
+            "footer": {
+              "text": "Ejecutado por ${{ github.actor }}"
+            }
+          }]
+        }' "${{ secrets.DISCORD_WEBHOOK }}"
+
+    - name: Send Discord Notification (Failure)
+      if: failure() && secrets.DISCORD_WEBHOOK != ''
+      run: |
+        curl -H "Content-Type: application/json" -X POST -d '{
+          "username": "GitHub Actions",
+          "embeds": [{
+            "title": "Fallo en el Despliegue :x:",
+            "description": "Ha fallado el despliegue del frontend de **CentralEats** en Producción. Se ha ejecutado el rollback automático al contenedor estable anterior.",
+            "color": 15158332,
+            "fields": [
+              {"name": "Entorno", "value": "producción", "inline": true},
+              {"name": "Commit SHA", "value": "${{ github.sha }}", "inline": false}
+            ],
+            "footer": {
+              "text": "Ejecutado por ${{ github.actor }}"
+            }
+          }]
+        }' "${{ secrets.DISCORD_WEBHOOK }}"
