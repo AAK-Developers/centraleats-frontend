@@ -1,0 +1,132 @@
+name: CD - Frontend QA Environment
+
+on:
+  repository_dispatch:
+    types: [ backend-deployed-qa ] # Escucha el evento disparado por el backend en QA
+  push:
+    branches:
+      - QA
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-frontend-qa:
+    runs-on: ubuntu-latest
+    environment: qa
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and Push Frontend Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        build-args: |
+          VITE_API_BASE_URL=${{ secrets.VITE_API_URL_QA }}
+          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_QA }}
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
+          ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa-${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.AWS_HOST_QA }}
+        username: ${{ secrets.AWS_SSH_USER_QA }}
+        key: ${{ secrets.AWS_SSH_KEY_QA }}
+        script: |
+          echo "==== Iniciando despliegue de centraleats-frontend (QA) ===="
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
+          
+          # Respaldar y renovar contenedor del frontend
+          if docker ps -a --format '{{.Names}}' | grep -Eq "^centraleats-frontend-qa$"; then
+            docker rm -f centraleats-frontend-qa-old || true
+            docker stop centraleats-frontend-qa || true
+            docker rename centraleats-frontend-qa centraleats-frontend-qa-old || true
+            HAS_OLD=true
+          else
+            HAS_OLD=false
+          fi
+          
+          echo "Levantando nuevo contenedor de Frontend en puerto 80..."
+          docker run -d --name centraleats-frontend-qa \
+            -p 80:80 \
+            -e BACKEND_ADDR="${{ secrets.BACKEND_ADDR_QA }}" \
+            ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
+            
+          # Smoke Test simple del Frontend en QA
+          sleep 5
+          if curl -s -f http://localhost:80/ > /dev/null; then
+            echo "==== DESPLIEGUE DE FRONTEND QA EXITOSO ===="
+            if [ "$HAS_OLD" = "true" ]; then
+              docker rm -f centraleats-frontend-qa-old || true
+            fi
+          else
+            echo "==== ERROR EN EL FRONTEND QA. Revirtiendo... ===="
+            docker stop centraleats-frontend-qa || true
+            docker rm -f centraleats-frontend-qa || true
+            if [ "$HAS_OLD" = "true" ]; then
+              docker rename centraleats-frontend-qa-old centraleats-frontend-qa || true
+              docker start centraleats-frontend-qa || true
+            fi
+            exit 1
+          fi
+
+    - name: Send Discord Notification (Success)
+      if: success() && env.DISCORD_WEBHOOK != ''
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      run: |
+        curl -H "Content-Type: application/json" -X POST -d '{
+          "username": "GitHub Actions",
+          "embeds": [{
+            "title": "Despliegue Exitoso :white_check_mark:",
+            "description": "El frontend de **CentralEats** se ha desplegado correctamente.",
+            "color": 3066993,
+            "fields": [
+              {"name": "Entorno", "value": "qa", "inline": true},
+              {"name": "Versión / Tag", "value": "qa", "inline": true},
+              {"name": "Commit SHA", "value": "${{ github.sha }}", "inline": false}
+            ],
+            "footer": {
+              "text": "Ejecutado por ${{ github.actor }}"
+            }
+          }]
+        }' "$DISCORD_WEBHOOK"
+
+    - name: Send Discord Notification (Failure)
+      if: failure() && env.DISCORD_WEBHOOK != ''
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      run: |
+        curl -H "Content-Type: application/json" -X POST -d '{
+          "username": "GitHub Actions",
+          "embeds": [{
+            "title": "Fallo en el Despliegue :x:",
+            "description": "Ha fallado el despliegue del frontend de **CentralEats** en QA. Se ha ejecutado el rollback automático al contenedor estable anterior.",
+            "color": 15158332,
+            "fields": [
+              {"name": "Entorno", "value": "qa", "inline": true},
+              {"name": "Versión / Tag", "value": "qa", "inline": true},
+              {"name": "Commit SHA", "value": "${{ github.sha }}", "inline": false}
+            ],
+            "footer": {
+              "text": "Ejecutado por ${{ github.actor }}"
+            }
+          }]
+        }' "$DISCORD_WEBHOOK"
