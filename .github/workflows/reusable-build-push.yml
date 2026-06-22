@@ -1,0 +1,58 @@
+name: Reusable Build and Push
+
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        required: true
+        type: string
+      vite_app_env:
+        required: true
+        type: string
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      VITE_API_BASE_URL:
+        required: true
+      VITE_CLERK_PUBLISHABLE_KEY:
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Generate Docker tags list
+        id: docker_meta
+        run: |
+          TAGS_INPUT="${{ inputs.image_tag }}"
+          USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
+          IFS=',' read -ra ADDR <<< "$TAGS_INPUT"
+          TAGS_LIST=""
+          for tag in "${ADDR[@]}"; do
+            TAGS_LIST="${TAGS_LIST}${USERNAME}/centraleats-frontend:${tag}"$'\n'
+          done
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAGS_LIST" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+            VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+            VITE_APP_ENV=${{ inputs.vite_app_env }}

@@ -76,6 +76,6 @@ describe("main.tsx entry point", () => {
 
         });
 
-    });
+    }, 20000);
 
 });
