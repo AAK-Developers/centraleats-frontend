@@ -1,0 +1,140 @@
+name: Reusable Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      smoke_test_url:
+        required: true
+        type: string
+      frontend_port:
+        required: false
+        type: string
+        default: '80'
+    secrets:
+      AWS_HOST:
+        required: true
+      AWS_SSH_USER:
+        required: true
+      AWS_SSH_KEY:
+        required: true
+      BACKEND_ADDR:
+        required: true
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      DISCORD_WEBHOOK:
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout docker-compose.yml
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.yml
+
+      - name: Copy docker-compose to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_SSH_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "~/centraleats-frontend"
+
+      - name: Remote SSH deploy with Smoke Test & Rollback
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_SSH_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            cd ~/centraleats-frontend
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            
+            # Guardar la referencia de la imagen actual antes de actualizar
+            CURRENT_IMAGE=$(docker inspect --format='{{.Config.Image}}' centraleats-frontend 2>/dev/null || true)
+            echo "Current running image: $CURRENT_IMAGE"
+            
+            # Exportar variables necesarias para docker compose
+            export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
+            export IMAGE_TAG="${{ inputs.image_tag }}"
+            export BACKEND_ADDR="${{ secrets.BACKEND_ADDR }}"
+            export FRONTEND_PORT="${{ inputs.frontend_port }}"
+            
+            # Pull y despliegue de la nueva versión
+            echo "Pulling new image..."
+            docker compose pull
+            echo "Starting container..."
+            docker compose up -d
+            
+            # Esperar a que el servidor de Nginx e inicie la app
+            echo "Waiting 10 seconds for service start..."
+            sleep 10
+            
+            # Prueba de humo (Smoke Test)
+            echo "Running smoke test on ${{ inputs.smoke_test_url }}..."
+            if curl -f --retry 3 --retry-delay 5 "${{ inputs.smoke_test_url }}"; then
+              echo "Smoke tests passed successfully! Deployment completed."
+            else
+              echo "Smoke tests failed! Restoring backup container image..."
+              if [ ! -z "$CURRENT_IMAGE" ]; then
+                echo "Reverting to previous image tag: $CURRENT_IMAGE"
+                docker tag "$CURRENT_IMAGE" "${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:${IMAGE_TAG}"
+                docker compose up -d
+                echo "Rollback completed."
+              else
+                echo "Warning: No previous image was running, cannot rollback."
+              fi
+              exit 1
+            fi
+
+      - name: Notify Success to Discord
+        if: success() && secrets.DISCORD_WEBHOOK != ''
+        run: |
+          curl -H "Content-Type: application/json" -X POST -d '{
+            "username": "GitHub Actions",
+            "embeds": [{
+              "title": "Despliegue Exitoso :white_check_mark:",
+              "description": "El frontend de **CentralEats** se ha desplegado correctamente.",
+              "color": 3066993,
+              "fields": [
+                {"name": "Entorno", "value": "${{ inputs.environment }}", "inline": true},
+                {"name": "Versión / Tag", "value": "${{ inputs.image_tag }}", "inline": true},
+                {"name": "Commit SHA", "value": "${{ github.sha }}", "inline": false}
+              ],
+              "footer": {
+                "text": "Ejecutado por ${{ github.actor }}"
+              }
+            }]
+          }' "${{ secrets.DISCORD_WEBHOOK }}"
+
+      - name: Notify Failure to Discord
+        if: failure() && secrets.DISCORD_WEBHOOK != ''
+        run: |
+          curl -H "Content-Type: application/json" -X POST -d '{
+            "username": "GitHub Actions",
+            "embeds": [{
+              "title": "Fallo en el Despliegue :x:",
+              "description": "Ha fallado el despliegue del frontend de **CentralEats**. Se ha ejecutado el rollback automático al contenedor estable anterior.",
+              "color": 15158332,
+              "fields": [
+                {"name": "Entorno", "value": "${{ inputs.environment }}", "inline": true},
+                {"name": "Versión / Tag", "value": "${{ inputs.image_tag }}", "inline": true},
+                {"name": "Commit SHA", "value": "${{ github.sha }}", "inline": false}
+              ],
+              "footer": {
+                "text": "Ejecutado por ${{ github.actor }}"
+              }
+            }]
+          }' "${{ secrets.DISCORD_WEBHOOK }}"

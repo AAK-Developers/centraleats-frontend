@@ -1,61 +1,74 @@
 name: Deploy to Production (AWS EC2 + Docker Hub)
+
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
+  repository_dispatch:
+    types: [deploy-prod, backend-deployed]
+  workflow_dispatch:
 
 jobs:
-  build-and-push:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      docker_tags: ${{ steps.set-tags.outputs.docker_tags }}
+      deploy_tag:  ${{ steps.set-tags.outputs.deploy_tag }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Calculate Release and Image Tags
+        id: set-tags
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAG_NAME="${{ github.ref_name }}"
+            echo "docker_tags=latest,${TAG_NAME}" >> $GITHUB_OUTPUT
+            echo "deploy_tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+          else
+            echo "docker_tags=latest,sha-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "deploy_tag=latest" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  ci:
+    uses: ./.github/workflows/reusable-ci.yml
 
-      - name: Build and push image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:latest
-          build-args: |
-            VITE_API_BASE_URL=${{ secrets.VITE_API_URL_PROD }}
-            VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-            VITE_APP_ENV=production
+  build-and-push:
+    needs: [prepare, ci]
+    uses: ./.github/workflows/reusable-build-push.yml
+    with:
+      image_tag: ${{ needs.prepare.outputs.docker_tags }}
+      vite_app_env: production
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_URL_PROD }}
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
 
   deploy:
-    needs: build-and-push
+    needs: [prepare, build-and-push]
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: production
+      image_tag: ${{ needs.prepare.outputs.deploy_tag }}
+      smoke_test_url: http://localhost:8080
+      frontend_port: '8080'
+    secrets:
+      AWS_HOST: ${{ secrets.AWS_HOST_PROD }}
+      AWS_SSH_USER: ${{ secrets.AWS_SSH_USER_PROD }}
+      AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY_PROD }}
+      BACKEND_ADDR: ${{ secrets.BACKEND_ADDR_PROD }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+  create-release:
+    needs: deploy
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          sparse-checkout: |
-            docker-compose.yml
-
-      - name: Copy docker-compose to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.AWS_HOST_PROD }}
-          username: ${{ secrets.AWS_SSH_USER }}
-          key: ${{ secrets.AWS_SSH_KEY }}
-          source: "docker-compose.yml"
-          target: "~/centraleats-frontend"
-
-      - name: Remote SSH deploy
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.AWS_HOST_PROD }}
-          username: ${{ secrets.AWS_SSH_USER }}
-          key: ${{ secrets.AWS_SSH_KEY }}
-          script: |
-            cd ~/centraleats-frontend
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            export IMAGE_TAG=latest
-            export BACKEND_ADDR=${{ secrets.BACKEND_ADDR_PROD }}
-            docker compose pull
-            docker compose up -d
+          generate_release_notes: true
