@@ -38,7 +38,7 @@ export default function RoleSelectionPage() {
             const payload = {
                 role,
 
-                // tests : clerkId: user?.id,
+                clerkId: user?.id,
             };
             console.log('Enviando POST a /api/users con payload:', payload);
 

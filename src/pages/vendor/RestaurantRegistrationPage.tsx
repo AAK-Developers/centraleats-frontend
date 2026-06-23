@@ -15,15 +15,26 @@ import { AppButton } from "../../components/atoms/AppButton";
 import { FormCard } from "../../components/molecules/FormCard";
 
 export default function RestaurantRegistrationPage() {
-    const { register, handleSubmit, formState: { isSubmitting } } = useForm();
+    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm();
     const navigate = useNavigate();
     const { user } = useUser();
 
-    const onSubmit = async (data: Record<string, unknown>) => {
+    const onSubmit = async (data: Record<string, any>) => {
         try {
-            await apiClient.post('/api/restaurants/register', {
-                ...data,
-                ownerClerkId: user?.id
+            const formData = new FormData();
+            Object.keys(data).forEach((key) => {
+
+                formData.append(key, data[key]);
+            });
+
+            if (user?.id) {
+                formData.append('ownerClerkId', user.id);
+            }
+
+            await apiClient.post('/api/restaurants/register', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
             toast.success("¡Restaurante registrado con éxito!");
@@ -97,8 +108,8 @@ export default function RestaurantRegistrationPage() {
                                     </Text>
 
                                     <ImageUploadBox
-                                        label="Sube la foto principal del plato"
-                                        onFileSelect={(f) => console.log(f)}
+                                        label="Sube la foto principal del Restaurante"
+                                        onFileSelect={(file) => setValue("image", file, { shouldValidate: true })}
                                     />
                                 </Box>
                                 <Box>
@@ -126,7 +137,7 @@ export default function RestaurantRegistrationPage() {
 
                         <Flex justify="center" mt={8}>
                             <AppButton
-                                text="Registrar Restaurante"
+                                text={isSubmitting ? "Registrando..." : "Registrar Resturante"}
                                 fontSize="lg"
                                 isLoading={isSubmitting}
                             />
