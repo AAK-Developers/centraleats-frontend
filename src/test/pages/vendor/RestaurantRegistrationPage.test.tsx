@@ -97,7 +97,7 @@ describe("RestaurantRegistrationPage", () => {
         fireEvent.change(screen.getByPlaceholderText(/teléfono/i), { target: { value: "123456789" } });
         fireEvent.change(screen.getByPlaceholderText(/tiempo estimado/i), { target: { value: "30" } });
 
-        fireEvent.click(screen.getByRole("button", { name: /registrar restaurante/i }));
+        fireEvent.click(screen.getByRole("button", { name: /registrar resturante/i }));
 
         await waitFor(() => {
             expect(mockPost).toHaveBeenCalledWith(
@@ -119,7 +119,7 @@ describe("RestaurantRegistrationPage", () => {
         fireEvent.change(screen.getByPlaceholderText(/teléfono/i), { target: { value: "123" } });
         fireEvent.change(screen.getByPlaceholderText(/tiempo estimado/i), { target: { value: "10" } });
 
-        fireEvent.click(screen.getByRole("button", { name: /registrar restaurante/i }));
+        fireEvent.click(screen.getByRole("button", { name: /registrar resturante/i }));
 
         await waitFor(() => {
             expect(mockNavigate).toHaveBeenCalledWith("/register-menu");
@@ -137,7 +137,7 @@ describe("RestaurantRegistrationPage", () => {
         fireEvent.change(screen.getByPlaceholderText(/teléfono/i), { target: { value: "123" } });
         fireEvent.change(screen.getByPlaceholderText(/tiempo estimado/i), { target: { value: "10" } });
 
-        fireEvent.click(screen.getByRole("button", { name: /registrar restaurante/i }));
+        fireEvent.click(screen.getByRole("button", { name: /registrar resturante/i }));
 
         await waitFor(() => {
             expect(toast.default.success).toHaveBeenCalled();
@@ -157,7 +157,7 @@ describe("RestaurantRegistrationPage", () => {
         fireEvent.change(screen.getByPlaceholderText(/teléfono/i), { target: { value: "123" } });
         fireEvent.change(screen.getByPlaceholderText(/tiempo estimado/i), { target: { value: "10" } });
 
-        fireEvent.click(screen.getByRole("button", { name: /registrar restaurante/i }));
+        fireEvent.click(screen.getByRole("button", { name: /registrar resturante/i }));
 
         await waitFor(() => {
             expect(toast.default.error).toHaveBeenCalled();
