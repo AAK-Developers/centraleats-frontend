@@ -13,7 +13,13 @@ import CentralEats from "../../assets/CentralEats.png";
 import { FormCard } from "../../components/molecules/FormCard";
 import { apiClient } from "../../api/axiosConfig";
 
-
+interface MenuFormData {
+    name: string;
+    description: string;
+    price: number;
+    categoryId: string;
+    image?: File;
+}
 const CATEGORIES = [
     {
         id: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a",
@@ -31,11 +37,10 @@ const CATEGORIES = [
 
 export default function RegisterMenuPage() {
 
-    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm();
+    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<MenuFormData>();
     const navigate = useNavigate();
 
-
-    const onSubmit = async (data: Record<string, any>) => {
+    const onSubmit = async (data: MenuFormData) => {
         try {
             const formData = new FormData();
 
@@ -51,22 +56,18 @@ export default function RegisterMenuPage() {
                 formData.append('image', data.image);
             }
 
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}:`, value);
-            }
-
             await apiClient.post('/api/products', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
             toast.success("¡Plato publicado!");
             navigate("/vendor-dashboard");
-        } catch (error: any) {
-            console.error('Error detallado:', error.response?.data);
+        } catch (error) {
+            const err = error as { response?: { data?: unknown } };
+            console.error('Error detallado:', err.response?.data);
             toast.error("Error al publicar el plato");
         }
     };
-
 
 
     return (
