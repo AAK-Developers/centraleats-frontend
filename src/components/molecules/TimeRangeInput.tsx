@@ -9,7 +9,7 @@ export const TimeRangeInput = ({ register }: TimeRangeInputProps) => {
     return (
         <HStack w="full" gap={2}>
             <Input
-                {...register("openTime", { required: true })}
+                {...register("openingTime", { required: true })}
                 type="time"
                 fontSize="xl"
                 size="lg"
@@ -18,7 +18,7 @@ export const TimeRangeInput = ({ register }: TimeRangeInputProps) => {
                 -
             </Text>
             <Input
-                {...register("closeTime", { required: true })}
+                {...register("closingTime", { required: true })}
                 type="time"
                 fontSize="xl"
                 size="lg"
