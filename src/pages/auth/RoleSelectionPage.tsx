@@ -5,6 +5,7 @@ import { SimpleGrid } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
+import { apiClient } from '../../api/axiosConfig';
 
 import { WaveLayout } from '../../components/layout/WaveLayout';
 import { RoleCard } from '../../components/molecules/RoleCard';
@@ -42,7 +43,7 @@ export default function RoleSelectionPage() {
             };
             console.log('Enviando POST a /api/users con payload:', payload);
 
-
+            await apiClient.post('/api/users', payload);
 
             console.log('Respuesta exitosa del servidor:', 'No se muestra response.data por seguirdad'/*response.data*/);
 

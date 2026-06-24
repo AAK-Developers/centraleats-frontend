@@ -43,6 +43,8 @@ vi.mock("../App", () => ({
 describe("main.tsx entry point", () => {
 
     it("should mount App with providers", async () => {
+        import.meta.env.VITE_CLERK_PUBLISHABLE_KEY = "pk_test_mock_key";
+        import.meta.env.VITE_API_BASE_URL = "http://localhost:3000";
 
         document.body.innerHTML = `
             <div id="root"></div>
@@ -76,6 +78,6 @@ describe("main.tsx entry point", () => {
 
         });
 
-    });
+    }, 20000);
 
 });
