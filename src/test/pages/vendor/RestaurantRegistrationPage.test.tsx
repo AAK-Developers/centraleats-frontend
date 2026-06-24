@@ -81,70 +81,30 @@ describe("RestaurantRegistrationPage", () => {
         render(<RestaurantRegistrationPage />);
 
         expect(screen.getByTestId("auth-header")).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/nombre del restaurante/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/tipo de cocina/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/dirección completa/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/teléfono/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/tiempo estimado/i)
-        ).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/nombre del restaurante/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/tipo de cocina/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/dirección completa/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/teléfono/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/tiempo estimado/i)).toBeInTheDocument();
     });
 
     it("should submit form and call API", async () => {
         render(<RestaurantRegistrationPage />);
 
-        fireEvent.change(
-            screen.getByPlaceholderText(/nombre del restaurante/i),
-            { target: { value: "Mi Restaurante" } }
-        );
+        fireEvent.change(screen.getByPlaceholderText(/nombre del restaurante/i), { target: { value: "Mi Restaurante" } });
+        fireEvent.change(screen.getByPlaceholderText(/tipo de cocina/i), { target: { value: "Pizza" } });
+        fireEvent.change(screen.getByPlaceholderText(/dirección completa/i), { target: { value: "Av. Siempre Viva" } });
+        fireEvent.change(screen.getByPlaceholderText(/teléfono/i), { target: { value: "123456789" } });
+        fireEvent.change(screen.getByPlaceholderText(/tiempo estimado/i), { target: { value: "30" } });
 
-        fireEvent.change(
-            screen.getByPlaceholderText(/tipo de cocina/i),
-            { target: { value: "Pizza" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/dirección completa/i),
-            { target: { value: "Av. Siempre Viva" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/teléfono/i),
-            { target: { value: "123456789" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/tiempo estimado/i),
-            { target: { value: "30" } }
-        );
-
-        fireEvent.click(
-            screen.getByRole("button", { name: /registrar restaurante/i })
-        );
+        fireEvent.click(screen.getByRole("button", { name: /registrar restaurante/i }));
 
         await waitFor(() => {
             expect(mockPost).toHaveBeenCalledWith(
-                "/api/restaurants/register",
+                "/api/vendors/register ",
+                expect.any(FormData),
                 expect.objectContaining({
-                    name: "Mi Restaurante",
-                    cuisineType: "Pizza",
-                    address: "Av. Siempre Viva",
-                    phone: "123456789",
-                    deliveryTime: "30",
-                    ownerClerkId: "user_123",
+                    headers: { "Content-Type": "multipart/form-data" },
                 })
             );
         });
