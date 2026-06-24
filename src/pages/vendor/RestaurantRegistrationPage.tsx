@@ -14,12 +14,24 @@ import { TimeRangeInput } from "../../components/molecules/TimeRangeInput";
 import { AppButton } from "../../components/atoms/AppButton";
 import { FormCard } from "../../components/molecules/FormCard";
 
+interface RestaurantFormData {
+    name: string;
+    description?: string;
+    address: string;
+    phone: string;
+    cuisineType: string;
+    openingTime: string;
+    closingTime: string;
+    deliveryTime: number;
+    image?: File;
+}
+
 export default function RestaurantRegistrationPage() {
-    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm();
+    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<RestaurantFormData>();
     const navigate = useNavigate();
     const { user } = useUser();
 
-    const onSubmit = async (data: Record<string, any>) => {
+    const onSubmit = async (data: RestaurantFormData) => {
         try {
             const formData = new FormData();
 
@@ -67,12 +79,7 @@ export default function RestaurantRegistrationPage() {
                     <FormCard>
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
                             <Box>
-                                <Text
-                                    fontWeight="bold"
-                                    color="#042E63"
-                                    fontSize="lg"
-                                    mb={3}
-                                >
+                                <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={3}>
                                     Paso 1: Información Básica
                                 </Text>
 
@@ -82,19 +89,16 @@ export default function RestaurantRegistrationPage() {
                                         placeholder="Nombre del Restaurante"
                                         fontSize="lg"
                                     />
-
                                     <Input
                                         {...register("cuisineType", { required: true })}
                                         placeholder="Tipo de cocina (ej. Almuerzos, Pizza)"
                                         fontSize="lg"
                                     />
-
                                     <Input
                                         {...register("address", { required: true })}
                                         placeholder="Dirección Completa"
                                         fontSize="lg"
                                     />
-
                                     <Input
                                         {...register("phone", { required: true })}
                                         placeholder="Teléfono de contacto"
@@ -105,32 +109,19 @@ export default function RestaurantRegistrationPage() {
 
                             <VStack align="stretch" gap={6}>
                                 <Box>
-                                    <Text
-                                        fontWeight="bold"
-                                        color="#042E63"
-                                        fontSize="lg"
-                                        mb={3}
-                                    >
+                                    <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={3}>
                                         Paso 2: Imagen
                                     </Text>
-
                                     <ImageUploadBox
                                         label="Sube la foto principal del Restaurante"
                                         onFileSelect={(file) => setValue("image", file, { shouldValidate: true })}
                                     />
                                 </Box>
                                 <Box>
-                                    <Text
-                                        fontWeight="bold"
-                                        color="#042E63"
-                                        fontSize="lg"
-                                        mb={3}
-                                    >
+                                    <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={3}>
                                         Paso 3: Horarios
                                     </Text>
-
                                     <TimeRangeInput register={register} />
-
                                     <Input
                                         {...register("deliveryTime", { required: true })}
                                         placeholder="Tiempo estimado (minutos)"

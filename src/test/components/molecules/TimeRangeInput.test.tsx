@@ -27,22 +27,21 @@ describe("TimeRangeInput Component", () => {
         );
 
         const inputs = screen.getAllByDisplayValue("");
-
         expect(inputs).toHaveLength(2);
     });
 
-    it("should call register for openTime and closeTime", () => {
+    it("should call register for openingTime and closingTime", () => {
         renderWithChakra(
             <TimeRangeInput register={mockRegister as any} />
         );
 
         expect(mockRegister).toHaveBeenCalledWith(
-            "openTime",
+            "openingTime",
             { required: true }
         );
 
         expect(mockRegister).toHaveBeenCalledWith(
-            "closeTime",
+            "closingTime",
             { required: true }
         );
     });
@@ -52,9 +51,7 @@ describe("TimeRangeInput Component", () => {
             <TimeRangeInput register={mockRegister as any} />
         );
 
-        expect(
-            screen.getByText("-")
-        ).toBeInTheDocument();
+        expect(screen.getByText("-")).toBeInTheDocument();
     });
 
     it("should render inputs of type time", () => {
@@ -62,10 +59,7 @@ describe("TimeRangeInput Component", () => {
             <TimeRangeInput register={mockRegister as any} />
         );
 
-        const inputs = container.querySelectorAll(
-            'input[type="time"]'
-        );
-
+        const inputs = container.querySelectorAll('input[type="time"]');
         expect(inputs).toHaveLength(2);
     });
 });

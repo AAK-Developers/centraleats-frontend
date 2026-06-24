@@ -5,6 +5,12 @@ import RegisterMenuPage from "../../../pages/vendor/RegisterMenuPage";
 
 let mockNavigate = vi.fn();
 
+vi.mock("../../../api/axiosConfig", () => ({
+    apiClient: {
+        post: vi.fn().mockResolvedValue({ data: {} }),
+    },
+}));
+
 vi.mock("@chakra-ui/react", () => ({
     VStack: ({ children }: any) => <div>{children}</div>,
     Input: (props: any) => <input {...props} />,
@@ -60,54 +66,21 @@ describe("RegisterMenuPage", () => {
         render(<RegisterMenuPage />);
 
         expect(screen.getByTestId("auth-header")).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/nombre del plato/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/descripción/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/precio/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByPlaceholderText(/categoría/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByRole("button", { name: /publicar plato/i })
-        ).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/nombre del plato/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/descripción/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/precio/i)).toBeInTheDocument();
+        expect(screen.getByRole("combobox")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /publicar plato/i })).toBeInTheDocument();
     });
 
     it("should submit form successfully", async () => {
         render(<RegisterMenuPage />);
 
-        fireEvent.change(
-            screen.getByPlaceholderText(/nombre del plato/i),
-            { target: { value: "Hamburguesa" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/descripción/i),
-            { target: { value: "Deliciosa" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/precio/i),
-            { target: { value: "5" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/categoría/i),
-            { target: { value: "Fast Food" } }
-        );
-
-        fireEvent.click(
-            screen.getByRole("button", { name: /publicar plato/i })
-        );
+        fireEvent.change(screen.getByPlaceholderText(/nombre del plato/i), { target: { value: "Hamburguesa" } });
+        fireEvent.change(screen.getByPlaceholderText(/descripción/i), { target: { value: "Deliciosa" } });
+        fireEvent.change(screen.getByPlaceholderText(/precio/i), { target: { value: "5" } });
+        fireEvent.change(screen.getByRole("combobox"), { target: { value: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a" } });
+        fireEvent.click(screen.getByRole("button", { name: /publicar plato/i }));
 
         await waitFor(() => {
             expect(mockNavigate).toHaveBeenCalledWith("/vendor-dashboard");
@@ -119,29 +92,11 @@ describe("RegisterMenuPage", () => {
 
         render(<RegisterMenuPage />);
 
-        fireEvent.change(
-            screen.getByPlaceholderText(/nombre del plato/i),
-            { target: { value: "Pizza" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/descripción/i),
-            { target: { value: "Italiana" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/precio/i),
-            { target: { value: "10" } }
-        );
-
-        fireEvent.change(
-            screen.getByPlaceholderText(/categoría/i),
-            { target: { value: "Comida" } }
-        );
-
-        fireEvent.click(
-            screen.getByRole("button", { name: /publicar plato/i })
-        );
+        fireEvent.change(screen.getByPlaceholderText(/nombre del plato/i), { target: { value: "Pizza" } });
+        fireEvent.change(screen.getByPlaceholderText(/descripción/i), { target: { value: "Italiana" } });
+        fireEvent.change(screen.getByPlaceholderText(/precio/i), { target: { value: "10" } });
+        fireEvent.change(screen.getByRole("combobox"), { target: { value: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a" } });
+        fireEvent.click(screen.getByRole("button", { name: /publicar plato/i }));
 
         await waitFor(() => {
             expect(toast.default.success).toHaveBeenCalled();
