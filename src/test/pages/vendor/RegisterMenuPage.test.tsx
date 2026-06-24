@@ -74,7 +74,7 @@ describe("RegisterMenuPage", () => {
         ).toBeInTheDocument();
 
         expect(
-            screen.getByPlaceholderText(/categoría/i)
+            screen.getByRole("combobox")
         ).toBeInTheDocument();
 
         expect(
@@ -101,8 +101,8 @@ describe("RegisterMenuPage", () => {
         );
 
         fireEvent.change(
-            screen.getByPlaceholderText(/categoría/i),
-            { target: { value: "Fast Food" } }
+            screen.getByRole("combobox"),
+            { target: { value: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a" } }
         );
 
         fireEvent.click(
@@ -135,8 +135,8 @@ describe("RegisterMenuPage", () => {
         );
 
         fireEvent.change(
-            screen.getByPlaceholderText(/categoría/i),
-            { target: { value: "Comida" } }
+            screen.getByRole("combobox"),
+            { target: { value: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a" } }
         );
 
         fireEvent.click(

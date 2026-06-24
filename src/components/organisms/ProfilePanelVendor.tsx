@@ -23,11 +23,6 @@ export const ProfilePanelVendor = ({
 
     if (!isOpen) return null;
 
-    const handleEditRestaurant = () => {
-        onClose();
-        navigate("/vendor/edit-restaurant");
-    };
-
     const handleEditMenu = () => {
         onClose();
         navigate("/vendor/edit-menu");
@@ -63,10 +58,7 @@ export const ProfilePanelVendor = ({
                     borderBottom="1px solid"
                     borderColor="gray.100"
                 >
-                    <Heading
-                        size={{ base: "sm", md: "md" }}
-                        color="#042E63"
-                    >
+                    <Heading size={{ base: "sm", md: "md" }} color="#042E63">
                         Mi Perfil
                     </Heading>
                     <CloseButton onClick={onClose} />
@@ -85,48 +77,6 @@ export const ProfilePanelVendor = ({
                                 fullName={user?.fullName || "Usuario"}
                                 email={user?.primaryEmailAddress?.emailAddress || ""}
                             />
-
-                            <Box w="full">
-                                <Heading
-                                    size={{ base: "xs", md: "sm" }}
-                                    color="#042E63"
-                                    mb={{ base: 2, md: 3 }}
-                                >
-                                    Editar Restaurante
-                                </Heading>
-                                <Flex
-                                    align="center"
-                                    gap={{ base: 2, md: 3 }}
-                                    p={{ base: 2, md: 3 }}
-                                    bg="white"
-                                    border="1px solid"
-                                    borderColor="gray.200"
-                                    borderRadius="xl"
-                                    cursor="pointer"
-                                    _hover={{ bg: "gray.50", borderColor: "#30B2BC" }}
-                                    transition="all 0.2s"
-                                    onClick={handleEditRestaurant}
-                                >
-                                    <img
-                                        src={restaurantLogoUrl}
-                                        alt={restaurantName}
-                                        width={40}
-                                        height={40}
-                                        style={{ objectFit: "contain", borderRadius: "6px" }}
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src =
-                                                "https://via.placeholder.com/48x48?text=R";
-                                        }}
-                                    />
-                                    <Text
-                                        fontWeight="semibold"
-                                        color="#042E63"
-                                        fontSize={{ base: "xs", md: "sm" }}
-                                    >
-                                        {restaurantName}
-                                    </Text>
-                                </Flex>
-                            </Box>
 
                             <Box w="full">
                                 <Heading
