@@ -12,7 +12,7 @@ import { AppButton } from "../../components/atoms/AppButton";
 import CentralEats from "../../assets/CentralEats.png";
 import { FormCard } from "../../components/molecules/FormCard";
 import { apiClient } from "../../api/axiosConfig";
-import { useUser } from "@clerk/clerk-react";
+
 
 const CATEGORIES = [
     {
@@ -30,8 +30,7 @@ const CATEGORIES = [
 ];
 
 export default function RegisterMenuPage() {
-    const { user } = useUser();
-    console.log("ID de usuario de Clerk que estoy enviando:", user?.id);
+
     const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm();
     const navigate = useNavigate();
 
@@ -40,19 +39,11 @@ export default function RegisterMenuPage() {
         try {
             const formData = new FormData();
 
-            if (user?.id) {
-                formData.append('vendorId', user.id);
-            } else {
-                toast.error("Error: No se pudo identificar al usuario.");
-                return;
-            }
-
             formData.append('name', data.name);
             formData.append('description', data.description);
             formData.append('price', String(data.price));
-            formData.append('categoryId', data.categoryId);
-
             formData.append('stock', '999');
+            formData.append('categoryId', data.categoryId);
             formData.append('isAvailable', 'true');
             formData.append('isActive', 'true');
 
@@ -60,10 +51,12 @@ export default function RegisterMenuPage() {
                 formData.append('image', data.image);
             }
 
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
+
             await apiClient.post('/api/products', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
 
             toast.success("¡Plato publicado!");

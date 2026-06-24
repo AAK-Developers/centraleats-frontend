@@ -22,26 +22,33 @@ export default function RestaurantRegistrationPage() {
     const onSubmit = async (data: Record<string, any>) => {
         try {
             const formData = new FormData();
-            Object.keys(data).forEach((key) => {
 
-                formData.append(key, data[key]);
-            });
+            formData.append("name", data.name);
+            formData.append("description", data.description || "");
+            formData.append("location", data.address);
+            formData.append("phone", data.phone);
+            formData.append("cuisineType", data.cuisineType);
+            formData.append("openingTime", data.openingTime);
+            formData.append("closingTime", data.closingTime);
+            formData.append("deliveryTime", String(data.deliveryTime));
 
-            if (user?.id) {
-                formData.append('ownerClerkId', user.id);
+            if (data.image instanceof File) {
+                formData.append("image", data.image);
             }
 
-            await apiClient.post('/api/restaurants/register', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+            if (user?.id) {
+                formData.append("ownerClerkId", user.id);
+            }
+
+            await apiClient.post("/api/vendors/register ", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
 
-            toast.success("¡Restaurante registrado con éxito!");
+            toast.success("¡Vendor registrado con éxito!");
             navigate("/register-menu");
         } catch (error) {
             console.error("Error al registrar:", error);
-            toast.error("Hubo un error al registrar el restaurante");
+            toast.error("Hubo un error al registrar el vendor");
         }
     };
 
