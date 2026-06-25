@@ -52,15 +52,16 @@ export default function RestaurantRegistrationPage() {
                 formData.append("ownerClerkId", user.id);
             }
 
-            await apiClient.post("/api/vendors/register ", formData, {
+            await apiClient.post("/api/vendors/register", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
             toast.success("¡Vendor registrado con éxito!");
             navigate("/register-menu");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error al registrar:", error);
-            toast.error("Hubo un error al registrar el vendor");
+            const serverMsg = error.response?.data?.message || "Hubo un error al registrar el vendor";
+            toast.error(serverMsg);
         }
     };
 
@@ -101,7 +102,7 @@ export default function RestaurantRegistrationPage() {
                                     />
                                     <Input
                                         {...register("phone", { required: true })}
-                                        placeholder="Teléfono de contacto"
+                                        placeholder="Teléfono (ej: 0999123456)"
                                         fontSize="lg"
                                     />
                                 </VStack>

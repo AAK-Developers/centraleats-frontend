@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VStack, Text } from '@chakra-ui/react';
 import toast from "react-hot-toast";
 import { SimpleGrid } from '@chakra-ui/react';
@@ -22,8 +22,21 @@ import { useAuthMe } from '../../hooks/useAuthMe';
 export default function RoleSelectionPage() {
     const navigate = useNavigate();
     const { user } = useUser();
-    const { fetchProfile } = useAuthMe();
+    const { profile, fetchProfile } = useAuthMe();
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const rawRole = profile?.role || (user?.publicMetadata?.role as string | undefined);
+    const normalizedRole = rawRole?.toUpperCase();
+
+    useEffect(() => {
+        if (normalizedRole && normalizedRole !== 'PENDING') {
+            if (normalizedRole === 'STUDENT' || normalizedRole === 'ADMIN') {
+                navigate('/student-dashboard', { replace: true });
+            } else if (normalizedRole === 'VENDOR') {
+                navigate('/vendor-dashboard', { replace: true });
+            }
+        }
+    }, [normalizedRole, navigate]);
 
     const handleSelection = async (role: 'student' | 'vendor') => {
         if (isSubmitting) return;

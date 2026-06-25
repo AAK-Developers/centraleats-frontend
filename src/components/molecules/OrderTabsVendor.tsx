@@ -1,6 +1,6 @@
 import { Box, Flex } from "@chakra-ui/react";
 
-export type OrderTab = "nuevos" | "en_cocina" | "listos";
+export type OrderTab = "nuevos" | "en_cocina" | "listos" | "platos";
 
 interface Tab {
     key: OrderTab;

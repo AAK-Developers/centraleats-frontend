@@ -101,7 +101,7 @@ describe("RestaurantRegistrationPage", () => {
 
         await waitFor(() => {
             expect(mockPost).toHaveBeenCalledWith(
-                "/api/vendors/register ",
+                "/api/vendors/register",
                 expect.any(FormData),
                 expect.objectContaining({
                     headers: { "Content-Type": "multipart/form-data" },

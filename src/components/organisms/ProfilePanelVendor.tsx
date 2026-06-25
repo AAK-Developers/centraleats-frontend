@@ -106,8 +106,9 @@ export const ProfilePanelVendor = ({
                                         height={40}
                                         style={{ objectFit: "contain", borderRadius: "6px" }}
                                         onError={(e) => {
-                                            (e.target as HTMLImageElement).src =
-                                                "https://via.placeholder.com/48x48?text=M";
+                                            const target = e.target as HTMLImageElement;
+                                            target.onerror = null;
+                                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurantName)}&background=0D8ABC&color=fff&size=40`;
                                         }}
                                     />
                                     <Text
