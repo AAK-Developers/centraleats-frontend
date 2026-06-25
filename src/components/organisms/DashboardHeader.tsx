@@ -5,19 +5,19 @@ import CentralEats from "../../assets/CentralEats.png";
 
 import { NotificationPanel } from '../organisms/NotificationPanel';
 import { ProfilePanel } from '../organisms/ProfilePanel';
+
 import { useNotifications } from '../../hooks/useNotifications';
+import { CartPanel } from './CartPanel';
+
 
 type DashboardHeaderProps = {
     userName: string;
-    onCartClick?: () => void;
 };
 
-export const DashboardHeader = ({
-    userName,
-    onCartClick,
-}: DashboardHeaderProps) => {
+export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const { notifications, clearAll } = useNotifications();
 
@@ -50,7 +50,7 @@ export const DashboardHeader = ({
                         bg="#30B2BC"
                         color="white"
                         _hover={{ bg: "#2899a1" }}
-                        onClick={onCartClick}
+                        onClick={() => setIsCartOpen(true)}
                     >
                         <FaShoppingCart size="24px" />
                     </IconButton>
@@ -82,6 +82,11 @@ export const DashboardHeader = ({
             <ProfilePanel
                 isOpen={isProfileOpen}
                 onClose={() => setIsProfileOpen(false)}
+            />
+
+            <CartPanel
+                isOpen={isCartOpen}
+                onClose={() => setIsCartOpen(false)}
             />
         </>
     );
