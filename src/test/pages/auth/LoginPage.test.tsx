@@ -6,10 +6,18 @@ import LoginPage from "../../../pages/auth/LoginPage";
 vi.mock("@clerk/clerk-react", () => ({
     SignIn: ({
         forceRedirectUrl,
+        signUpForceRedirectUrl,
+        fallbackRedirectUrl,
     }: {
         forceRedirectUrl: string;
+        signUpForceRedirectUrl: string;
+        fallbackRedirectUrl: string;
     }) => (
-        <div data-testid="sign-in">
+        <div 
+            data-testid="sign-in" 
+            data-sign-up-redirect={signUpForceRedirectUrl} 
+            data-fallback-redirect={fallbackRedirectUrl}
+        >
             {forceRedirectUrl}
         </div>
     ),
@@ -115,6 +123,28 @@ describe("LoginPage", () => {
         expect(
             screen.getByTestId("sign-in")
         ).toHaveTextContent(
+            "/role-selection"
+        );
+    });
+
+    it("should configure sign up redirect url correctly", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByTestId("sign-in")
+        ).toHaveAttribute(
+            "data-sign-up-redirect",
+            "/role-selection"
+        );
+    });
+
+    it("should configure fallback redirect url correctly", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByTestId("sign-in")
+        ).toHaveAttribute(
+            "data-fallback-redirect",
             "/role-selection"
         );
     });

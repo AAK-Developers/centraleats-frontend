@@ -8,7 +8,10 @@ export default function LoginPage() {
         <WaveLayout>
             <AppContainer>
                 <AuthHeader logoSize="350px" >
-                    <SignIn forceRedirectUrl="/role-selection"
+                    <SignIn 
+                        forceRedirectUrl="/role-selection"
+                        signUpForceRedirectUrl="/role-selection"
+                        fallbackRedirectUrl="/role-selection"
                         appearance={{
                             variables: {
                                 colorPrimary: '#E65100',

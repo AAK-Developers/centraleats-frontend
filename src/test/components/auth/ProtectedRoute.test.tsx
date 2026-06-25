@@ -1,10 +1,20 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { ChakraProvider } from "@chakra-ui/react";
+import theme from "../../../theme";
 
 import { ProtectedRoute } from "../../../components/auth/ProtectedRoute";
 
 const mockFetchProfile = vi.fn();
 const mockClearAuth = vi.fn();
+
+const renderWithChakra = (ui: React.ReactElement) => {
+    return render(
+        <ChakraProvider value={theme}>
+            {ui}
+        </ChakraProvider>
+    );
+};
 
 vi.mock("@clerk/clerk-react", () => ({
     useUser: vi.fn(),
@@ -60,14 +70,14 @@ describe("ProtectedRoute", () => {
             error: null,
         });
 
-        render(
+        renderWithChakra(
             <ProtectedRoute>
                 <div>Protected Content</div>
             </ProtectedRoute>
         );
 
         expect(
-            screen.getByText("Presentation Page")
+            screen.getByText("Cargando tu perfil...")
         ).toBeInTheDocument();
     });
 
@@ -85,7 +95,7 @@ describe("ProtectedRoute", () => {
             error: null,
         });
 
-        render(
+        renderWithChakra(
             <ProtectedRoute>
                 <div>Protected Content</div>
             </ProtectedRoute>
@@ -117,7 +127,7 @@ describe("ProtectedRoute", () => {
             error: null,
         });
 
-        render(
+        renderWithChakra(
             <ProtectedRoute>
                 <div>Protected Content</div>
             </ProtectedRoute>
@@ -147,7 +157,39 @@ describe("ProtectedRoute", () => {
             error: null,
         });
 
-        render(
+        renderWithChakra(
+            <ProtectedRoute>
+                <div>Protected Content</div>
+            </ProtectedRoute>
+        );
+
+        expect(
+            screen.getByTestId("navigate")
+        ).toHaveTextContent("/role-selection");
+    });
+
+    it("should redirect to role-selection when role is PENDING", () => {
+        (useUser as any).mockReturnValue({
+            isLoaded: true,
+            isSignedIn: true,
+            user: {
+                publicMetadata: {
+                    role: "PENDING",
+                },
+            },
+        });
+
+        (useAuthMe as any).mockReturnValue({
+            profile: {
+                role: "PENDING",
+                isActive: true,
+            },
+            isLoadingProfile: false,
+            fetchProfile: mockFetchProfile,
+            error: null,
+        });
+
+        renderWithChakra(
             <ProtectedRoute>
                 <div>Protected Content</div>
             </ProtectedRoute>
@@ -175,7 +217,7 @@ describe("ProtectedRoute", () => {
             error: null,
         });
 
-        render(
+        renderWithChakra(
             <ProtectedRoute>
                 <div>Protected Content</div>
             </ProtectedRoute>
@@ -200,7 +242,7 @@ describe("ProtectedRoute", () => {
             error: null,
         });
 
-        render(
+        renderWithChakra(
             <ProtectedRoute>
                 <div>Protected Content</div>
             </ProtectedRoute>

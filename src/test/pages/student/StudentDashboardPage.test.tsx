@@ -12,6 +12,23 @@ vi.mock("@chakra-ui/react", () => ({
     Text: ({ children }: any) => <div>{children}</div>,
     Input: (props: any) => <input {...props} />,
     SimpleGrid: ({ children }: any) => <div>{children}</div>,
+    Dialog: {
+        Root: ({ children, open }: any) => open ? <div>{children}</div> : null,
+        Backdrop: () => <div>Backdrop</div>,
+        Positioner: ({ children }: any) => <div>{children}</div>,
+        Content: ({ children }: any) => <div>{children}</div>,
+        Header: ({ children }: any) => <div>{children}</div>,
+        Body: ({ children }: any) => <div>{children}</div>,
+        Footer: ({ children }: any) => <div>{children}</div>,
+        CloseTrigger: () => <button>Close</button>,
+    },
+    Portal: ({ children }: any) => <div>{children}</div>,
+    Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
+    useDisclosure: () => ({ isOpen: false, onOpen: vi.fn(), onClose: vi.fn() }),
+    Spinner: () => <div>Loading...</div>,
+    Image: (props: any) => <img {...props} />,
+    Badge: ({ children }: any) => <span>{children}</span>,
+    Stack: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock("@clerk/clerk-react", () => ({

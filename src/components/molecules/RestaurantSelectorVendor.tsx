@@ -33,8 +33,9 @@ export function RestaurantSelectorVendor({ name, logoUrl }: Props) {
                     height={50}
                     style={{ objectFit: "contain", borderRadius: "6px" }}
                     onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                            "https://via.placeholder.com/48x48?text=R";
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff&size=50`;
                     }}
                 />
                 <Text

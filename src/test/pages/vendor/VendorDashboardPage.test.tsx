@@ -14,6 +14,13 @@ vi.mock("react-router-dom", () => ({
 vi.mock("@chakra-ui/react", () => ({
     Box: ({ children }: any) => <div>{children}</div>,
     SimpleGrid: ({ children }: any) => <div>{children}</div>,
+    Image: (props: any) => <img {...props} />,
+    Text: ({ children }: any) => <div>{children}</div>,
+    Badge: ({ children }: any) => <span>{children}</span>,
+    Stack: ({ children }: any) => <div>{children}</div>,
+    Flex: ({ children }: any) => <div>{children}</div>,
+    Spinner: () => <div>Loading...</div>,
+    Separator: () => <hr />,
 }));
 
 vi.mock("../../../components/layout/WaveLayout", () => ({

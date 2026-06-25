@@ -6,12 +6,12 @@ import PresentationPage from "../../../pages/landing/PresentationPage";
 const mockNavigate = vi.fn();
 
 vi.mock("@chakra-ui/react", async () => {
-
     return {
         Box: ({ children }: any) => <div>{children}</div>,
         Flex: ({ children }: any) => <div>{children}</div>,
         VStack: ({ children }: any) => <div>{children}</div>,
         Text: ({ children }: any) => <div>{children}</div>,
+        Button: (props: any) => <button {...props}>{props.children}</button>,
     };
 });
 
@@ -49,20 +49,6 @@ vi.mock(
     })
 );
 
-vi.mock(
-    "../../../components/atoms/AuthButton",
-    () => ({
-        AuthButton: ({ onClick }: any) => (
-            <button
-                data-testid="auth-button"
-                onClick={onClick}
-            >
-                Login
-            </button>
-        ),
-    })
-);
-
 describe("PresentationPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -89,17 +75,26 @@ describe("PresentationPage", () => {
             .toHaveAttribute("data-logo-size", "500px");
     });
 
-    it("should render AuthButton", () => {
+    it("should render login and register buttons", () => {
         render(<PresentationPage />);
-        expect(screen.getByTestId("auth-button")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /iniciar sesión/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /registrarse/i })).toBeInTheDocument();
     });
 
-    it("should navigate to login when AuthButton is clicked", () => {
+    it("should navigate to login when Iniciar Sesion button is clicked", () => {
         render(<PresentationPage />);
 
-        fireEvent.click(screen.getByTestId("auth-button"));
+        fireEvent.click(screen.getByRole("button", { name: /iniciar sesión/i }));
 
         expect(mockNavigate).toHaveBeenCalledWith("/login");
+    });
+
+    it("should navigate to register when Registrarse button is clicked", () => {
+        render(<PresentationPage />);
+
+        fireEvent.click(screen.getByRole("button", { name: /registrarse/i }));
+
+        expect(mockNavigate).toHaveBeenCalledWith("/register");
     });
 
     it("should render main slogan", () => {
