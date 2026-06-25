@@ -1,4 +1,4 @@
-import { Box, SimpleGrid, Image, Text, Badge, Stack, Flex, Spinner, Separator, Button } from "@chakra-ui/react";
+import { Box, SimpleGrid, Image, Text, Badge, Stack, Flex, Spinner, Separator, Button, VStack } from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -232,7 +232,7 @@ export function VendorOrderCard({ order, onAccept, onReady, onDeliver }: OrderCa
 
             <Separator />
 
-            <VStack align="stretch" spacing={2}>
+            <VStack align="stretch" gap={2}>
                 <Text fontSize="sm" fontWeight="bold" color="gray.700">
                     Cliente: {order.user?.fullName || "Estudiante"}
                 </Text>
@@ -248,7 +248,7 @@ export function VendorOrderCard({ order, onAccept, onReady, onDeliver }: OrderCa
                 </Box>
                 {order.notes && (
                     <Box bg="orange.50" p={2} borderRadius="lg" borderLeft="3px solid" borderColor="orange.300">
-                        <Text fontSize="xs" color="orange.700" italic>
+                        <Text fontSize="xs" color="orange.700" fontStyle="italic">
                             Nota: {order.notes}
                         </Text>
                     </Box>
@@ -355,7 +355,7 @@ export default function VendorDashboardPage() {
             <WaveLayout>
                 <AppContainer>
                     <Box display="flex" justifyContent="center" alignItems="center" h="60vh">
-                        <Spinner size="xl" color="#2DC6B8" thickness="4px" />
+                        <Spinner size="xl" color="#2DC6B8" borderWidth="4px" />
                     </Box>
                 </AppContainer>
             </WaveLayout>
@@ -445,7 +445,7 @@ export default function VendorDashboardPage() {
                                                         h="full"
                                                         w="full"
                                                         objectFit="cover"
-                                                        fallbackSrc="https://ui-avatars.com/api/?name=Plato&background=0D8ABC&color=fff&size=200"
+                                                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "https://ui-avatars.com/api/?name=Plato&background=0D8ABC&color=fff&size=200"; }}
                                                     />
                                                     <Badge
                                                         position="absolute"
@@ -460,16 +460,16 @@ export default function VendorDashboardPage() {
                                                         {product.isAvailable ? "Disponible" : "Agotado"}
                                                     </Badge>
                                                 </Box>
-                                                <Stack p={5} spacing={3}>
+                                                <Stack p={5} gap={3}>
                                                     <Flex justifyContent="space-between" alignItems="baseline">
-                                                        <Text fontSize="lg" fontWeight="bold" noOfLines={1} color="gray.800">
+                                                        <Text fontSize="lg" fontWeight="bold" lineClamp={1} color="gray.800">
                                                             {product.name}
                                                         </Text>
                                                         <Text fontSize="lg" fontWeight="extrabold" color="#2DC6B8">
                                                             ${(product.price / 100).toFixed(2)}
                                                         </Text>
                                                     </Flex>
-                                                    <Text fontSize="sm" color="gray.600" noOfLines={2} h="40px">
+                                                    <Text fontSize="sm" color="gray.600" lineClamp={2} h="40px">
                                                         {product.description || "Sin descripción disponible."}
                                                     </Text>
                                                     <Flex justifyContent="space-between" alignItems="center" pt={2} borderTop="1px solid" borderColor="gray.50">

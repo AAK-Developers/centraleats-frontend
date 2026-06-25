@@ -135,7 +135,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                 <Dialog.Positioner>
                     <Dialog.Content borderRadius="3xl" overflow="hidden" maxW="600px" bg="white">
                         <Box bg="#042E63" p={6} color="white" position="relative">
-                            <Dialog.CloseTrigger color="white" top={4} right={4} size="lg" borderRadius="full" bg="whiteAlpha.200" _hover={{ bg: "whiteAlpha.300" }} />
+                            <Dialog.CloseTrigger color="white" top={4} right={4} borderRadius="full" bg="whiteAlpha.200" _hover={{ bg: "whiteAlpha.300" }} />
                             <Flex gap={4} align="center">
                                 <Image
                                     boxSize="80px"
@@ -145,7 +145,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                                     objectFit="cover"
                                     border="2px solid white"
                                 />
-                                <Stack spacing={1}>
+                                <Stack gap={1}>
                                     <Text fontSize="2xl" fontWeight="bold">
                                         {restaurant.name}
                                     </Text>
@@ -178,7 +178,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                                     Este restaurante no tiene platos registrados todavía.
                                 </Box>
                             ) : (
-                                <Stack spacing={4}>
+                                <Stack gap={4}>
                                     {products.map((product) => (
                                         <Flex
                                             key={product.id}
@@ -199,18 +199,18 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                                                 src={product.imageUrl}
                                                 alt={product.name}
                                                 objectFit="cover"
-                                                fallbackSrc="https://ui-avatars.com/api/?name=Plato&background=0D8ABC&color=fff&size=200"
+                                                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "https://ui-avatars.com/api/?name=Plato&background=0D8ABC&color=fff&size=200"; }}
                                             />
-                                            <Stack flex={1} spacing={1}>
+                                            <Stack flex={1} gap={1}>
                                                 <Flex justify="space-between" align="baseline">
-                                                    <Text fontWeight="bold" fontSize="md" color="gray.800" noOfLines={1}>
+                                                    <Text fontWeight="bold" fontSize="md" color="gray.800" lineClamp={1}>
                                                         {product.name}
                                                     </Text>
                                                     <Text fontWeight="extrabold" color="#2DC6B8" fontSize="md">
                                                         ${(product.price / 100).toFixed(2)}
                                                     </Text>
                                                 </Flex>
-                                                <Text fontSize="xs" color="gray.500" noOfLines={2}>
+                                                <Text fontSize="xs" color="gray.500" lineClamp={2}>
                                                     {product.description || "Sin descripción disponible."}
                                                 </Text>
                                                 <Flex justify="space-between" align="center" mt={1}>
@@ -239,8 +239,8 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                                                             e.stopPropagation();
                                                             handleOrder(product);
                                                         }}
-                                                        isLoading={isOrdering}
-                                                        isDisabled={!product.isAvailable || product.stock <= 0}
+                                                        loading={isOrdering}
+                                                        disabled={!product.isAvailable || product.stock <= 0}
                                                     >
                                                         Pedir y Pagar
                                                     </Button>
@@ -266,7 +266,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
 export default function StudentDashboardPage() {
     const { user } = useUser();
     const { restaurants } = useRestaurants();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { open: isOpen, onOpen, onClose } = useDisclosure();
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
 
     const handleRestaurantClick = (rest: Restaurant) => {
