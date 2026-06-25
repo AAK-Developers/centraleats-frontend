@@ -113,6 +113,9 @@ function useVendorRestaurant() {
                         imageUrl: p.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
                         isAvailable: p.isAvailable,
                     })));
+                } else {
+                    setRestaurant(null);
+                    setProducts([]);
                 }
             } catch (err) {
                 console.error("Error fetching vendor restaurant:", err);
@@ -366,8 +369,18 @@ export default function VendorDashboardPage() {
         return (
             <WaveLayout>
                 <AppContainer>
-                    <Box textAlign="center" py={10} color="gray.500">
-                        No se encontró ningún local registrado para este usuario.
+                    <Box textAlign="center" py={10} color="gray.500" display="flex" flexDirection="column" alignItems="center" gap={4}>
+                        <Text fontSize="lg">No se encontró ningún local registrado para este usuario.</Text>
+                        <Button
+                            onClick={() => navigate("/register-restaurant")}
+                            bg="#2DC6B8"
+                            color="white"
+                            borderRadius="full"
+                            px={6}
+                            _hover={{ bg: "#25a89c" }}
+                        >
+                            Registrar mi Restaurante
+                        </Button>
                     </Box>
                 </AppContainer>
             </WaveLayout>
