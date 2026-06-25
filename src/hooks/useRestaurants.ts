@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../api/axiosConfig';
 
 export interface Restaurant {
+    id: string;
     name: string;
     category: string;
     time: string;

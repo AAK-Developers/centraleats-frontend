@@ -11,6 +11,7 @@ import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
 import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
 import FactureDashboard from './pages/payment/FactureDashboard';
+import StudentMenuViewPage from './pages/student/StudentMenuViewPage';
 
 
 export default function App() {
@@ -74,6 +75,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <FactureDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/menu/:id"
+            element={
+              <ProtectedRoute>
+                <StudentMenuViewPage />
               </ProtectedRoute>
             }
           />
