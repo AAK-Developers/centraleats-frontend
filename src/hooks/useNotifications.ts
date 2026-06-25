@@ -14,12 +14,28 @@ export const useNotifications = () => {
 
     const fetchNotifications = useCallback(async () => {
         try {
-            const response = await apiClient.get('/api/restaurants');
-            // Unwrap the data property from the backend DTO
-            const responseData = response.data.data || response.data;
-            setNotifications(Array.isArray(responseData) ? responseData : []);
+            const response = await apiClient.get('/api/orders/student');
+            const responseData: Array<{
+                id: string;
+                status: string;
+                vendorName?: string;
+            }> = response.data?.data || response.data || [];
+
+            // Only surface READY orders as notifications
+            const readyOrders = responseData.filter(
+                (o) => o.status === 'READY'
+            );
+
+            setNotifications(
+                readyOrders.map((o) => ({
+                    id: o.id,
+                    title: '¡Tu pedido está listo para retirar!',
+                    restaurant: o.vendorName || 'Restaurante',
+                    status: o.status,
+                }))
+            );
         } catch (error) {
-            console.error("Failed to load notifications:", error);
+            console.error('Failed to load notifications:', error);
             setNotifications([]);
         } finally {
             setIsLoading(false);
@@ -27,13 +43,14 @@ export const useNotifications = () => {
     }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchNotifications();
+        const interval = setInterval(fetchNotifications, 8000);
+        return () => clearInterval(interval);
     }, [fetchNotifications]);
 
-    const clearAll = async () => {
+    const clearAll = () => {
         setNotifications([]);
     };
 
-    return { notifications, isLoading, clearAll };
+    return { notifications, isLoading, clearAll, refresh: fetchNotifications };
 };
