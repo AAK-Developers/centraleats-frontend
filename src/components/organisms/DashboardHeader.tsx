@@ -1,25 +1,26 @@
 import { useState } from 'react';
-import { Flex, HStack, Text, Button, IconButton, Image } from "@chakra-ui/react";
+import { Flex, HStack, Text, Button, IconButton, Image, Box } from "@chakra-ui/react";
 import { FaBell, FaShoppingCart, FaUser } from "react-icons/fa";
 import CentralEats from "../../assets/CentralEats.png";
 
 import { NotificationPanel } from '../organisms/NotificationPanel';
 import { ProfilePanel } from '../organisms/ProfilePanel';
 import { useNotifications } from '../../hooks/useNotifications';
+import { CartPanel } from './CartPanel';
+import { useCartStore } from '../../store/cartStore';
+
 
 type DashboardHeaderProps = {
     userName: string;
-    onCartClick?: () => void;
 };
 
-export const DashboardHeader = ({
-    userName,
-    onCartClick,
-}: DashboardHeaderProps) => {
+export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const { notifications, clearAll } = useNotifications();
+    const totalItems = useCartStore((s) => s.totalItems());
 
     return (
         <>
@@ -31,29 +32,77 @@ export const DashboardHeader = ({
                 />
 
                 <HStack justify="center" wrap="wrap" gap={4}>
-                    <IconButton
-                        aria-label="Notificaciones"
-                        borderRadius="full"
-                        size={{ base: "lg", md: "2xl" }}
-                        bg="#30B2BC"
-                        color="white"
-                        _hover={{ bg: "#2899a1" }}
-                        onClick={() => setIsNotificationOpen(true)}
-                    >
-                        <FaBell size="24px" />
-                    </IconButton>
+                    {/* Notifications Bell */}
+                    <Box position="relative">
+                        <IconButton
+                            aria-label="Notificaciones"
+                            borderRadius="full"
+                            size={{ base: "lg", md: "2xl" }}
+                            bg="#30B2BC"
+                            color="white"
+                            _hover={{ bg: "#2899a1" }}
+                            onClick={() => setIsNotificationOpen(true)}
+                        >
+                            <FaBell size="24px" />
+                        </IconButton>
+                        {notifications.length > 0 && (
+                            <Box
+                                position="absolute"
+                                top="-2px"
+                                right="-2px"
+                                bg="red.500"
+                                color="white"
+                                borderRadius="full"
+                                minW="20px"
+                                h="20px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                fontSize="10px"
+                                fontWeight="bold"
+                                border="2px solid white"
+                                zIndex={1}
+                            >
+                                {notifications.length > 9 ? "9+" : notifications.length}
+                            </Box>
+                        )}
+                    </Box>
 
-                    <IconButton
-                        aria-label="Carrito"
-                        borderRadius="full"
-                        size={{ base: "lg", md: "2xl" }}
-                        bg="#30B2BC"
-                        color="white"
-                        _hover={{ bg: "#2899a1" }}
-                        onClick={onCartClick}
-                    >
-                        <FaShoppingCart size="24px" />
-                    </IconButton>
+                    {/* Cart Button with item count badge */}
+                    <Box position="relative">
+                        <IconButton
+                            aria-label="Carrito"
+                            borderRadius="full"
+                            size={{ base: "lg", md: "2xl" }}
+                            bg="#30B2BC"
+                            color="white"
+                            _hover={{ bg: "#2899a1" }}
+                            onClick={() => setIsCartOpen(true)}
+                        >
+                            <FaShoppingCart size="24px" />
+                        </IconButton>
+                        {totalItems > 0 && (
+                            <Box
+                                position="absolute"
+                                top="-2px"
+                                right="-2px"
+                                bg="#042E63"
+                                color="white"
+                                borderRadius="full"
+                                minW="20px"
+                                h="20px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                fontSize="10px"
+                                fontWeight="bold"
+                                border="2px solid white"
+                                zIndex={1}
+                            >
+                                {totalItems > 9 ? "9+" : totalItems}
+                            </Box>
+                        )}
+                    </Box>
 
                     <Button
                         borderRadius="full"
@@ -82,6 +131,11 @@ export const DashboardHeader = ({
             <ProfilePanel
                 isOpen={isProfileOpen}
                 onClose={() => setIsProfileOpen(false)}
+            />
+
+            <CartPanel
+                isOpen={isCartOpen}
+                onClose={() => setIsCartOpen(false)}
             />
         </>
     );

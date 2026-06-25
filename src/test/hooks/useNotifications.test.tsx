@@ -16,18 +16,17 @@ describe("useNotifications", () => {
     });
 
     it("should load notifications successfully from wrapped response", async () => {
-        const notifications = [
+        const mockResponseData = [
             {
                 id: "1",
-                title: "Pedido listo",
-                restaurant: "Pizza House",
-                status: "Completado",
+                vendorName: "Pizza House",
+                status: "READY",
             },
         ];
 
         vi.mocked(apiClient.get).mockResolvedValue({
             data: {
-                data: notifications,
+                data: mockResponseData,
             },
         });
 
@@ -37,23 +36,27 @@ describe("useNotifications", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        expect(result.current.notifications).toEqual(
-            notifications
-        );
+        expect(result.current.notifications).toEqual([
+            {
+                id: "1",
+                title: "¡Tu pedido está listo para retirar!",
+                restaurant: "Pizza House",
+                status: "READY",
+            },
+        ]);
     });
 
     it("should load notifications successfully from direct response", async () => {
-        const notifications = [
+        const mockResponseData = [
             {
                 id: "1",
-                title: "Nuevo pedido",
-                restaurant: "Burger Express",
-                status: "Pendiente",
+                vendorName: "Burger Express",
+                status: "READY",
             },
         ];
 
         vi.mocked(apiClient.get).mockResolvedValue({
-            data: notifications,
+            data: mockResponseData,
         });
 
         const { result } = renderHook(() => useNotifications());
@@ -62,9 +65,14 @@ describe("useNotifications", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        expect(result.current.notifications).toEqual(
-            notifications
-        );
+        expect(result.current.notifications).toEqual([
+            {
+                id: "1",
+                title: "¡Tu pedido está listo para retirar!",
+                restaurant: "Burger Express",
+                status: "READY",
+            },
+        ]);
     });
 
     it("should return empty array when response is not an array", async () => {
@@ -105,7 +113,7 @@ describe("useNotifications", () => {
         consoleSpy.mockRestore();
     });
 
-    it("should call restaurants endpoint", async () => {
+    it("should call student orders endpoint", async () => {
         vi.mocked(apiClient.get).mockResolvedValue({
             data: [],
         });
@@ -114,7 +122,7 @@ describe("useNotifications", () => {
 
         await waitFor(() => {
             expect(apiClient.get).toHaveBeenCalledWith(
-                "/api/restaurants"
+                "/api/orders/student"
             );
         });
     });
@@ -131,17 +139,16 @@ describe("useNotifications", () => {
     });
 
     it("should clear all notifications", async () => {
-        const notifications = [
+        const mockResponseData = [
             {
                 id: "1",
-                title: "Pedido listo",
-                restaurant: "Pizza House",
-                status: "Completado",
+                vendorName: "Pizza House",
+                status: "READY",
             },
         ];
 
         vi.mocked(apiClient.get).mockResolvedValue({
-            data: notifications,
+            data: mockResponseData,
         });
 
         const { result } = renderHook(() => useNotifications());

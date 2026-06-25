@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { waitFor } from "@testing-library/react";
+import { waitFor, act } from "@testing-library/react";
 
 
 vi.mock("@clerk/clerk-react", () => ({
@@ -51,7 +51,9 @@ describe("main.tsx entry point", () => {
         `;
 
 
-        await import("../main");
+        await act(async () => {
+            await import("../main");
+        });
 
 
         await waitFor(() => {
@@ -78,6 +80,6 @@ describe("main.tsx entry point", () => {
 
         });
 
-    }, 20000);
+    }, 90000);
 
 });

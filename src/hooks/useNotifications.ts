@@ -14,12 +14,25 @@ export const useNotifications = () => {
 
     const fetchNotifications = useCallback(async () => {
         try {
-            const response = await apiClient.get('/api/restaurants');
-            // Unwrap the data property from the backend DTO
-            const responseData = response.data.data || response.data;
-            setNotifications(Array.isArray(responseData) ? responseData : []);
+            const response = await apiClient.get('/api/orders/student');
+            const rawData = response.data?.data || response.data || [];
+            const responseData = Array.isArray(rawData) ? rawData : [];
+
+            // Only surface READY orders as notifications
+            const readyOrders = responseData.filter(
+                (o) => o.status === 'READY'
+            );
+
+            setNotifications(
+                readyOrders.map((o) => ({
+                    id: o.id,
+                    title: '¡Tu pedido está listo para retirar!',
+                    restaurant: o.vendorName || 'Restaurante',
+                    status: o.status,
+                }))
+            );
         } catch (error) {
-            console.error("Failed to load notifications:", error);
+            console.error('Failed to load notifications:', error);
             setNotifications([]);
         } finally {
             setIsLoading(false);
@@ -27,13 +40,19 @@ export const useNotifications = () => {
     }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchNotifications();
+        const timer = setTimeout(() => {
+            fetchNotifications();
+        }, 0);
+        const interval = setInterval(fetchNotifications, 8000);
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
     }, [fetchNotifications]);
 
-    const clearAll = async () => {
+    const clearAll = () => {
         setNotifications([]);
     };
 
-    return { notifications, isLoading, clearAll };
+    return { notifications, isLoading, clearAll, refresh: fetchNotifications };
 };

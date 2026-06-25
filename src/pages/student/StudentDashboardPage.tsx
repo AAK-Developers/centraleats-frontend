@@ -15,16 +15,15 @@ import {
 } from "@chakra-ui/react";
 import { FaSearch, FaClock, FaStar } from "react-icons/fa";
 import { useUser } from "@clerk/clerk-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { RestaurantCard } from "../../components/molecules/RestaurantCard";
-import { useRestaurants } from "../../hooks/useRestaurants";
-import type { Restaurant } from "../../hooks/useRestaurants";
 import { DashboardHeader } from "../../components/organisms/DashboardHeader";
 import { apiClient } from "../../api/axiosConfig";
+import { useRestaurants, type Restaurant } from "../../hooks/useRestaurants";
+import { RestaurantCard } from "../../components/molecules/RestaurantCard";
 
 interface MenuProduct {
     id: string;
@@ -100,7 +99,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                 items: [
                     {
                         productId: product.id,
-                        targetQuantity: 1
+                        quantity: 1
                     }
                 ],
                 notes: "Pedido rápido desde menú del estudiante"
@@ -268,74 +267,116 @@ export default function StudentDashboardPage() {
     const { restaurants } = useRestaurants();
     const { open: isOpen, onOpen, onClose } = useDisclosure();
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+    const [search, setSearch] = useState("");
 
     const handleRestaurantClick = (rest: Restaurant) => {
         setSelectedRestaurant(rest);
         onOpen();
     };
 
+    const filteredRestaurants = useMemo(() => {
+        const q = search.toLowerCase().trim();
+        if (!q) return restaurants;
+        return restaurants.filter(
+            (r) =>
+                r.name.toLowerCase().includes(q) ||
+                r.category.toLowerCase().includes(q)
+        );
+    }, [restaurants, search]);
+
     return (
         <WaveLayout>
             <AppContainer>
-                <DashboardHeader
-                    userName={user?.firstName || "Usuario"}
-                />
-                <Flex
-                    justify="space-between"
-                    align="center"
-                    mb={8}
-                    gap={4}
-                    flexWrap="wrap"
-                >
+                <DashboardHeader userName={user?.firstName || "Usuario"} />
+
+                {/* Hero Section — centered */}
+                <Box mb={8} textAlign="center">
                     <Text
-                        fontSize="4xl"
-                        fontWeight="bold"
+                        fontSize={{ base: "2xl", md: "4xl" }}
+                        fontWeight="extrabold"
                         color="#042E63"
-                        flex="1"
+                        mb={1}
                     >
-                        Los mejores restaurantes de la Universidad Central del Ecuador
+                        ¿Qué vas a pedir hoy?
+                    </Text>
+                    <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" mb={6}>
+                        Todos los platos de los restaurantes de la Universidad Central del Ecuador
                     </Text>
 
-                    <Box position="relative" maxW="300px" w="full">
-                        <Input
-                            placeholder="Buscar..."
-                            borderRadius="full"
-                            bg="white"
-                            shadow="sm"
-                            ps="10"
-                        />
+                    {/* Search bar — centered, responsive */}
+                    <Box position="relative" maxW="560px" mx="auto" w="full">
                         <Box
                             position="absolute"
-                            left="3"
+                            left="18px"
                             top="50%"
                             transform="translateY(-50%)"
-                            zIndex="1"
+                            zIndex={1}
                             color="gray.400"
+                            pointerEvents="none"
                         >
                             <FaSearch />
                         </Box>
+                        <Input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar por plato, descripción o restaurante..."
+                            borderRadius="full"
+                            bg="white"
+                            boxShadow="lg"
+                            pl="48px"
+                            pr={5}
+                            h={{ base: "48px", md: "56px" }}
+                            fontSize={{ base: "sm", md: "md" }}
+                            border="2px solid"
+                            borderColor="gray.100"
+                            _focus={{
+                                borderColor: "#2DC6B8",
+                                boxShadow: "0 0 0 4px rgba(45,198,184,0.18)",
+                                outline: "none",
+                            }}
+                            _placeholder={{ color: "gray.400" }}
+                        />
                     </Box>
-                </Flex>
+                </Box>
 
-                <SimpleGrid
-                    columns={{ base: 1, md: 2, lg: 3 }}
-                    gap={10}
-                    pb={10}
-                    w="full"
-                >
-                    {restaurants.map((rest: Restaurant, index) => (
-                        <Box
-                            key={index}
-                            w="full"
-                            onClick={() => handleRestaurantClick(rest)}
-                            cursor="pointer"
-                            transition="all 0.2s"
-                            _hover={{ transform: "translateY(-4px)", opacity: 0.95 }}
-                        >
-                            <RestaurantCard {...rest} />
-                        </Box>
-                    ))}
-                </SimpleGrid>
+                {filteredRestaurants.length === 0 ? (
+                    <Flex direction="column" align="center" justify="center" py={20} gap={3}>
+                        <Text color="gray.500" fontSize="lg" fontWeight="semibold">
+                            {search ? "Sin resultados para tu búsqueda" : "No hay locales disponibles"}
+                        </Text>
+                        {search && (
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                color="#2DC6B8"
+                                onClick={() => setSearch("")}
+                                borderRadius="full"
+                            >
+                                Limpiar búsqueda
+                            </Button>
+                        )}
+                    </Flex>
+                ) : (
+                    <SimpleGrid
+                        columns={{ base: 1, md: 2, lg: 3 }}
+                        gap={10}
+                        pb={10}
+                        w="full"
+                    >
+                        {filteredRestaurants.map((rest: Restaurant) => (
+                            <Box
+                                key={rest.id}
+                                w="full"
+                                onClick={() => handleRestaurantClick(rest)}
+                                cursor="pointer"
+                                transition="all 0.2s"
+                                _hover={{ transform: "translateY(-4px)", opacity: 0.95 }}
+                            >
+                                <RestaurantCard {...rest} />
+                            </Box>
+                        ))}
+                    </SimpleGrid>
+                )}
 
                 <RestaurantMenuModal
                     restaurant={selectedRestaurant}

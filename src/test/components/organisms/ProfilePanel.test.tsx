@@ -18,26 +18,54 @@ vi.mock("@clerk/clerk-react", () => ({
     }),
 }));
 
-vi.mock("../../../hooks/useOrderHistory", () => ({
-    useOrderHistory: () => ({
+vi.mock("../../../hooks/useStudentOrders", () => ({
+    useStudentOrders: () => ({
         isLoading: false,
+        activeOrders: [
+            {
+                id: "active-1",
+                status: "PREPARING",
+                totalAmount: 1250,
+                createdAt: "2025-08-01T12:00:00.000Z",
+                vendorName: "Pizza House",
+                items: [
+                    { id: "item-1", productName: "Pizza", quantity: 1 }
+                ]
+            }
+        ],
         orders: [
             {
-                id: "1",
-                restaurant: "Pizza House",
-                price: "$12.50",
-                date: "2025-08-01",
-                status: "Entregado",
-            },
-            {
-                id: "2",
-                restaurant: "Burger Express",
-                price: "$8.00",
-                date: "2025-08-02",
-                status: "Entregado",
-            },
+                id: "completed-1",
+                status: "COMPLETED",
+                totalAmount: 800,
+                createdAt: "2025-08-02T12:00:00.000Z",
+                vendorName: "Burger Express",
+                items: [
+                    { id: "item-2", productName: "Burger", quantity: 1 }
+                ]
+            }
         ],
     }),
+    STATUS_LABELS: {
+        PENDING_PAYMENT: 'Pendiente de pago',
+        PAID: 'Pagado',
+        RECEIVED: 'Recibido por local',
+        PREPARING: 'En preparación',
+        READY: 'Listo para retirar',
+        PICKED_UP: 'Retirado',
+        COMPLETED: 'Completado',
+        CANCELLED: 'Cancelado',
+    },
+    STATUS_COLORS: {
+        PENDING_PAYMENT: 'orange',
+        PAID: 'green',
+        RECEIVED: 'blue',
+        PREPARING: 'yellow',
+        READY: 'teal',
+        PICKED_UP: 'gray',
+        COMPLETED: 'gray',
+        CANCELLED: 'red',
+    }
 }));
 
 vi.mock("../../../components/organisms/UserProfileHeader", () => ({
@@ -50,14 +78,6 @@ vi.mock("../../../components/organisms/UserProfileHeader", () => ({
     }) => (
         <div data-testid="user-profile-header">
             {fullName} - {email}
-        </div>
-    ),
-}));
-
-vi.mock("../../../components/molecules/OrderCard", () => ({
-    OrderCard: ({ id }: { id: string }) => (
-        <div data-testid="order-card">
-            Order {id}
         </div>
     ),
 }));
@@ -148,7 +168,7 @@ describe("ProfilePanel Component", () => {
         );
 
         expect(
-            screen.getByText("Historial de Pedidos")
+            screen.getByText("Últimos pedidos")
         ).toBeInTheDocument();
     });
 
@@ -160,9 +180,8 @@ describe("ProfilePanel Component", () => {
             />
         );
 
-        const orders = screen.getAllByTestId("order-card");
-
-        expect(orders).toHaveLength(2);
+        expect(screen.getByText(/Pedido #TIVE-1/i)).toBeInTheDocument();
+        expect(screen.getByText(/#ETED-1/i)).toBeInTheDocument();
     });
 
     it("should render logout button", () => {

@@ -11,7 +11,12 @@ vi.mock("@chakra-ui/react", async () => {
         Flex: ({ children }: any) => <div>{children}</div>,
         VStack: ({ children }: any) => <div>{children}</div>,
         Text: ({ children }: any) => <div>{children}</div>,
-        Button: (props: any) => <button {...props}>{props.children}</button>,
+        Button: (props: any) => {
+            const rest = { ...props };
+            delete rest.borderColor;
+            delete rest.borderRadius;
+            return <button {...rest}>{rest.children}</button>;
+        },
     };
 });
 

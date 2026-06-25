@@ -1,9 +1,19 @@
 import { render, screen } from "@testing-library/react";
 import { ChakraProvider } from "@chakra-ui/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 import theme from "../../../theme";
 import { UserProfileHeader } from "../../../components/organisms/UserProfileHeader";
+
+vi.mock("@chakra-ui/react", async () => {
+    const actual = await vi.importActual<any>("@chakra-ui/react");
+    return {
+        ...actual,
+        AvatarRoot: ({ children }: any) => <div data-testid="avatar-root">{children}</div>,
+        AvatarImage: ({ src }: any) => <img src={src} data-testid="avatar-image" />,
+        AvatarFallback: ({ children }: any) => <span data-testid="avatar-fallback">{children}</span>,
+    };
+});
 
 const renderWithChakra = (ui: React.ReactNode) => {
     return render(
