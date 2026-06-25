@@ -89,12 +89,7 @@ function useVendorRestaurant() {
             try {
                 const res = await apiClient.get("/api/restaurants");
                 const list = res.data?.data || res.data || [];
-                console.log("[VENDOR DEBUG] Vendor Profile:", profile);
-                console.log("[VENDOR DEBUG] All Restaurants:", list);
-                const myRest = list.find((r: ApiRestaurant) => 
-                    r.ownerId === profile.id || 
-                    (profile.clerkId && r.ownerId === profile.clerkId)
-                );
+                const myRest = list.find((r: ApiRestaurant) => r.ownerId === profile.id);
                 if (myRest) {
                     setRestaurant({
                         id: myRest.id,
@@ -130,7 +125,7 @@ function useVendorRestaurant() {
         };
 
         fetchVendorData();
-    }, [profile]);
+    }, [profile?.id]);
 
     return {
         restaurant,
@@ -152,7 +147,6 @@ interface VendorOrder {
     totalAmount: number;
     notes?: string;
     createdAt: string;
-    pickupCode?: string | null;
     user?: {
         fullName?: string;
         email?: string;
@@ -193,7 +187,6 @@ function useVendorOrders(restaurantId?: string) {
         };
     }, [restaurantId, fetchOrders]);
 
-    // Show all unaccepted orders as new: PENDING_PAYMENT (efectivo pending), PAID (card paid), RECEIVED
     const nuevos = orders.filter(o => o.status === "PENDING_PAYMENT" || o.status === "PAID" || o.status === "RECEIVED");
     const enCocina = orders.filter(o => o.status === "PREPARING");
     const listos = orders.filter(o => o.status === "READY" || o.status === "PICKED_UP");
@@ -209,25 +202,13 @@ function useVendorOrders(restaurantId?: string) {
 
 interface OrderCardProps {
     order: VendorOrder;
-    onAccept?: () => void;       // PENDING_PAYMENT / PAID → RECEIVED
-    onStartCooking?: () => void; // RECEIVED → PREPARING
-    onReady?: () => void;        // PREPARING → READY
-    onDeliver?: () => void;      // READY/PICKED_UP → COMPLETED
+    onAccept?: () => void;
+    onReady?: () => void;
+    onDeliver?: () => void;
 }
 
-const STATUS_BADGE: Record<string, { label: string; color: string }> = {
-    PENDING_PAYMENT: { label: "Pago pendiente (efectivo)", color: "orange" },
-    PAID: { label: "Pagado (tarjeta)", color: "green" },
-    RECEIVED: { label: "Aceptado", color: "blue" },
-    PREPARING: { label: "En preparación", color: "yellow" },
-    READY: { label: "Listo para retirar", color: "teal" },
-    PICKED_UP: { label: "Retirado", color: "gray" },
-    COMPLETED: { label: "Completado", color: "gray" },
-};
-
-export function VendorOrderCard({ order, onAccept, onStartCooking, onReady, onDeliver }: OrderCardProps) {
+export function VendorOrderCard({ order, onAccept, onReady, onDeliver }: OrderCardProps) {
     const formattedDate = new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const statusInfo = STATUS_BADGE[order.status] || { label: order.status, color: "gray" };
 
     return (
         <Box
@@ -235,7 +216,7 @@ export function VendorOrderCard({ order, onAccept, onStartCooking, onReady, onDe
             borderRadius="2xl"
             p={5}
             border="1px solid"
-            borderColor={order.status === "PENDING_PAYMENT" ? "orange.200" : "gray.100"}
+            borderColor="gray.100"
             shadow="sm"
             display="flex"
             flexDirection="column"
@@ -251,18 +232,6 @@ export function VendorOrderCard({ order, onAccept, onStartCooking, onReady, onDe
                     {formattedDate}
                 </Text>
             </Flex>
-
-            {/* Payment status badge */}
-            <Badge
-                colorScheme={statusInfo.color}
-                borderRadius="full"
-                px={3}
-                py={1}
-                fontSize="xs"
-                alignSelf="flex-start"
-            >
-                {statusInfo.label}
-            </Badge>
 
             <Separator />
 
@@ -298,25 +267,20 @@ export function VendorOrderCard({ order, onAccept, onStartCooking, onReady, onDe
                 </Text>
             </Flex>
 
-            <Flex justify="stretch" mt={2} gap={2} direction="column">
+            <Flex justify="stretch" mt={2}>
                 {onAccept && (
                     <Button onClick={onAccept} w="full" bg="#2DC6B8" color="white" borderRadius="xl" _hover={{ bg: "#25a89c" }}>
-                        ✅ Aceptar Pedido
-                    </Button>
-                )}
-                {onStartCooking && (
-                    <Button onClick={onStartCooking} w="full" bg="#D69E2E" color="white" borderRadius="xl" _hover={{ bg: "#B7791F" }}>
-                        🔥 Iniciar Preparación
+                        Aceptar Pedido
                     </Button>
                 )}
                 {onReady && (
                     <Button onClick={onReady} w="full" bg="orange.400" color="white" borderRadius="xl" _hover={{ bg: "orange.500" }}>
-                        🔔 Marcar como Listo
+                        Marcar como Listo
                     </Button>
                 )}
                 {onDeliver && (
                     <Button onClick={onDeliver} w="full" bg="blue.500" color="white" borderRadius="xl" _hover={{ bg: "blue.600" }}>
-                        📦 Entregar Pedido
+                        Entregar Pedido
                     </Button>
                 )}
             </Flex>
@@ -337,10 +301,10 @@ export default function VendorDashboardPage() {
 
     const [activeTab, setActiveTab] = useState<OrderTab>("nuevos");
 
-    const tabs: { key: OrderTab; label: string; count: number; badgeColor?: string }[] = [
-        { key: "nuevos", label: "Pedidos Nuevos", count: nuevos.length, badgeColor: "#E53E3E" },
-        { key: "en_cocina", label: "En Cocina", count: enCocina.length, badgeColor: "#D69E2E" },
-        { key: "listos", label: "Listos", count: listos.length, badgeColor: "#38A169" },
+    const tabs: { key: OrderTab; label: string; count: number }[] = [
+        { key: "nuevos", label: "Nuevos", count: nuevos.length },
+        { key: "en_cocina", label: "En Cocina", count: enCocina.length },
+        { key: "listos", label: "Listos", count: listos.length },
         { key: "platos", label: "Mis Platos", count: products.length },
     ];
 
@@ -356,24 +320,13 @@ export default function VendorDashboardPage() {
 
     const handleAccept = async (orderId: string) => {
         try {
-            // Transition: PENDING_PAYMENT/PAID → RECEIVED (vendor acknowledges order)
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "RECEIVED" });
-            toast.success("Pedido aceptado. Ahora pasa a cocina.");
+            await apiClient.patch(`/api/orders/${orderId}/status`, { status: "PREPARING" });
+            toast.success("Pedido aceptado y en preparación.");
             refreshOrders();
         } catch (err) {
             console.error("Failed to accept order:", err);
             toast.error("Error al aceptar pedido");
-        }
-    };
-
-    const handleStartCooking = async (orderId: string) => {
-        try {
-            await apiClient.patch(`/api/orders/${orderId}/status`, { status: "PREPARING" });
-            toast.success("¡Pedido en preparación!");
-            refreshOrders();
-        } catch (err) {
-            console.error("Failed to start cooking:", err);
-            toast.error("Error al iniciar preparación");
         }
     };
 
@@ -388,16 +341,7 @@ export default function VendorDashboardPage() {
         }
     };
 
-    const handleDeliver = async (orderId: string, expectedCode?: string | null) => {
-        if (expectedCode) {
-            const inputCode = window.prompt("Ingrese el código de retiro de 4 dígitos proporcionado por el estudiante:");
-            if (inputCode === null) return; // User cancelled
-            if (inputCode.trim() !== expectedCode.trim()) {
-                toast.error("Código de retiro incorrecto. No se puede entregar el pedido.");
-                return;
-            }
-        }
-
+    const handleDeliver = async (orderId: string) => {
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "PICKED_UP" });
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "COMPLETED" });
@@ -568,19 +512,9 @@ export default function VendorDashboardPage() {
                                     <VendorOrderCard
                                         key={order.id}
                                         order={order}
-                                        // Nuevos: PENDING_PAYMENT/PAID → accept; RECEIVED → start cooking
-                                        onAccept={
-                                            activeTab === "nuevos" && (order.status === "PENDING_PAYMENT" || order.status === "PAID")
-                                                ? () => handleAccept(order.id)
-                                                : undefined
-                                        }
-                                        onStartCooking={
-                                            activeTab === "nuevos" && order.status === "RECEIVED"
-                                                ? () => handleStartCooking(order.id)
-                                                : undefined
-                                        }
+                                        onAccept={activeTab === "nuevos" ? () => handleAccept(order.id) : undefined}
                                         onReady={activeTab === "en_cocina" ? () => handleReady(order.id) : undefined}
-                                        onDeliver={activeTab === "listos" ? () => handleDeliver(order.id, order.pickupCode) : undefined}
+                                        onDeliver={activeTab === "listos" ? () => handleDeliver(order.id) : undefined}
                                     />
                                 ))}
                             </SimpleGrid>

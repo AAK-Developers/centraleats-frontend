@@ -31,7 +31,6 @@ vi.mock("@chakra-ui/react", () => ({
     Image: (props: any) => <img {...props} />,
     Badge: ({ children }: any) => <span>{children}</span>,
     Stack: ({ children }: any) => <div>{children}</div>,
-    HStack: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock("@clerk/clerk-react", () => ({

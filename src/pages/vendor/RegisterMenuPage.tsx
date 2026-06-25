@@ -46,7 +46,7 @@ export default function RegisterMenuPage() {
 
             formData.append('name', data.name);
             formData.append('description', data.description);
-            formData.append('price', String(Math.round(Number(data.price) * 100)));
+            formData.append('price', String(data.price));
             formData.append('stock', '999');
             formData.append('categoryId', data.categoryId);
             formData.append('isAvailable', 'true');
@@ -99,7 +99,7 @@ export default function RegisterMenuPage() {
                                 </Text>
                                 <VStack gap={4}>
                                     <Textarea {...register("description", { required: true })} placeholder="Descripción e Ingredientes" minH="120px" fontSize="lg" />
-                                    <Input {...register("price", { required: true })} placeholder="Precio (ej. 3.50)" type="number" step="any" fontSize="lg" />
+                                    <Input {...register("price", { required: true })} placeholder="Precio" type="number" fontSize="lg" />
                                     <Box w="full">
                                         <select
                                             {...register("categoryId", { required: true })}
