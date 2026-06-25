@@ -15,11 +15,8 @@ export const useNotifications = () => {
     const fetchNotifications = useCallback(async () => {
         try {
             const response = await apiClient.get('/api/orders/student');
-            const responseData: Array<{
-                id: string;
-                status: string;
-                vendorName?: string;
-            }> = response.data?.data || response.data || [];
+            const rawData = response.data?.data || response.data || [];
+            const responseData = Array.isArray(rawData) ? rawData : [];
 
             // Only surface READY orders as notifications
             const readyOrders = responseData.filter(
