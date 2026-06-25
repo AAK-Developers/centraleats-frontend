@@ -10,6 +10,8 @@ import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
 import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
+import FactureDashboard from './pages/payment/FactureDashboard';
+
 
 export default function App() {
   return (
@@ -63,6 +65,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <RegisterMenuPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/facture-dashboard"
+            element={
+              <ProtectedRoute>
+                <FactureDashboard />
               </ProtectedRoute>
             }
           />
