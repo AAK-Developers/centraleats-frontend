@@ -26,27 +26,6 @@ interface InvoicePanelProps {
     onSeguirPedido: () => void;
 }
 
-export const MOCK_INVOICE: Omit<InvoicePanelProps, "onSeguirPedido"> = {
-    invoiceNumber: "F-001",
-    date: new Date().toLocaleDateString("es-EC"),
-    restaurant: {
-        name: "Mañaz Cafetería",
-        address: "Carrera 70 #17a-50",
-        city: "Quito, Ecuador",
-    },
-    customer: {
-        name: "Aquiles Parra",
-        address: "Carrera 70 #17a-50",
-    },
-    items: [
-        { code: "1", name: "Almuerzo Ejecutivo", quantity: 2, unitPrice: 2.90 },
-        { code: "2", name: "Jugo Natural", quantity: 1, unitPrice: 1.50 },
-        { code: "3", name: "Empanada", quantity: 3, unitPrice: 1.00 },
-    ],
-    paymentMethod: "Efectivo",
-    amountPaid: 15.00,
-};
-
 export const InvoicePanel = ({
     invoiceNumber,
     date,

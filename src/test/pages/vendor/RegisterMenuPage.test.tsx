@@ -14,7 +14,11 @@ vi.mock("../../../api/axiosConfig", () => ({
 vi.mock("@chakra-ui/react", () => ({
     VStack: ({ children }: any) => <div>{children}</div>,
     Input: (props: any) => <input {...props} />,
-    Textarea: ({ minH, ...props }: any) => <textarea {...props} />,
+    Textarea: (props: any) => {
+        const rest = { ...props };
+        delete rest.minH;
+        return <textarea {...rest} />;
+    },
     Text: ({ children }: any) => <div>{children}</div>,
     Box: ({ children }: any) => <div>{children}</div>,
     SimpleGrid: ({ children }: any) => <div>{children}</div>,

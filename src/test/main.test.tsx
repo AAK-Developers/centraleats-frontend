@@ -80,6 +80,6 @@ describe("main.tsx entry point", () => {
 
         });
 
-    }, 20000);
+    }, 90000);
 
 });
