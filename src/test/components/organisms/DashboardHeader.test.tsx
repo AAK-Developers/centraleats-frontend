@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ChakraProvider } from "@chakra-ui/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import theme from "../../../theme";
 import { DashboardHeader } from "../../../components/organisms/DashboardHeader";
 
 const mockClearAll = vi.fn();
@@ -39,7 +39,7 @@ vi.mock("../../../components/organisms/ProfilePanel", () => ({
 
 const renderWithChakra = (ui: React.ReactNode) => {
     return render(
-        <ChakraProvider value={theme}>
+        <ChakraProvider>
             {ui}
         </ChakraProvider>
     );
