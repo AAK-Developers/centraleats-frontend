@@ -7,7 +7,8 @@ import { NotificationPanel } from '../organisms/NotificationPanel';
 import { ProfilePanel } from '../organisms/ProfilePanel';
 
 import { useNotifications } from '../../hooks/useNotifications';
-import { CartPanel } from './cartPanel';
+import { CartPanel } from './CartPanel';
+
 
 type DashboardHeaderProps = {
     userName: string;

@@ -1,7 +1,6 @@
 import { Box, VStack, Flex, Text, HStack, Icon } from "@chakra-ui/react";
 import { useState } from "react";
 import { HiBell, HiShoppingCart } from "react-icons/hi";
-import { useNavigate } from "react-router-dom";
 
 import { CloseButton } from "../atoms/CloseButton";
 import { CartItem } from "../molecules/CartItem";
@@ -9,6 +8,7 @@ import { CartTotalBanner } from "../molecules/CartTotalBanner";
 import { CartActionButton } from "../molecules/CartActionButton";
 import { CardForm } from "../molecules/CardForm";
 import { PaymentMethodSelector } from "../molecules/PaymentMethodSelector";
+import { InvoicePanel, MOCK_INVOICE } from "./InvoicePanel";
 
 interface CartItemData {
     id: string;
@@ -30,12 +30,11 @@ const MOCK_ITEMS: CartItemData[] = [
 ];
 
 type PaymentMethod = "efectivo" | "tarjeta" | null;
-type PanelView = "cart" | "card-form";
+type PanelView = "cart" | "card-form" | "factura";
 
 export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps) => {
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
     const [view, setView] = useState<PanelView>("cart");
-    const navigate = useNavigate();
 
     const [cardNumber, setCardNumber] = useState("");
     const [cardName, setCardName] = useState("");
@@ -48,16 +47,32 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
     const items = MOCK_ITEMS;
     const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+    // El panel nunca se desmonta (el padre solo alterna isOpen), así que hay
+    // que resetear el estado interno manualmente al cerrar. Si no, la próxima
+    // vez que se abra el carrito seguirá mostrando la última vista (factura).
+    const handleClose = () => {
+        setView("cart");
+        setPaymentMethod(null);
+        setCardNumber("");
+        setCardName("");
+        setCardExpiry("");
+        setCardCvv("");
+        setError("");
+        onClose();
+    };
+
     const handleAction = () => {
         if (paymentMethod === "tarjeta") {
             setView("card-form");
             return;
         }
         if (paymentMethod === "efectivo") {
-            onClose();
-            navigate("/facture-dashboard");
+            setView("factura");
         }
     };
+
+    // Tamaño del panel flotante: la vista de factura necesita más espacio
+    const isFacturaView = view === "factura";
 
     const content = (
         <>
@@ -66,19 +81,19 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
                     <HStack gap={2}>
                         <Icon as={HiShoppingCart} boxSize={8} color="white" />
                         <Text fontWeight="bold" fontSize={{ base: "xl", md: "2xl" }} color="white">
-                            Carrito
+                            {isFacturaView ? "Factura" : "Carrito"}
                         </Text>
                     </HStack>
                 </Flex>
 
                 {!isInline && (
                     <Box position="absolute" right={4} top="50%" transform="translateY(-50%)">
-                        <CloseButton onClick={onClose} />
+                        <CloseButton onClick={handleClose} />
                     </Box>
                 )}
             </Box>
 
-            {view === "cart" ? (
+            {view === "cart" && (
                 <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
                     <Box flex={1} overflowY="auto" p={{ base: 3, md: 4 }}>
                         <VStack gap={3} align="stretch">
@@ -119,7 +134,9 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
                         <CartActionButton paymentMethod={paymentMethod} onClick={handleAction} />
                     </Box>
                 </Box>
-            ) : (
+            )}
+
+            {view === "card-form" && (
                 <CardForm
                     cardNumber={cardNumber}
                     cardName={cardName}
@@ -145,10 +162,17 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
                             return;
                         }
                         setError("");
-                        onClose();
-                        navigate("/facture-dashboard");
+                        setView("factura");
                     }}
                     error={error}
+                />
+            )}
+
+            {view === "factura" && (
+                <InvoicePanel
+                    {...MOCK_INVOICE}
+                    paymentMethod={paymentMethod === "tarjeta" ? "Tarjeta" : "Efectivo"}
+                    onSeguirPedido={handleClose}
                 />
             )}
         </>
@@ -177,14 +201,14 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
                 bg="blackAlpha.500"
                 backdropFilter="blur(3px)"
                 zIndex={998}
-                onClick={onClose}
+                onClick={handleClose}
             />
             <Box
                 position="fixed"
-                top={{ base: "60px", md: "60px" }}
-                bottom={{ base: "60px", md: "60px" }}
-                right={{ base: "4px", md: "24px" }}
-                w={{ base: "calc(100% - 8px)", md: "400px" }}
+                top={{ base: "60px", md: isFacturaView ? "30px" : "60px" }}
+                bottom={{ base: "60px", md: isFacturaView ? "30px" : "60px" }}
+                right={{ base: "4px", md: isFacturaView ? "24px" : "24px" }}
+                w={{ base: "calc(100% - 8px)", md: isFacturaView ? "640px" : "400px" }}
                 bg="white"
                 borderRadius="3xl"
                 boxShadow="2xl"
@@ -192,6 +216,7 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
                 zIndex={999}
                 display="flex"
                 flexDirection="column"
+                transition="width 0.25s ease, top 0.25s ease, bottom 0.25s ease"
             >
                 {content}
             </Box>
