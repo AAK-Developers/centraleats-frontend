@@ -1,166 +1,93 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { ChakraProvider } from "@chakra-ui/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { useState } from 'react';
+import { Flex, HStack, Text, Button, IconButton, Image } from "@chakra-ui/react";
+import { FaBell, FaShoppingCart, FaUser } from "react-icons/fa";
+import CentralEats from "../../assets/CentralEats.png";
 
-import theme from "../../../theme";
-import { DashboardHeader } from "../../../components/organisms/DashboardHeader";
+import { NotificationPanel } from '../organisms/NotificationPanel';
+import { ProfilePanel } from '../organisms/ProfilePanel';
 
-const mockClearAll = vi.fn();
+import { useNotifications } from '../../hooks/useNotifications';
+import { CartPanel } from './CartPanel';
 
-vi.mock("../../../hooks/useNotifications", () => ({
-    useNotifications: () => ({
-        notifications: [
-            {
-                title: "Pedido listo",
-                restaurant: "Pizza House",
-                status: "Completado",
-            },
-        ],
-        clearAll: mockClearAll,
-    }),
-}));
 
-vi.mock("../../../components/organisms/NotificationPanel", () => ({
-    NotificationPanel: ({ isOpen }: { isOpen: boolean }) => (
-        <div data-testid="notification-panel">
-            {isOpen ? "OPEN" : "CLOSED"}
-        </div>
-    ),
-}));
-
-vi.mock("../../../components/organisms/ProfilePanel", () => ({
-    ProfilePanel: ({ isOpen }: { isOpen: boolean }) => (
-        <div data-testid="profile-panel">
-            {isOpen ? "OPEN" : "CLOSED"}
-        </div>
-    ),
-}));
-
-vi.mock("../../../components/organisms/CartPanel", () => ({
-    CartPanel: ({ isOpen }: { isOpen: boolean }) => (
-        <div data-testid="cart-panel">
-            {isOpen ? "OPEN" : "CLOSED"}
-        </div>
-    ),
-}));
-
-const renderWithChakra = (ui: React.ReactNode) => {
-    return render(
-        <ChakraProvider value={theme}>
-            {ui}
-        </ChakraProvider>
-    );
+type DashboardHeaderProps = {
+    userName: string;
 };
 
-describe("DashboardHeader Component", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
-    it("should render the logo", () => {
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
+    const { notifications, clearAll } = useNotifications();
 
-        expect(
-            screen.getByAltText("Logo")
-        ).toBeInTheDocument();
-    });
+    return (
+        <>
+            <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" mb={8} mt={-50} wrap="wrap" gap={4} px={4}>
+                <Image
+                    src={CentralEats}
+                    alt="Logo"
+                    w={{ base: "225px", md: "250px" }}
+                />
 
-    it("should render user name", () => {
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
+                <HStack justify="center" wrap="wrap" gap={4}>
+                    <IconButton
+                        aria-label="Notificaciones"
+                        borderRadius="full"
+                        size={{ base: "lg", md: "2xl" }}
+                        bg="#30B2BC"
+                        color="white"
+                        _hover={{ bg: "#2899a1" }}
+                        onClick={() => setIsNotificationOpen(true)}
+                    >
+                        <FaBell size="24px" />
+                    </IconButton>
 
-        expect(
-            screen.getByText("Hola, Kevin")
-        ).toBeInTheDocument();
-    });
+                    <IconButton
+                        aria-label="Carrito"
+                        borderRadius="full"
+                        size={{ base: "lg", md: "2xl" }}
+                        bg="#30B2BC"
+                        color="white"
+                        _hover={{ bg: "#2899a1" }}
+                        onClick={() => setIsCartOpen(true)}
+                    >
+                        <FaShoppingCart size="24px" />
+                    </IconButton>
 
-    it("should render notification button", () => {
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
+                    <Button
+                        borderRadius="full"
+                        colorPalette="orange"
+                        px={{ base: 4, md: 6 }}
+                        size={{ base: "lg", md: "2xl" }}
+                        onClick={() => setIsProfileOpen(true)}
+                    >
+                        <HStack gap={3}>
+                            <FaUser size="20px" />
+                            <Text fontSize={{ base: "xs", md: "lg" }} fontWeight="semibold">
+                                Hola, {userName}
+                            </Text>
+                        </HStack>
+                    </Button>
+                </HStack>
+            </Flex>
 
-        expect(
-            screen.getByLabelText("Notificaciones")
-        ).toBeInTheDocument();
-    });
+            <NotificationPanel
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                notifications={notifications}
+                onClearAll={clearAll}
+            />
 
-    it("should render cart button", () => {
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
+            <ProfilePanel
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+            />
 
-        expect(
-            screen.getByLabelText("Carrito")
-        ).toBeInTheDocument();
-    });
-
-    it("should open notification panel when notification button is clicked", async () => {
-        const user = userEvent.setup();
-
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
-
-        const button = screen.getByLabelText("Notificaciones");
-
-        await user.click(button);
-
-        expect(
-            screen.getByTestId("notification-panel")
-        ).toHaveTextContent("OPEN");
-    });
-
-    it("should open profile panel when profile button is clicked", async () => {
-        const user = userEvent.setup();
-
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
-
-        const profileButton = screen.getByText("Hola, Kevin");
-
-        await user.click(profileButton);
-
-        expect(
-            screen.getByTestId("profile-panel")
-        ).toHaveTextContent("OPEN");
-    });
-
-    it("should open cart panel when cart button is clicked", async () => {
-        const user = userEvent.setup();
-
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
-
-        const cartButton = screen.getByLabelText("Carrito");
-
-        await user.click(cartButton);
-
-        expect(
-            screen.getByTestId("cart-panel")
-        ).toHaveTextContent("OPEN");
-    });
-
-    it("should render panels initially closed", () => {
-        renderWithChakra(
-            <DashboardHeader userName="Kevin" />
-        );
-
-        expect(
-            screen.getByTestId("notification-panel")
-        ).toHaveTextContent("CLOSED");
-
-        expect(
-            screen.getByTestId("profile-panel")
-        ).toHaveTextContent("CLOSED");
-
-        expect(
-            screen.getByTestId("cart-panel")
-        ).toHaveTextContent("CLOSED");
-    });
-});
+            <CartPanel
+                isOpen={isCartOpen}
+                onClose={() => setIsCartOpen(false)}
+            />
+        </>
+    );
+};
