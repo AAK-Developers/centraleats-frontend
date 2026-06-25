@@ -16,6 +16,7 @@ import {
 import { FaSearch, FaClock, FaStar } from "react-icons/fa";
 import { useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
@@ -94,7 +95,6 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
         if (!restaurant?.id || isOrdering) return;
         setIsOrdering(true);
         try {
-            // Step 1: Create Order (enters PENDING_PAYMENT status)
             const orderRes = await apiClient.post("/api/orders", {
                 vendorId: restaurant.id,
                 items: [
@@ -111,7 +111,6 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                 throw new Error("Order creation failed");
             }
 
-            // Step 2: Instant mock payment (transitions PENDING_PAYMENT -> PAID)
             await apiClient.patch(`/api/orders/${newOrder.id}/status`, {
                 status: "PAID"
             });
@@ -269,6 +268,9 @@ export default function StudentDashboardPage() {
     const { open: isOpen, onOpen, onClose } = useDisclosure();
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
 
+    const location = useLocation();
+    const activeOrder = location.state?.activeOrder ?? null;
+
     const handleRestaurantClick = (rest: Restaurant) => {
         setSelectedRestaurant(rest);
         onOpen();
@@ -277,6 +279,12 @@ export default function StudentDashboardPage() {
     return (
         <WaveLayout>
             <AppContainer>
+
+                {activeOrder && (
+                    <Box p={4} mb={4} bg="teal.50" borderRadius="md">
+                        <Text>Tienes un pedido activo: {activeOrder.id}</Text>
+                    </Box>
+                )}
                 <DashboardHeader
                     userName={user?.firstName || "Usuario"}
                 />

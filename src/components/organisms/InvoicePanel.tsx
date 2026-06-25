@@ -5,6 +5,7 @@ import { InvoiceItemsTable, type InvoiceItemData } from "./InvoiceItemsTable";
 import { InvoiceTotals } from "../molecules/invoice/InvoiceTotals";
 import { InvoiceQR } from "../molecules/invoice/InvoiceQR";
 import { InvoiceActions } from "../molecules/invoice/InvoiceActions";
+import { useNavigate } from "react-router-dom";
 
 interface InvoicePanelProps {
     invoiceNumber: string;
@@ -23,7 +24,13 @@ interface InvoicePanelProps {
     amountPaid: number;
     onShare?: () => void;
     onDownload?: () => void;
-    onSeguirPedido: () => void;
+    onSeguirPedido?: () => void;
+    orderDetails?: {
+        restaurantName: string;
+        productName: string;
+        estimatedTime: string;
+        orderId: string;
+    };
 }
 
 export const MOCK_INVOICE: Omit<InvoicePanelProps, "onSeguirPedido"> = {
@@ -58,13 +65,23 @@ export const InvoicePanel = ({
     onShare,
     onDownload,
     onSeguirPedido,
+    orderDetails,
 }: InvoicePanelProps) => {
+    const navigate = useNavigate();
+
     const subtotal = items.reduce(
         (acc, item) => acc + item.unitPrice * item.quantity,
         0
     );
     const change = amountPaid - subtotal;
     const qrValue = `Factura:${invoiceNumber}|Total:${subtotal.toFixed(2)}|Restaurante:${restaurant.name}`;
+
+    const handleSeguirPedido = () => {
+        onSeguirPedido?.();
+        navigate("/student-dashboard", {
+            state: { activeOrder: orderDetails ?? null },  // ← pasa por router state
+        });
+    };
 
     return (
         <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
@@ -82,29 +99,23 @@ export const InvoicePanel = ({
                     invoiceNumber={invoiceNumber}
                     date={date}
                 />
-
                 <InvoiceCustomerInfo
                     customerName={customer.name}
                     customerAddress={customer.address}
                     paymentMethod={paymentMethod}
                 />
-
                 <InvoiceItemsTable items={items} />
-
                 <InvoiceTotals
                     subtotal={subtotal}
                     amountPaid={amountPaid}
                     change={change}
                 />
-
                 <Box mb={6} />
-
                 <InvoiceQR value={qrValue} />
-
                 <InvoiceActions
                     onShare={onShare}
                     onDownload={onDownload}
-                    onSeguirPedido={onSeguirPedido}
+                    onSeguirPedido={handleSeguirPedido}
                 />
             </Box>
         </Box>
