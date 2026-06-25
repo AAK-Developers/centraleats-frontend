@@ -43,9 +43,14 @@ export const useNotifications = () => {
     }, []);
 
     useEffect(() => {
-        fetchNotifications();
+        const timer = setTimeout(() => {
+            fetchNotifications();
+        }, 0);
         const interval = setInterval(fetchNotifications, 8000);
-        return () => clearInterval(interval);
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
     }, [fetchNotifications]);
 
     const clearAll = () => {

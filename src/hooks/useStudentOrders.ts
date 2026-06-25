@@ -78,9 +78,14 @@ export const useStudentOrders = () => {
     }, []);
 
     useEffect(() => {
-        fetchOrders();
+        const timer = setTimeout(() => {
+            fetchOrders();
+        }, 0);
         const interval = setInterval(fetchOrders, 8000);
-        return () => clearInterval(interval);
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
     }, [fetchOrders]);
 
     const activeOrders = orders.filter((o) =>

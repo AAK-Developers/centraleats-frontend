@@ -170,7 +170,7 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
         : [];
 
     // ─── Confirmation Screen ────────────────────────────────────────────────────
-    const ConfirmView = () => (
+    const renderConfirmView = () => (
         <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
             <Box flex={1} overflowY="auto" p={5}>
                 {/* Warning banner */}
@@ -380,7 +380,7 @@ export const CartPanel = ({ isOpen, onClose, isInline = false }: CartPanelProps)
             )}
 
             {/* Confirmation View */}
-            {view === "confirm" && <ConfirmView />}
+            {view === "confirm" && renderConfirmView()}
 
             {/* Card Form View */}
             {view === "card-form" && (

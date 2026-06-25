@@ -130,7 +130,7 @@ function useVendorRestaurant() {
         };
 
         fetchVendorData();
-    }, [profile?.id]);
+    }, [profile]);
 
     return {
         restaurant,
