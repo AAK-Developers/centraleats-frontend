@@ -15,13 +15,15 @@ import {
 } from "@chakra-ui/react";
 import { FaSearch, FaClock, FaStar } from "react-icons/fa";
 import { useUser } from "@clerk/clerk-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
 import { DashboardHeader } from "../../components/organisms/DashboardHeader";
 import { apiClient } from "../../api/axiosConfig";
+import { useRestaurants, type Restaurant } from "../../hooks/useRestaurants";
+import { RestaurantCard } from "../../components/molecules/RestaurantCard";
 
 interface MenuProduct {
     id: string;
@@ -97,7 +99,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
                 items: [
                     {
                         productId: product.id,
-                        targetQuantity: 1
+                        quantity: 1
                     }
                 ],
                 notes: "Pedido rápido desde menú del estudiante"
@@ -265,11 +267,22 @@ export default function StudentDashboardPage() {
     const { restaurants } = useRestaurants();
     const { open: isOpen, onOpen, onClose } = useDisclosure();
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+    const [search, setSearch] = useState("");
 
     const handleRestaurantClick = (rest: Restaurant) => {
         setSelectedRestaurant(rest);
         onOpen();
     };
+
+    const filteredRestaurants = useMemo(() => {
+        const q = search.toLowerCase().trim();
+        if (!q) return restaurants;
+        return restaurants.filter(
+            (r) =>
+                r.name.toLowerCase().includes(q) ||
+                r.category.toLowerCase().includes(q)
+        );
+    }, [restaurants, search]);
 
     return (
         <WaveLayout>
@@ -326,25 +339,44 @@ export default function StudentDashboardPage() {
                     </Box>
                 </Box>
 
-                <SimpleGrid
-                    columns={{ base: 1, md: 2, lg: 3 }}
-                    gap={10}
-                    pb={10}
-                    w="full"
-                >
-                    {restaurants.map((rest: Restaurant, index) => (
-                        <Box
-                            key={index}
-                            w="full"
-                            onClick={() => handleRestaurantClick(rest)}
-                            cursor="pointer"
-                            transition="all 0.2s"
-                            _hover={{ transform: "translateY(-4px)", opacity: 0.95 }}
-                        >
-                            <RestaurantCard {...rest} />
-                        </Box>
-                    ))}
-                </SimpleGrid>
+                {filteredRestaurants.length === 0 ? (
+                    <Flex direction="column" align="center" justify="center" py={20} gap={3}>
+                        <Text color="gray.500" fontSize="lg" fontWeight="semibold">
+                            {search ? "Sin resultados para tu búsqueda" : "No hay locales disponibles"}
+                        </Text>
+                        {search && (
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                color="#2DC6B8"
+                                onClick={() => setSearch("")}
+                                borderRadius="full"
+                            >
+                                Limpiar búsqueda
+                            </Button>
+                        )}
+                    </Flex>
+                ) : (
+                    <SimpleGrid
+                        columns={{ base: 1, md: 2, lg: 3 }}
+                        gap={10}
+                        pb={10}
+                        w="full"
+                    >
+                        {filteredRestaurants.map((rest: Restaurant) => (
+                            <Box
+                                key={rest.id}
+                                w="full"
+                                onClick={() => handleRestaurantClick(rest)}
+                                cursor="pointer"
+                                transition="all 0.2s"
+                                _hover={{ transform: "translateY(-4px)", opacity: 0.95 }}
+                            >
+                                <RestaurantCard {...rest} />
+                            </Box>
+                        ))}
+                    </SimpleGrid>
+                )}
 
                 <RestaurantMenuModal
                     restaurant={selectedRestaurant}
@@ -352,15 +384,6 @@ export default function StudentDashboardPage() {
                     onClose={onClose}
                 />
             </AppContainer>
-
-            {/* Conflict Dialog */}
-            <ConflictDialog
-                isOpen={!!conflictProduct}
-                currentVendorName={currentVendorName}
-                newVendorName={conflictProduct?.vendorName || ""}
-                onConfirm={handleConflictConfirm}
-                onCancel={() => setConflictProduct(null)}
-            />
         </WaveLayout>
     );
 }

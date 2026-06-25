@@ -7,6 +7,7 @@ let mockUseUser = vi.fn();
 let mockUseAllProducts = vi.fn();
 let mockUseStudentOrders = vi.fn();
 let mockUseCartStore = vi.fn();
+let mockUseRestaurants = vi.fn();
 
 vi.mock("@chakra-ui/react", () => ({
     Box: ({ children }: any) => <div>{children}</div>,
@@ -35,6 +36,14 @@ vi.mock("@chakra-ui/react", () => ({
 
 vi.mock("@clerk/clerk-react", () => ({
     useUser: () => mockUseUser(),
+}));
+
+vi.mock("../../../hooks/useRestaurants", () => ({
+    useRestaurants: () => mockUseRestaurants(),
+}));
+
+vi.mock("../../../components/molecules/RestaurantCard", () => ({
+    RestaurantCard: (props: any) => <div data-testid="restaurant-card">{props.name}</div>,
 }));
 
 vi.mock("../../../hooks/useAllProducts", () => ({
@@ -124,6 +133,27 @@ describe("StudentDashboardPage", () => {
             ],
         });
 
+        mockUseRestaurants.mockReturnValue({
+            restaurants: [
+                {
+                    id: "r1",
+                    name: "Restaurant 1",
+                    category: "Almuerzos",
+                    time: "08:00 - 17:00",
+                    rating: 4.5,
+                    image: "r1.jpg",
+                },
+                {
+                    id: "r2",
+                    name: "Restaurant 2",
+                    category: "Comida Rápida",
+                    time: "09:00 - 18:00",
+                    rating: 4.8,
+                    image: "r2.jpg",
+                },
+            ],
+        });
+
         mockUseStudentOrders.mockReturnValue({
             isLoading: false,
             activeOrders: [],
@@ -163,11 +193,9 @@ describe("StudentDashboardPage", () => {
         ).toBeInTheDocument();
     });
 
-    it("should render all products", () => {
+    it("should render all restaurants", () => {
         render(<StudentDashboardPage />);
 
-        expect(screen.getByText("Plato 1")).toBeInTheDocument();
-        expect(screen.getByText("Plato 2")).toBeInTheDocument();
         expect(screen.getByText("Restaurant 1")).toBeInTheDocument();
         expect(screen.getByText("Restaurant 2")).toBeInTheDocument();
     });
