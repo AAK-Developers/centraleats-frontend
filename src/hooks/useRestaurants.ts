@@ -11,6 +11,20 @@ export interface Restaurant {
     image: string;
 }
 
+interface ApiRestaurant {
+    id?: string;
+    ownerId?: string;
+    name: string;
+    category?: string;
+    description?: string;
+    time?: string;
+    openingTime?: string;
+    closingTime?: string;
+    rating?: number;
+    image?: string;
+    logoUrl?: string;
+}
+
 export const useRestaurants = () => {
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 
@@ -20,7 +34,7 @@ export const useRestaurants = () => {
                 const response = await apiClient.get('/api/restaurants');
                 // Backend wraps responses in a { data: [...] } structure
                 const responseData = response.data.data || response.data;
-                const mappedData = (Array.isArray(responseData) ? responseData : []).map((r: any) => ({
+                const mappedData = (Array.isArray(responseData) ? responseData : []).map((r: ApiRestaurant) => ({
                     id: r.id,
                     ownerId: r.ownerId,
                     name: r.name,

@@ -42,6 +42,16 @@ interface RestaurantMenuModalProps {
     onClose: () => void;
 }
 
+interface ApiProduct {
+    id: string;
+    name: string;
+    description?: string;
+    price: number;
+    stock?: number;
+    imageUrl?: string;
+    isAvailable: boolean;
+}
+
 export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantMenuModalProps) {
     const [products, setProducts] = useState<MenuProduct[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +64,7 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
             try {
                 const res = await apiClient.get(`/api/products?vendorId=${restaurant.id}`);
                 const list = res.data?.data || res.data || [];
-                setProducts(list.map((p: any) => ({
+                setProducts(list.map((p: ApiProduct) => ({
                     id: p.id,
                     name: p.name,
                     description: p.description || "",
@@ -73,7 +83,10 @@ export function RestaurantMenuModal({ restaurant, isOpen, onClose }: RestaurantM
         if (isOpen && restaurant?.id) {
             fetchMenu();
         } else {
-            setProducts([]);
+            const timer = setTimeout(() => {
+                setProducts([]);
+            }, 0);
+            return () => clearTimeout(timer);
         }
     }, [isOpen, restaurant?.id]);
 

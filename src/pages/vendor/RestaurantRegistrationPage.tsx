@@ -58,9 +58,10 @@ export default function RestaurantRegistrationPage() {
 
             toast.success("¡Vendor registrado con éxito!");
             navigate("/register-menu");
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error al registrar:", error);
-            const serverMsg = error.response?.data?.message || "Hubo un error al registrar el vendor";
+            const err = error as { response?: { data?: { message?: string } } };
+            const serverMsg = err.response?.data?.message || "Hubo un error al registrar el vendor";
             toast.error(serverMsg);
         }
     };

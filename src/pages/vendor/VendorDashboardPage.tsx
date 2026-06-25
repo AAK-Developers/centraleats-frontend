@@ -1,6 +1,6 @@
 import { Box, SimpleGrid, Image, Text, Badge, Stack, Flex, Spinner, Separator, Button } from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -16,6 +16,28 @@ import { useAuthStore } from "../../store/authStore";
 import { apiClient } from "../../api/axiosConfig";
 
 // HOOK: Restaurante del vendor
+
+interface ApiRestaurant {
+    id: string;
+    ownerId: string;
+    name: string;
+    logoUrl?: string;
+    description?: string;
+    location?: string;
+    phone?: string;
+    openingTime?: string;
+    closingTime?: string;
+}
+
+interface ApiProduct {
+    id: string;
+    name: string;
+    description?: string;
+    price: number;
+    stock?: number;
+    imageUrl?: string;
+    isAvailable: boolean;
+}
 
 interface VendorRestaurant {
     id: string;
@@ -67,7 +89,7 @@ function useVendorRestaurant() {
             try {
                 const res = await apiClient.get("/api/restaurants");
                 const list = res.data?.data || res.data || [];
-                const myRest = list.find((r: any) => r.ownerId === profile.id);
+                const myRest = list.find((r: ApiRestaurant) => r.ownerId === profile.id);
                 if (myRest) {
                     setRestaurant({
                         id: myRest.id,
@@ -82,7 +104,7 @@ function useVendorRestaurant() {
 
                     const prodRes = await apiClient.get(`/api/products?vendorId=${myRest.id}`);
                     const prodList = prodRes.data?.data || prodRes.data || [];
-                    setProducts(prodList.map((p: any) => ({
+                    setProducts(prodList.map((p: ApiProduct) => ({
                         id: p.id,
                         name: p.name,
                         description: p.description || "",
@@ -109,27 +131,58 @@ function useVendorRestaurant() {
     };
 }
 
+// COMPONENT: Tarjeta de pedido individual
+interface OrderItem {
+    id: string;
+    productName: string;
+    quantity: number;
+}
+
+interface VendorOrder {
+    id: string;
+    status: string;
+    totalAmount: number;
+    notes?: string;
+    createdAt: string;
+    user?: {
+        fullName?: string;
+        email?: string;
+    } | null;
+    items: OrderItem[];
+}
+
 // HOOK: Pedidos del vendor en tiempo real
 function useVendorOrders(restaurantId?: string) {
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<VendorOrder[]>([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         if (!restaurantId || restaurantId === "test-restaurant-id") return;
+        setIsLoadingOrders(true);
         try {
             const res = await apiClient.get(`/api/orders/vendor?vendorId=${restaurantId}`);
             setOrders(res.data?.data || res.data || []);
         } catch (err) {
             console.error("Error fetching vendor orders:", err);
+        } finally {
+            setIsLoadingOrders(false);
         }
-    };
+    }, [restaurantId]);
 
     useEffect(() => {
         if (!restaurantId || restaurantId === "test-restaurant-id") return;
-        fetchOrders();
+        
+        const timer = setTimeout(() => {
+            fetchOrders();
+        }, 0);
+
         const interval = setInterval(fetchOrders, 4000);
-        return () => clearInterval(interval);
-    }, [restaurantId]);
+
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
+    }, [restaurantId, fetchOrders]);
 
     const nuevos = orders.filter(o => o.status === "PENDING_PAYMENT" || o.status === "PAID" || o.status === "RECEIVED");
     const enCocina = orders.filter(o => o.status === "PREPARING");
@@ -144,23 +197,8 @@ function useVendorOrders(restaurantId?: string) {
     };
 }
 
-// COMPONENT: Tarjeta de pedido individual
-interface OrderItem {
-    id: string;
-    productName: string;
-    quantity: number;
-}
-
 interface OrderCardProps {
-    order: {
-        id: string;
-        status: string;
-        totalAmount: number;
-        notes?: string;
-        createdAt: string;
-        user: { fullName: string; email: string };
-        items: OrderItem[];
-    };
+    order: VendorOrder;
     onAccept?: () => void;
     onReady?: () => void;
     onDeliver?: () => void;
@@ -457,7 +495,7 @@ export default function VendorDashboardPage() {
                                 pb={10}
                                 w="full"
                             >
-                                {currentOrders.map((order: any) => (
+                                {currentOrders.map((order: VendorOrder) => (
                                     <VendorOrderCard
                                         key={order.id}
                                         order={order}
