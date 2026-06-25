@@ -5,6 +5,7 @@ import { AuthInitializer } from './components/auth/AuthInitializer';
 import PresentationPage from './pages/landing/PresentationPage';
 import RoleSelectionPage from './pages/auth/RoleSelectionPage';
 import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
 
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
@@ -19,6 +20,7 @@ export default function App() {
 
           <Route path="/" element={<PresentationPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           <Route
             path="/role-selection"

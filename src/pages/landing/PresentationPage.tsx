@@ -1,9 +1,8 @@
-import { Box, Text, Flex, VStack } from '@chakra-ui/react'
+import { Box, Text, Flex, VStack, Button } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { WaveLayout } from '../../components/layout/WaveLayout'
 import { AuthHeader } from '../../components/organisms/AuthHeader'
 import { AppContainer } from '../../components/layout/AppContainer'
-import { AuthButton } from '../../components/atoms/AuthButton'
 
 export default function PresentationPage() {
     const navigate = useNavigate()
@@ -11,8 +10,29 @@ export default function PresentationPage() {
     return (
         <WaveLayout >
             <AppContainer>
-                <Flex justify="flex-end" align="center" w="full" p={4}>
-                    <AuthButton onClick={() => navigate('/login')} />
+                <Flex justify="flex-end" align="center" w="full" p={4} gap={4}>
+                    <Button
+                        bg="transparent"
+                        color="#042E63"
+                        border="2px solid"
+                        borderColor="#042E63"
+                        _hover={{ bg: "gray.50" }}
+                        size="md"
+                        borderRadius="full"
+                        onClick={() => navigate('/login')}
+                    >
+                        Iniciar Sesión
+                    </Button>
+                    <Button
+                        bg="#E65100"
+                        color="white"
+                        _hover={{ bg: "#cc4800" }}
+                        size="md"
+                        borderRadius="full"
+                        onClick={() => navigate('/register')}
+                    >
+                        Registrarse
+                    </Button>
                 </Flex>
 
                 <VStack gap={8} mt={{ base: 10, md: 20 }} flex="1">

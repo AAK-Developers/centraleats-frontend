@@ -38,8 +38,10 @@ vi.mock("react-hot-toast", () => ({
     },
 }));
 
+let mockProfile: any = null;
 vi.mock("../../../hooks/useAuthMe", () => ({
     useAuthMe: () => ({
+        profile: mockProfile,
         fetchProfile: mockFetchProfile,
     }),
 }));
@@ -79,6 +81,7 @@ describe("RoleSelectionPage", () => {
         vi.clearAllMocks();
         mockReload.mockResolvedValue(undefined);
         mockFetchProfile.mockResolvedValue(undefined);
+        mockProfile = null;
     });
 
     it("should render page content", () => {
@@ -194,6 +197,26 @@ describe("RoleSelectionPage", () => {
 
         await waitFor(() => {
             expect(mockNavigate).toHaveBeenCalled();
+        });
+    });
+
+    it("should redirect student to student dashboard if role already exists", async () => {
+        mockProfile = { role: "STUDENT" };
+
+        render(<RoleSelectionPage />);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith("/student-dashboard", { replace: true });
+        });
+    });
+
+    it("should redirect vendor to vendor dashboard if role already exists", async () => {
+        mockProfile = { role: "VENDOR" };
+
+        render(<RoleSelectionPage />);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith("/vendor-dashboard", { replace: true });
         });
     });
 });

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import PresentationPage from '../../pages/landing/PresentationPage';
+import { Center, Spinner, VStack, Text } from '@chakra-ui/react';
 
 import { useUser } from "@clerk/clerk-react";
 import { Navigate, useLocation } from "react-router-dom";
@@ -12,6 +12,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { profile, isLoadingProfile, fetchProfile, error } = useAuthMe();
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const location = useLocation();
+    console.log("AUTH PROFILE:", profile);
 
     useEffect(() => {
         // Only attempt to sync if no previous error occurred to avoid infinite request loops
@@ -30,7 +31,16 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     }, [isClerkLoaded, isSignedIn, clearAuth]);
 
     if (!isClerkLoaded || (isSignedIn && isLoadingProfile && !profile)) {
-        return <PresentationPage />;
+        return (
+            <Center h="100vh" w="100vw" bg="white">
+                <VStack gap={4}>
+                    <Spinner size="xl" color="primaryOrange" />
+                    <Text color="primaryBlue" fontWeight="semibold" fontSize="lg">
+                        Cargando tu perfil...
+                    </Text>
+                </VStack>
+            </Center>
+        );
     }
 
     if (!isSignedIn) {
@@ -52,7 +62,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         );
     }
 
-    if (!normalizedRole && location.pathname !== "/role-selection") {
+    const hasRole = normalizedRole && normalizedRole !== "PENDING";
+
+    if (!hasRole && location.pathname !== "/role-selection") {
         return <Navigate to="/role-selection" replace />;
     }
 

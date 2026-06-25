@@ -14,23 +14,55 @@ import { TimeRangeInput } from "../../components/molecules/TimeRangeInput";
 import { AppButton } from "../../components/atoms/AppButton";
 import { FormCard } from "../../components/molecules/FormCard";
 
+interface RestaurantFormData {
+    name: string;
+    description?: string;
+    address: string;
+    phone: string;
+    cuisineType: string;
+    openingTime: string;
+    closingTime: string;
+    deliveryTime: number;
+    image?: File;
+}
+
 export default function RestaurantRegistrationPage() {
-    const { register, handleSubmit, formState: { isSubmitting } } = useForm();
+    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<RestaurantFormData>();
     const navigate = useNavigate();
     const { user } = useUser();
 
-    const onSubmit = async (data: Record<string, unknown>) => {
+    const onSubmit = async (data: RestaurantFormData) => {
         try {
-            await apiClient.post('/api/restaurants/register', {
-                ...data,
-                ownerClerkId: user?.id
+            const formData = new FormData();
+
+            formData.append("name", data.name);
+            formData.append("description", data.description || "");
+            formData.append("location", data.address);
+            formData.append("phone", data.phone);
+            formData.append("cuisineType", data.cuisineType);
+            formData.append("openingTime", data.openingTime);
+            formData.append("closingTime", data.closingTime);
+            formData.append("deliveryTime", String(data.deliveryTime));
+
+            if (data.image instanceof File) {
+                formData.append("image", data.image);
+            }
+
+            if (user?.id) {
+                formData.append("ownerClerkId", user.id);
+            }
+
+            await apiClient.post("/api/vendors/register", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
 
-            toast.success("¡Restaurante registrado con éxito!");
+            toast.success("¡Vendor registrado con éxito!");
             navigate("/register-menu");
         } catch (error) {
             console.error("Error al registrar:", error);
-            toast.error("Hubo un error al registrar el restaurante");
+            const err = error as { response?: { data?: { message?: string } } };
+            const serverMsg = err.response?.data?.message || "Hubo un error al registrar el vendor";
+            toast.error(serverMsg);
         }
     };
 
@@ -49,12 +81,7 @@ export default function RestaurantRegistrationPage() {
                     <FormCard>
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
                             <Box>
-                                <Text
-                                    fontWeight="bold"
-                                    color="#042E63"
-                                    fontSize="lg"
-                                    mb={3}
-                                >
+                                <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={3}>
                                     Paso 1: Información Básica
                                 </Text>
 
@@ -64,22 +91,19 @@ export default function RestaurantRegistrationPage() {
                                         placeholder="Nombre del Restaurante"
                                         fontSize="lg"
                                     />
-
                                     <Input
                                         {...register("cuisineType", { required: true })}
                                         placeholder="Tipo de cocina (ej. Almuerzos, Pizza)"
                                         fontSize="lg"
                                     />
-
                                     <Input
                                         {...register("address", { required: true })}
                                         placeholder="Dirección Completa"
                                         fontSize="lg"
                                     />
-
                                     <Input
                                         {...register("phone", { required: true })}
-                                        placeholder="Teléfono de contacto"
+                                        placeholder="Teléfono (ej: 0999123456)"
                                         fontSize="lg"
                                     />
                                 </VStack>
@@ -87,32 +111,19 @@ export default function RestaurantRegistrationPage() {
 
                             <VStack align="stretch" gap={6}>
                                 <Box>
-                                    <Text
-                                        fontWeight="bold"
-                                        color="#042E63"
-                                        fontSize="lg"
-                                        mb={3}
-                                    >
+                                    <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={3}>
                                         Paso 2: Imagen
                                     </Text>
-
                                     <ImageUploadBox
-                                        label="Sube la foto principal del plato"
-                                        onFileSelect={(f) => console.log(f)}
+                                        label="Sube la foto principal del Restaurante"
+                                        onFileSelect={(file) => setValue("image", file, { shouldValidate: true })}
                                     />
                                 </Box>
                                 <Box>
-                                    <Text
-                                        fontWeight="bold"
-                                        color="#042E63"
-                                        fontSize="lg"
-                                        mb={3}
-                                    >
+                                    <Text fontWeight="bold" color="#042E63" fontSize="lg" mb={3}>
                                         Paso 3: Horarios
                                     </Text>
-
                                     <TimeRangeInput register={register} />
-
                                     <Input
                                         {...register("deliveryTime", { required: true })}
                                         placeholder="Tiempo estimado (minutos)"
@@ -126,7 +137,7 @@ export default function RestaurantRegistrationPage() {
 
                         <Flex justify="center" mt={8}>
                             <AppButton
-                                text="Registrar Restaurante"
+                                text={isSubmitting ? "Registrando..." : "Registrar Resturante"}
                                 fontSize="lg"
                                 isLoading={isSubmitting}
                             />

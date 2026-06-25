@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { ChakraProvider } from "@chakra-ui/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -89,35 +90,38 @@ describe("DashboardHeader Component", () => {
         ).toBeInTheDocument();
     });
 
-    it("should open notification panel when notification button is clicked", () => {
+    it("should open notification panel when notification button is clicked", async () => {
+        const user = userEvent.setup();
         renderWithChakra(
             <DashboardHeader userName="Kevin" />
         );
 
         const button = screen.getByLabelText("Notificaciones");
 
-        fireEvent.click(button);
+        await user.click(button);
 
         expect(
             screen.getByTestId("notification-panel")
         ).toHaveTextContent("OPEN");
     });
 
-    it("should open profile panel when profile button is clicked", () => {
+    it("should open profile panel when profile button is clicked", async () => {
+        const user = userEvent.setup();
         renderWithChakra(
             <DashboardHeader userName="Kevin" />
         );
 
         const profileButton = screen.getByText("Hola, Kevin");
 
-        fireEvent.click(profileButton);
+        await user.click(profileButton);
 
         expect(
             screen.getByTestId("profile-panel")
         ).toHaveTextContent("OPEN");
     });
 
-    it("should call onCartClick when cart button is clicked", () => {
+    it("should call onCartClick when cart button is clicked", async () => {
+        const user = userEvent.setup();
         const handleCartClick = vi.fn();
 
         renderWithChakra(
@@ -129,7 +133,7 @@ describe("DashboardHeader Component", () => {
 
         const cartButton = screen.getByLabelText("Carrito");
 
-        fireEvent.click(cartButton);
+        await user.click(cartButton);
 
         expect(handleCartClick).toHaveBeenCalledTimes(1);
     });
