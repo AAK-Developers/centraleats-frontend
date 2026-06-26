@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../api/axiosConfig';
 
-export interface Notification {
+export interface AppNotification {
     id: string;
     title: string;
     restaurant: string;
@@ -9,7 +9,7 @@ export interface Notification {
 }
 
 export const useNotifications = () => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<AppNotification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchNotifications = useCallback(async () => {
@@ -18,13 +18,12 @@ export const useNotifications = () => {
             const rawData = response.data?.data || response.data || [];
             const responseData = Array.isArray(rawData) ? rawData : [];
 
-            // Only surface READY orders as notifications
             const readyOrders = responseData.filter(
-                (o) => o.status === 'READY'
+                (o: any) => o.status === 'READY'
             );
 
             setNotifications(
-                readyOrders.map((o) => ({
+                readyOrders.map((o: any) => ({
                     id: o.id,
                     title: '¡Tu pedido está listo para retirar!',
                     restaurant: o.vendorName || 'Restaurante',

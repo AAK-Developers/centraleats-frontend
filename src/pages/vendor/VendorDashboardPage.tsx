@@ -6,14 +6,16 @@ import toast from "react-hot-toast";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { DashboardHeaderVendor } from "../../components/organisms/DashboardHeaderVendor";
-import { RestaurantSelectorVendor } from "../../components/molecules/RestaurantSelectorVendor";
-import { PanelHeaderVendor } from "../../components/organisms/PanelHeaderVendor";
-import { OrderTabsVendor, type OrderTab } from "../../components/molecules/OrderTabsVendor";
-import { EmptyOrdersVendor } from "../../components/molecules/EmptyOrdersVendor";
-import { ClosedStateVendor } from "../../components/molecules/ClosedStateVendor";
+
+import { RestaurantSelectorVendor } from "../../components/restaurant/molecules/RestaurantSelectorVendor";
+
+import { OrderTabsVendor, type OrderTab } from "../../components/restaurant/molecules/OrderTabsVendor";
+import { EmptyOrdersVendor } from "../../components/restaurant/molecules/EmptyOrdersVendor";
+import { ClosedStateVendor } from "../../components/restaurant/molecules/ClosedStateVendor";
 import { useAuthStore } from "../../store/authStore";
 import { apiClient } from "../../api/axiosConfig";
+import { DashboardHeaderVendor } from "../../components/restaurant/organisms/DashboardHeaderVendor";
+import { PanelHeaderVendor } from "../../components/restaurant/organisms/PanelHeaderVendor";
 
 // HOOK: Restaurante del vendor
 

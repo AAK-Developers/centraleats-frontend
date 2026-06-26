@@ -6,12 +6,13 @@ import { useNavigate } from "react-router-dom";
 
 import { WaveLayout } from '../../components/layout/WaveLayout';
 import { AppContainer } from '../../components/layout/AppContainer';
-import { AuthHeader } from '../../components/organisms/AuthHeader';
-import { ImageUploadBox } from "../../components/atoms/ImageUploadBox";
-import { AppButton } from "../../components/atoms/AppButton";
+
+import { ImageUploadBox } from "../../components/restaurant/atoms/RestaurantImageUploadBox";
+import { AppButton } from "../../components/restaurant/atoms/RestaurantAppButton";
 import CentralEats from "../../assets/CentralEats.png";
-import { FormCard } from "../../components/molecules/FormCard";
+import { FormCard } from "../../components/restaurant/molecules/FormCard";
 import { apiClient } from "../../api/axiosConfig";
+import { AuthHeader } from "../../components/shared/organisms/AuthHeader";
 
 interface MenuFormData {
     name: string;

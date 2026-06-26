@@ -7,12 +7,13 @@ import { useUser } from "@clerk/clerk-react";
 import { apiClient } from '../../api/axiosConfig';
 import { WaveLayout } from '../../components/layout/WaveLayout';
 import { AppContainer } from '../../components/layout/AppContainer';
-import { AuthHeader } from '../../components/organisms/AuthHeader';
+
 import CentralEats from "../../assets/CentralEats.png";
-import { ImageUploadBox } from "../../components/atoms/ImageUploadBox";
-import { TimeRangeInput } from "../../components/molecules/TimeRangeInput";
-import { AppButton } from "../../components/atoms/AppButton";
-import { FormCard } from "../../components/molecules/FormCard";
+import { ImageUploadBox } from "../../components/restaurant/atoms/RestaurantImageUploadBox";
+import { TimeRangeInput } from "../../components/shared/molecules/TimeRangeInput";
+import { AppButton } from "../../components/restaurant/atoms/RestaurantAppButton";
+import { FormCard } from "../../components/restaurant/molecules/FormCard";
+import { AuthHeader } from "../../components/shared/organisms/AuthHeader";
 
 interface RestaurantFormData {
     name: string;

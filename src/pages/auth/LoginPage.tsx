@@ -1,14 +1,15 @@
 import { SignIn } from '@clerk/clerk-react'
 import { WaveLayout } from '../../components/layout/WaveLayout'
-import { AuthHeader } from '../../components/organisms/AuthHeader'
+
 import { AppContainer } from '../../components/layout/AppContainer'
+import { AuthHeader } from '../../components/shared/organisms/AuthHeader'
 
 export default function LoginPage() {
     return (
         <WaveLayout>
             <AppContainer>
                 <AuthHeader logoSize="350px" >
-                    <SignIn 
+                    <SignIn
                         forceRedirectUrl="/role-selection"
                         signUpForceRedirectUrl="/role-selection"
                         fallbackRedirectUrl="/role-selection"
