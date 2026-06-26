@@ -6,6 +6,7 @@ server {
     location / {
         index index.html index.htm;
         try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
     }
 
     # Proxy to backend to avoid Mixed Content (HTTPS to HTTP)
