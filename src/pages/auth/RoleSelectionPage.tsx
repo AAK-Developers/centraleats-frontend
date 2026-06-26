@@ -25,7 +25,9 @@ export default function RoleSelectionPage() {
     const { profile, fetchProfile } = useAuthMe();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const rawRole = profile?.role || (user?.publicMetadata?.role as string | undefined);
+    // Only redirect if the user has a profile in the backend database.
+    // If profile is null (database record is missing), we do NOT redirect, even if Clerk metadata has a role.
+    const rawRole = profile?.role;
     const normalizedRole = rawRole?.toUpperCase();
 
     useEffect(() => {
