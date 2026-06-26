@@ -8,7 +8,7 @@ import { useAuthMe } from '../../hooks/useAuthMe';
 import { useAuthStore } from '../../store/authStore';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    const { isLoaded: isClerkLoaded, isSignedIn, user: clerkUser } = useUser();
+    const { isLoaded: isClerkLoaded, isSignedIn } = useUser();
     const { profile, isLoadingProfile, fetchProfile, error } = useAuthMe();
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const location = useLocation();
@@ -47,8 +47,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         return <Navigate to="/login" replace />;
     }
 
-    // Backend uses uppercase roles (STUDENT, VENDOR), normalize for consistency
-    const rawRole = profile?.role || (clerkUser?.publicMetadata?.role as string | undefined);
+    // Backend uses uppercase roles (STUDENT, VENDOR), normalize for consistency.
+    // If the database profile is missing (null), we treat rawRole as undefined.
+    // This forces the user to the role-selection page to register in the backend database.
+    const rawRole = profile?.role;
     const normalizedRole = rawRole?.toUpperCase();
     const isActive = profile ? profile.isActive : true;
 
