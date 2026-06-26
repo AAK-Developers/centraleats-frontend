@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 
 export type OrderTab = "nuevos" | "en_cocina" | "listos" | "platos";
 
@@ -6,6 +6,7 @@ interface Tab {
     key: OrderTab;
     label: string;
     count: number;
+    badgeColor?: string; // CSS color for the count badge when count > 0
 }
 
 interface Props {
@@ -24,6 +25,7 @@ export function OrderTabsVendor({ tabs, activeTab, onTabChange }: Props) {
         >
             {tabs.map((tab) => {
                 const isActive = activeTab === tab.key;
+                const hasItems = tab.count > 0 && tab.badgeColor;
                 return (
                     <Box
                         key={tab.key}
@@ -41,8 +43,30 @@ export function OrderTabsVendor({ tabs, activeTab, onTabChange }: Props) {
                         cursor="pointer"
                         style={{ transition: "all 0.2s" }}
                         _hover={{ borderColor: "#2DC6B8", color: "#2DC6B8" }}
+                        position="relative"
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
                     >
-                        {tab.label} ({tab.count})
+                        <Text>{tab.label}</Text>
+                        {tab.count > 0 && (
+                            <Box
+                                as="span"
+                                bg={hasItems ? tab.badgeColor : "gray.200"}
+                                color="white"
+                                borderRadius="full"
+                                minW="22px"
+                                h="22px"
+                                display="inline-flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                fontSize="11px"
+                                fontWeight="bold"
+                                px={1}
+                            >
+                                {tab.count}
+                            </Box>
+                        )}
                     </Box>
                 );
             })}
