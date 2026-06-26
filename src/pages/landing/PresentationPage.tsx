@@ -1,8 +1,9 @@
 import { Box, Text, Flex, VStack, Button } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { WaveLayout } from '../../components/layout/WaveLayout'
-import { AuthHeader } from '../../components/organisms/AuthHeader'
+
 import { AppContainer } from '../../components/layout/AppContainer'
+import { AuthHeader } from '../../components/shared/organisms/AuthHeader'
 
 export default function PresentationPage() {
     const navigate = useNavigate()

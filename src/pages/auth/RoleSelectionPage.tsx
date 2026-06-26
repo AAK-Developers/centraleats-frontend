@@ -8,8 +8,7 @@ import axios from 'axios';
 import { apiClient } from '../../api/axiosConfig';
 
 import { WaveLayout } from '../../components/layout/WaveLayout';
-import { RoleCard } from '../../components/molecules/RoleCard';
-import { AuthHeader } from '../../components/organisms/AuthHeader';
+
 import CentralEatsLogo from "../../assets/CentralEatsLogo.png";
 import { AppContainer } from '../../components/layout/AppContainer';
 import studentImg from '../../assets/Student.png';
@@ -17,6 +16,8 @@ import vendorImg from '../../assets/Vendor.jpg';
 
 
 import { useAuthMe } from '../../hooks/useAuthMe';
+import { AuthHeader } from '../../components/shared/organisms/AuthHeader';
+import { RoleCard } from '../../components/shared/molecules/RoleCard';
 
 
 export default function RoleSelectionPage() {

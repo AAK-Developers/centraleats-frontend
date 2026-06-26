@@ -19,10 +19,11 @@ import toast from "react-hot-toast";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { DashboardHeader } from "../../components/organisms/DashboardHeader";
+
 import { useAllProducts, type Product } from "../../hooks/useAllProducts";
 import { useCartStore } from "../../store/cartStore";
 import { useStudentOrders, STATUS_LABELS, STATUS_COLORS } from "../../hooks/useStudentOrders";
+import { DashboardHeader } from "../../components/student/organisms/DashboardHeader";
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
