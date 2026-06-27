@@ -4,7 +4,7 @@ import { HiKey, HiExclamationCircle } from "react-icons/hi";
 
 interface PickupCodeModalProps {
     isOpen: boolean;
-    vendorOrderLabel: string; 
+    vendorOrderLabel: string;
     onConfirm: (code: string) => void;
     onCancel: () => void;
     error?: string;
@@ -21,14 +21,27 @@ export const PickupCodeModal = ({
 }: PickupCodeModalProps) => {
     const [code, setCode] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+    const prevIsOpenRef = useRef(isOpen);
+
+    if (!prevIsOpenRef.current && isOpen) {
+        prevIsOpenRef.current = isOpen;
+    }
+    if (prevIsOpenRef.current && !isOpen) {
+        prevIsOpenRef.current = isOpen;
+    }
+
+    const openCountRef = useRef(0);
+    const prevOpenRef = useRef(false);
+    if (isOpen && !prevOpenRef.current) {
+        openCountRef.current += 1;
+    }
+    prevOpenRef.current = isOpen;
 
     useEffect(() => {
-        if (isOpen) {
-            setCode("");
-            const t = setTimeout(() => inputRef.current?.focus(), 50);
-            return () => clearTimeout(t);
-        }
-    }, [isOpen]);
+        if (!isOpen) return;
+        const t = setTimeout(() => inputRef.current?.focus(), 50);
+        return () => clearTimeout(t);
+    }, [isOpen, openCountRef.current]);
 
     if (!isOpen) return null;
 
@@ -82,8 +95,7 @@ export const PickupCodeModal = ({
                         <VStack gap={4} align="stretch">
                             <HStack gap={3} align="center">
                                 <Flex
-                                    w="44px"
-                                    h="44px"
+                                    w="44px" h="44px"
                                     borderRadius="xl"
                                     bg="#F0FBFC"
                                     align="center"
@@ -108,6 +120,7 @@ export const PickupCodeModal = ({
 
                             <Box>
                                 <input
+                                    key={openCountRef.current}
                                     ref={inputRef}
                                     inputMode="numeric"
                                     maxLength={4}

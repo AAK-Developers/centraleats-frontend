@@ -9,7 +9,6 @@ export interface AppNotification {
     receivedAt: number;
 }
 
-
 const STUDENT_NOTIFICATION_STATUSES = ['RECEIVED', 'PREPARING', 'READY'];
 
 const STUDENT_NOTIFICATION_TITLES: Record<string, string> = {
@@ -45,34 +44,45 @@ const loadDismissedIds = (storageKey: string): Set<string> => {
         const parsed = JSON.parse(raw);
         return new Set(Array.isArray(parsed) ? parsed : []);
     } catch {
-        return new Set();
+        return new Set<string>();
     }
 };
 
 const saveDismissedIds = (storageKey: string, ids: Set<string>) => {
     try {
         localStorage.setItem(storageKey, JSON.stringify(Array.from(ids)));
-    } catch {
+    } catch (e) {
+        console.warn('Could not save dismissed notifications', e);
     }
 };
 
 export const useNotifications = (options: UseNotificationsOptions = {}) => {
     const { role = 'student', vendorId } = options;
 
-    const [notifications, setNotifications] = useState<AppNotification[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
     const storageKey = getDismissedStorageKey(role, vendorId);
+    const prevStorageKeyRef = useRef<string>(storageKey);
 
     const dismissedIdsRef = useRef<Set<string>>(loadDismissedIds(storageKey));
     const seenIdsRef = useRef<Set<string>>(new Set());
+    const pendingResetRef = useRef(false);
+
+    if (prevStorageKeyRef.current !== storageKey) {
+        prevStorageKeyRef.current = storageKey;
+        dismissedIdsRef.current = loadDismissedIds(storageKey);
+        seenIdsRef.current = new Set();
+        pendingResetRef.current = true;
+    }
+
+    const [notifications, setNotifications] = useState<AppNotification[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
 
     useEffect(() => {
-        dismissedIdsRef.current = loadDismissedIds(storageKey);
-        seenIdsRef.current = new Set();
-        setNotifications([]);
-    }, [storageKey]);
+        if (pendingResetRef.current) {
+            pendingResetRef.current = false;
+            setNotifications([]);
+        }
+    });
 
     const fetchNotifications = useCallback(async () => {
         if (role === 'vendor' && (!vendorId || vendorId === 'test-restaurant-id')) {
@@ -135,7 +145,6 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
             clearInterval(interval);
         };
     }, [fetchNotifications]);
-
 
     const clearAll = () => {
         notifications.forEach((n) => dismissedIdsRef.current.add(n.id));
