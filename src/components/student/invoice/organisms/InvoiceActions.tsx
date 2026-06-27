@@ -69,13 +69,13 @@ export const InvoiceActions = ({
                 bg="#F97316"
                 color="white"
                 borderRadius="full"
-                py={{ base: 3, md: 4 }}
+                py={{ base: 2, md: 3 }}
                 fontWeight="bold"
-                fontSize={{ base: "sm", md: "md" }}
+                fontSize={{ base: "md", md: "xl" }}
                 _hover={{ bg: "#ea6c0a" }}
                 transition="all 0.2s"
                 onClick={onSeguirPedido}
-                minH="48px"
+                minH="44px"
             >
                 <Icon as={FaBell} />
                 Seguir Pedido

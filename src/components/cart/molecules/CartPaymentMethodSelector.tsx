@@ -45,8 +45,8 @@ export const PaymentMethodSelector = ({ selected, onChange }: PaymentMethodSelec
             gap={2}
             p={{ base: 2, md: 3 }}
             border="2px solid"
-            borderColor={selected === "tarjeta" ? "#042E63" : "gray.400"}
-            bg={selected === "tarjeta" ? "#042E63" : "white"}
+            borderColor={selected === "tarjeta" ? "#30B2BC" : "gray.400"}
+            bg={selected === "tarjeta" ? "#30B2BC" : "white"}
             borderRadius="xl"
             onClick={() => onChange("tarjeta")}
             transition="all 0.2s"
@@ -74,7 +74,7 @@ export const PaymentMethodSelector = ({ selected, onChange }: PaymentMethodSelec
             >
                 <ArrowRight
                     size={15}
-                    color={selected === "tarjeta" ? "#042E63" : "gray"}
+                    color={selected === "tarjeta" ? "#30B2BC" : "gray"}
                 />
             </Flex>
         </Flex>

@@ -24,7 +24,7 @@ export const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
             >
                 <SimpleGrid columns={4} gap={2}>
                     {["CÓDIGO", "ARTÍCULO", "CANT.", "TOTAL"].map((header) => (
-                        <Text key={header} fontSize="xs" color="white" fontWeight="bold">
+                        <Text key={header} fontSize="sm" color="white" fontWeight="bold">
                             {header}
                         </Text>
                     ))}
@@ -43,34 +43,34 @@ export const InvoiceItemsTable = ({ items }: InvoiceItemsTableProps) => {
                     >
                         <Box display={{ base: "block", sm: "none" }}>
                             <Flex justify="space-between" align="start" mb={1}>
-                                <Text fontSize="sm" color="#042E63" fontWeight="semibold" flex={1}>
+                                <Text fontSize="md" color="#042E63" fontWeight="semibold" flex={1}>
                                     {item.name}
                                 </Text>
-                                <Text fontSize="sm" fontWeight="bold" color="#042E63" ml={2}>
+                                <Text fontSize="md" fontWeight="bold" color="#042E63" ml={2}>
                                     ${(item.unitPrice * item.quantity).toFixed(2)}
                                 </Text>
                             </Flex>
                             <Flex gap={3}>
-                                <Text fontSize="xs" color="gray.400">
+                                <Text fontSize="md" color="gray.400">
                                     Cód. {item.code}
                                 </Text>
-                                <Text fontSize="xs" color="gray.500">
+                                <Text fontSize="md" color="gray.500">
                                     ×{item.quantity} · ${item.unitPrice.toFixed(2)} c/u
                                 </Text>
                             </Flex>
                         </Box>
 
                         <SimpleGrid columns={4} gap={2} display={{ base: "none", sm: "grid" }}>
-                            <Text fontSize="sm" color="gray.500">
+                            <Text fontSize="md" color="gray.500">
                                 {item.code}
                             </Text>
-                            <Text fontSize="sm" color="#042E63" fontWeight="semibold">
+                            <Text fontSize="md" color="#042E63" fontWeight="semibold">
                                 {item.name}
                             </Text>
-                            <Text fontSize="sm" color="gray.600">
+                            <Text fontSize="md" color="gray.600">
                                 {item.quantity}
                             </Text>
-                            <Text fontSize="sm" fontWeight="bold" color="#042E63">
+                            <Text fontSize="md" fontWeight="bold" color="#042E63">
                                 ${(item.unitPrice * item.quantity).toFixed(2)}
                             </Text>
                         </SimpleGrid>

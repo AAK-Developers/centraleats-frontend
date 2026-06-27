@@ -20,7 +20,7 @@ export const InvoiceHeader = ({
             mb={6}
         >
             <VStack align={{ base: "center", sm: "start" }} gap={1}>
-                <Text fontSize="xs" color="gray.500" fontWeight="semibold">
+                <Text fontSize="sm" color="gray.500" fontWeight="semibold">
                     RESTAURANTE
                 </Text>
                 <Text fontWeight="bold" color="#042E63" fontSize={{ base: "md", md: "lg" }}>
@@ -38,14 +38,14 @@ export const InvoiceHeader = ({
                     FACTURA
                 </Text>
                 <HStack gap={2}>
-                    <Text fontSize="xs" color="gray.500">N° FACTURA</Text>
-                    <Text fontSize="xs" fontWeight="bold" color="#042E63">
+                    <Text fontSize="sm" color="gray.500">N° FACTURA</Text>
+                    <Text fontSize="sm" fontWeight="bold" color="#042E63">
                         {invoiceNumber}
                     </Text>
                 </HStack>
                 <HStack gap={2}>
-                    <Text fontSize="xs" color="gray.500">FECHA</Text>
-                    <Text fontSize="xs" fontWeight="bold" color="#042E63">
+                    <Text fontSize="sm" color="gray.500">FECHA</Text>
+                    <Text fontSize="sm" fontWeight="bold" color="#042E63">
                         {date}
                     </Text>
                 </HStack>

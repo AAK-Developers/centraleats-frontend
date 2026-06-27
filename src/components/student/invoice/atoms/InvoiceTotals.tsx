@@ -14,22 +14,22 @@ export const InvoiceTotals = ({
     return (
         <VStack align="stretch" gap={2} px={{ base: 3, md: 4 }} pt={2}>
             <Flex justify="space-between">
-                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">SUBTOTAL</Text>
-                <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="#042E63">
+                <Text fontSize={{ base: "sm", md: "lg" }} color="gray.500">SUBTOTAL</Text>
+                <Text fontSize={{ base: "sm", md: "lg" }} fontWeight="bold" color="#042E63">
                     ${subtotal.toFixed(2)}
                 </Text>
             </Flex>
 
             <Flex justify="space-between">
-                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">PAGA CON</Text>
-                <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="#042E63">
+                <Text fontSize={{ base: "sm", md: "lg" }} color="gray.500">PAGA CON</Text>
+                <Text fontSize={{ base: "sm", md: "lg" }} fontWeight="bold" color="#042E63">
                     ${amountPaid.toFixed(2)}
                 </Text>
             </Flex>
 
             <Flex justify="space-between">
-                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">VUELTAS</Text>
-                <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="#042E63">
+                <Text fontSize={{ base: "sm", md: "lg" }} color="gray.500">VUELTO</Text>
+                <Text fontSize={{ base: "sm", md: "lg" }} fontWeight="bold" color="#042E63">
                     ${change.toFixed(2)}
                 </Text>
             </Flex>
