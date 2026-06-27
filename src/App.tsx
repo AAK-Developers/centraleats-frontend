@@ -70,6 +70,15 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/edit-menu"
+            element={
+              <ProtectedRoute>
+                <RegisterMenuPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthInitializer>
 

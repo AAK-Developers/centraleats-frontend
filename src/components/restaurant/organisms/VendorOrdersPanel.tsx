@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { SimpleGrid } from "@chakra-ui/react";
 import toast from "react-hot-toast";
 import { apiClient } from "../../../api/axiosConfig";
 import { VendorOrderCard } from "../molecules/VendorOrderCard";
 import { EmptyOrdersVendor } from "../molecules/EmptyOrdersVendor";
+import { PickupCodeModal } from "../molecules/PickupCodeModal";
 import type { VendorOrder } from "../types/vendor.types";
 import type { OrderTab } from "../molecules/OrderTabsVendor";
 
@@ -12,7 +14,17 @@ interface VendorOrdersPanelProps {
     onRefresh: () => void;
 }
 
+interface PendingDelivery {
+    orderId: string;
+    orderLabel: string;
+    pickupCode: string;
+}
+
 export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrdersPanelProps) {
+    const [pendingDelivery, setPendingDelivery] = useState<PendingDelivery | null>(null);
+    const [pickupError, setPickupError] = useState("");
+    const [isConfirmingDelivery, setIsConfirmingDelivery] = useState(false);
+
     const handleAccept = async (orderId: string) => {
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "RECEIVED" });
@@ -43,17 +55,22 @@ export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrders
         }
     };
 
-    const handleDeliver = async (orderId: string, pickupCode?: string | null) => {
+    const handleDeliver = (orderId: string, pickupCode?: string | null) => {
         if (pickupCode) {
-            const inputCode = window.prompt(
-                "Ingrese el código de retiro de 4 dígitos proporcionado por el estudiante:"
-            );
-            if (inputCode === null) return;
-            if (inputCode.trim() !== pickupCode.trim()) {
-                toast.error("Código de retiro incorrecto. No se puede entregar el pedido.");
-                return;
-            }
+            const order = orders.find((o) => o.id === orderId);
+            setPickupError("");
+            setPendingDelivery({
+                orderId,
+                orderLabel: `Pedido #${orderId.slice(-6).toUpperCase()}${order?.user?.fullName ? ` — ${order.user.fullName}` : ""}`,
+                pickupCode,
+            });
+            return;
         }
+        completeDelivery(orderId);
+    };
+
+
+    const completeDelivery = async (orderId: string) => {
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "PICKED_UP" });
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "COMPLETED" });
@@ -64,42 +81,76 @@ export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrders
         }
     };
 
+    const handleModalConfirm = async (inputCode: string) => {
+        if (!pendingDelivery) return;
+
+        if (inputCode.trim() !== pendingDelivery.pickupCode.trim()) {
+            setPickupError("Código incorrecto. Verifica con el estudiante e intenta de nuevo.");
+            return;
+        }
+
+        setIsConfirmingDelivery(true);
+        try {
+            await completeDelivery(pendingDelivery.orderId);
+            setPendingDelivery(null);
+            setPickupError("");
+        } finally {
+            setIsConfirmingDelivery(false);
+        }
+    };
+
+    const handleModalCancel = () => {
+        setPendingDelivery(null);
+        setPickupError("");
+    };
+
     if (orders.length === 0) return <EmptyOrdersVendor />;
 
     return (
-        <SimpleGrid
-            columns={{ base: 1, md: 2, lg: 3 }}
-            gap={{ base: 4, md: 6 }}
-            pb={10}
-            w="full"
-        >
-            {orders.map((order) => (
-                <VendorOrderCard
-                    key={order.id}
-                    order={order}
-                    onAccept={
-                        activeTab === "nuevos" &&
-                            (order.status === "PENDING_PAYMENT" || order.status === "PAID")
-                            ? () => handleAccept(order.id)
-                            : undefined
-                    }
-                    onStartCooking={
-                        activeTab === "nuevos" && order.status === "RECEIVED"
-                            ? () => handleStartCooking(order.id)
-                            : undefined
-                    }
-                    onReady={
-                        activeTab === "en_cocina"
-                            ? () => handleReady(order.id)
-                            : undefined
-                    }
-                    onDeliver={
-                        activeTab === "listos"
-                            ? () => handleDeliver(order.id, order.pickupCode)
-                            : undefined
-                    }
-                />
-            ))}
-        </SimpleGrid>
+        <>
+            <SimpleGrid
+                columns={{ base: 1, md: 2, lg: 3 }}
+                gap={{ base: 4, md: 6 }}
+                pb={10}
+                w="full"
+            >
+                {orders.map((order) => (
+                    <VendorOrderCard
+                        key={order.id}
+                        order={order}
+                        onAccept={
+                            activeTab === "nuevos" &&
+                                (order.status === "PENDING_PAYMENT" || order.status === "PAID")
+                                ? () => handleAccept(order.id)
+                                : undefined
+                        }
+                        onStartCooking={
+                            activeTab === "nuevos" && order.status === "RECEIVED"
+                                ? () => handleStartCooking(order.id)
+                                : undefined
+                        }
+                        onReady={
+                            activeTab === "en_cocina"
+                                ? () => handleReady(order.id)
+                                : undefined
+                        }
+                        onDeliver={
+                            activeTab === "listos"
+                                ? () => handleDeliver(order.id, order.pickupCode)
+                                : undefined
+                        }
+                    />
+                ))}
+            </SimpleGrid>
+
+            <PickupCodeModal
+                isOpen={!!pendingDelivery}
+                vendorOrderLabel={pendingDelivery?.orderLabel ?? ""}
+                onConfirm={handleModalConfirm}
+                onCancel={handleModalCancel}
+                error={pickupError}
+                isSubmitting={isConfirmingDelivery}
+            />
+        </>
     );
 }
