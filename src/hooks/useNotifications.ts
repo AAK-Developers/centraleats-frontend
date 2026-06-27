@@ -60,29 +60,18 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
     const { role = 'student', vendorId } = options;
 
     const storageKey = getDismissedStorageKey(role, vendorId);
-    const prevStorageKeyRef = useRef<string>(storageKey);
 
     const dismissedIdsRef = useRef<Set<string>>(loadDismissedIds(storageKey));
     const seenIdsRef = useRef<Set<string>>(new Set());
-    const pendingResetRef = useRef(false);
-
-    if (prevStorageKeyRef.current !== storageKey) {
-        prevStorageKeyRef.current = storageKey;
-        dismissedIdsRef.current = loadDismissedIds(storageKey);
-        seenIdsRef.current = new Set();
-        pendingResetRef.current = true;
-    }
 
     const [notifications, setNotifications] = useState<AppNotification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-
     useEffect(() => {
-        if (pendingResetRef.current) {
-            pendingResetRef.current = false;
-            setNotifications([]);
-        }
-    });
+        dismissedIdsRef.current = loadDismissedIds(storageKey);
+        seenIdsRef.current = new Set();
+        setNotifications([]);
+    }, [storageKey]);
 
     const fetchNotifications = useCallback(async () => {
         if (role === 'vendor' && (!vendorId || vendorId === 'test-restaurant-id')) {
@@ -114,8 +103,8 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
             const newCards: AppNotification[] = [];
             for (const o of relevantOrders) {
                 const cardId = `${o.id}-${o.status}`;
-                if (seenIdsRef.current.has(cardId)) continue;
                 if (dismissedIdsRef.current.has(cardId)) continue;
+                if (seenIdsRef.current.has(cardId)) continue;
 
                 seenIdsRef.current.add(cardId);
                 newCards.push({

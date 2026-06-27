@@ -20,28 +20,16 @@ export const PickupCodeModal = ({
     isSubmitting = false,
 }: PickupCodeModalProps) => {
     const [code, setCode] = useState("");
+    const [openCount, setOpenCount] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
-    const prevIsOpenRef = useRef(isOpen);
-
-    if (!prevIsOpenRef.current && isOpen) {
-        prevIsOpenRef.current = isOpen;
-    }
-    if (prevIsOpenRef.current && !isOpen) {
-        prevIsOpenRef.current = isOpen;
-    }
-
-    const openCountRef = useRef(0);
-    const prevOpenRef = useRef(false);
-    if (isOpen && !prevOpenRef.current) {
-        openCountRef.current += 1;
-    }
-    prevOpenRef.current = isOpen;
 
     useEffect(() => {
         if (!isOpen) return;
+        setCode("");
+        setOpenCount((c) => c + 1);
         const t = setTimeout(() => inputRef.current?.focus(), 50);
         return () => clearTimeout(t);
-    }, [isOpen, openCountRef.current]);
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -120,7 +108,7 @@ export const PickupCodeModal = ({
 
                             <Box>
                                 <input
-                                    key={openCountRef.current}
+                                    key={openCount}
                                     ref={inputRef}
                                     inputMode="numeric"
                                     maxLength={4}
