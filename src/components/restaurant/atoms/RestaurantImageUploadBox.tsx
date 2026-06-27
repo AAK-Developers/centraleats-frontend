@@ -4,11 +4,12 @@ import { useRef, useState, type ChangeEvent } from "react";
 interface ImageUploadBoxProps {
     label: string;
     onFileSelect: (file: File) => void;
+    initialPreviewUrl?: string;
 }
 
-export const ImageUploadBox = ({ label, onFileSelect }: ImageUploadBoxProps) => {
+export const ImageUploadBox = ({ label, onFileSelect, initialPreviewUrl }: ImageUploadBoxProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [preview, setPreview] = useState<string | null>(initialPreviewUrl ?? null);
 
     const handleBoxClick = () => fileInputRef.current?.click();
 
@@ -16,8 +17,6 @@ export const ImageUploadBox = ({ label, onFileSelect }: ImageUploadBoxProps) => 
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
             onFileSelect(file);
-
-            // Crear una URL temporal para previsualizar la imagen
             const objectUrl = URL.createObjectURL(file);
             setPreview(objectUrl);
         }

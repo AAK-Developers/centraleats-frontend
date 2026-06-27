@@ -14,15 +14,12 @@ import { OrderTabsVendor } from "../../components/restaurant/molecules/OrderTabs
 import { ClosedStateVendor } from "../../components/restaurant/molecules/ClosedStateVendor";
 import type { OrderTab } from "../../components/restaurant/molecules/OrderTabsVendor";
 
-// New components
 import { VendorProductCatalog } from "../../components/restaurant/organisms/VendorProductCatalog";
 import { VendorOrdersPanel } from "../../components/restaurant/organisms/VendorOrdersPanel";
 
-// Hooks
 import { useVendorRestaurant } from "../../hooks/useVendorRestaurant";
 import { useVendorOrders } from "../../hooks/useVendorOrders";
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function VendorDashboardPage() {
     const { user } = useUser();
@@ -53,7 +50,7 @@ export default function VendorDashboardPage() {
             return next;
         });
 
-    // ── Loading ──────────────────────────────────────────────────────────────
+
     if (isLoading) {
         return (
             <WaveLayout>
@@ -66,7 +63,6 @@ export default function VendorDashboardPage() {
         );
     }
 
-    // ── No restaurant ────────────────────────────────────────────────────────
     if (!restaurant) {
         return (
             <WaveLayout>
@@ -98,11 +94,10 @@ export default function VendorDashboardPage() {
         );
     }
 
-    // ── Main ─────────────────────────────────────────────────────────────────
     return (
         <WaveLayout>
             <AppContainer>
-                <DashboardHeaderVendor userName={user?.firstName || "Nombre"} />
+                <DashboardHeaderVendor userName={user?.firstName || "Nombre"} restaurantId={restaurant.id} />
 
                 <RestaurantSelectorVendor
                     name={restaurant.name}

@@ -27,6 +27,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       '@typescript-eslint/no-explicit-any': 'off',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
   {

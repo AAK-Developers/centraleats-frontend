@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flex, HStack, Text, Button, IconButton, Image } from "@chakra-ui/react";
+import { Flex, HStack, Text, Button, IconButton, Image, Box } from "@chakra-ui/react";
 import { FaBell, FaUser } from "react-icons/fa";
 import CentralEats from "../../../assets/CentralEats.png";
 
@@ -9,14 +9,16 @@ import { NotificationPanel } from '../../shared/organisms/NotificationPanel';
 
 type DashboardHeaderVendorProps = {
     userName: string;
+    restaurantId?: string;
 };
 
 export const DashboardHeaderVendor = ({
     userName,
+    restaurantId,
 }: DashboardHeaderVendorProps) => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const { notifications, clearAll } = useNotifications();
+    const { notifications, clearAll } = useNotifications({ role: 'vendor', vendorId: restaurantId });
 
     return (
         <>
@@ -41,17 +43,40 @@ export const DashboardHeaderVendor = ({
                     wrap="wrap"
                     gap={{ base: 2, md: 4 }}
                 >
-                    <IconButton
-                        aria-label="Notificaciones"
-                        borderRadius="full"
-                        size={{ base: "md", md: "lg", lg: "2xl" }}
-                        bg="#30B2BC"
-                        color="white"
-                        _hover={{ bg: "#2899a1" }}
-                        onClick={() => setIsNotificationOpen(true)}
-                    >
-                        <FaBell size="20px" />
-                    </IconButton>
+                    <Box position="relative">
+                        <IconButton
+                            aria-label="Notificaciones"
+                            borderRadius="full"
+                            size={{ base: "md", md: "lg", lg: "2xl" }}
+                            bg="#30B2BC"
+                            color="white"
+                            _hover={{ bg: "#2899a1" }}
+                            onClick={() => setIsNotificationOpen(true)}
+                        >
+                            <FaBell size="20px" />
+                        </IconButton>
+                        {notifications.length > 0 && (
+                            <Box
+                                position="absolute"
+                                top="-2px"
+                                right="-2px"
+                                bg="red.500"
+                                color="white"
+                                borderRadius="full"
+                                minW="20px"
+                                h="20px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                fontSize="10px"
+                                fontWeight="bold"
+                                border="2px solid white"
+                                zIndex={1}
+                            >
+                                {notifications.length > 9 ? "9+" : notifications.length}
+                            </Box>
+                        )}
+                    </Box>
 
                     <Button
                         borderRadius="full"
