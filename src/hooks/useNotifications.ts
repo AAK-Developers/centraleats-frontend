@@ -8,6 +8,14 @@ export interface AppNotification {
     status: string;
 }
 
+const NOTIFICATION_STATUSES = ['RECEIVED', 'PREPARING', 'READY'];
+
+const NOTIFICATION_TITLES: Record<string, string> = {
+    RECEIVED: '✅ ¡Tu pedido fue aceptado por el local!',
+    PREPARING: '🔥 ¡Tu pedido está en preparación!',
+    READY: '🔔 ¡Tu pedido está listo para retirar!',
+};
+
 export const useNotifications = () => {
     const [notifications, setNotifications] = useState<AppNotification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -18,14 +26,14 @@ export const useNotifications = () => {
             const rawData = response.data?.data || response.data || [];
             const responseData = Array.isArray(rawData) ? rawData : [];
 
-            const readyOrders = responseData.filter(
-                (o: any) => o.status === 'READY'
+            const relevantOrders = responseData.filter((o: any) =>
+                NOTIFICATION_STATUSES.includes(o.status)
             );
 
             setNotifications(
-                readyOrders.map((o: any) => ({
+                relevantOrders.map((o: any) => ({
                     id: o.id,
-                    title: '¡Tu pedido está listo para retirar!',
+                    title: NOTIFICATION_TITLES[o.status] ?? '📦 Actualización de tu pedido',
                     restaurant: o.vendorName || 'Restaurante',
                     status: o.status,
                 }))
@@ -39,9 +47,7 @@ export const useNotifications = () => {
     }, []);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchNotifications();
-        }, 0);
+        const timer = setTimeout(() => fetchNotifications(), 0);
         const interval = setInterval(fetchNotifications, 8000);
         return () => {
             clearTimeout(timer);
@@ -49,9 +55,7 @@ export const useNotifications = () => {
         };
     }, [fetchNotifications]);
 
-    const clearAll = () => {
-        setNotifications([]);
-    };
+    const clearAll = () => setNotifications([]);
 
     return { notifications, isLoading, clearAll, refresh: fetchNotifications };
 };

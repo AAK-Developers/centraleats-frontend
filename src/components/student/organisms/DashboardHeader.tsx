@@ -20,7 +20,6 @@ export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
-
     const { notifications, clearAll } = useNotifications();
     const totalItems = useCartStore((s) => s.totalItems());
 
@@ -34,7 +33,6 @@ export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
                 />
 
                 <HStack justify="center" wrap="wrap" gap={4}>
-                    {/* Notifications Bell */}
                     <Box position="relative">
                         <IconButton
                             aria-label="Notificaciones"
@@ -70,7 +68,6 @@ export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
                         )}
                     </Box>
 
-                    {/* Cart Button with item count badge */}
                     <Box position="relative">
                         <IconButton
                             aria-label="Carrito"

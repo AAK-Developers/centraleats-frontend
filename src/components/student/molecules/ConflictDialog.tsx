@@ -19,7 +19,6 @@ export function ConflictDialog({
 
     return (
         <>
-            {/* Backdrop */}
             <Box
                 position="fixed"
                 inset={0}
@@ -29,7 +28,6 @@ export function ConflictDialog({
                 onClick={onCancel}
             />
 
-            {/* Modal */}
             <Box
                 position="fixed"
                 top="50%"

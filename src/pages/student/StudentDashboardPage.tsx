@@ -23,9 +23,11 @@ import { ProductCard } from "../../components/student/atoms/ProductCard";
 import type { Product } from "../../components/student/atoms/ProductCard";
 import { ActiveOrdersStrip } from "../../components/student/molecules/ActiveOrdersStrip";
 import { ConflictDialog } from "../../components/student/molecules/ConflictDialog";
+import { CartAddedToast } from "../../components/student/molecules/CartAddedToast";
 
 import { useAllProducts } from "../../hooks/useAllProducts";
 import { useCartStore } from "../../store/cartStore";
+import { useCartToast } from "../../hooks/useCartToast";
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
@@ -33,6 +35,7 @@ export default function StudentDashboardPage() {
     const { user } = useUser();
     const { products, isLoading } = useAllProducts();
     const { addItem, clearCart, vendorName: currentVendorName } = useCartStore();
+    const { toasts, notify, dismiss } = useCartToast();
 
     const [search, setSearch] = useState("");
     const [conflictProduct, setConflictProduct] = useState<{
@@ -79,18 +82,12 @@ export default function StudentDashboardPage() {
             return;
         }
 
-        toast.success(
-            () => (
-                <span>
-                    <strong>"{product.name}"</strong> agregado 🛒
-                    <br />
-                    <span style={{ fontSize: "12px", color: "#6b7280" }}>
-                        {product.vendorName} · ${(product.price / 100).toFixed(2)}
-                    </span>
-                </span>
-            ),
-            { duration: 3000, icon: "✅" }
-        );
+        notify({
+            productName: product.name,
+            vendorName: product.vendorName,
+            price: product.price,
+            imageUrl: product.imageUrl,
+        });
     };
 
     const handleConflictConfirm = () => {
@@ -107,7 +104,12 @@ export default function StudentDashboardPage() {
             conflictProduct.vendorId,
             conflictProduct.vendorName
         );
-        toast.success(`Carrito actualizado. "${conflictProduct.product.name}" agregado 🛒`);
+        notify({
+            productName: conflictProduct.product.name,
+            vendorName: conflictProduct.product.vendorName,
+            price: conflictProduct.product.price,
+            imageUrl: conflictProduct.product.imageUrl,
+        });
         setConflictProduct(null);
     };
 
@@ -227,7 +229,6 @@ export default function StudentDashboardPage() {
                 )}
             </AppContainer>
 
-            {/* Conflict Dialog */}
             <ConflictDialog
                 isOpen={!!conflictProduct}
                 currentVendorName={currentVendorName}
@@ -235,6 +236,8 @@ export default function StudentDashboardPage() {
                 onConfirm={handleConflictConfirm}
                 onCancel={() => setConflictProduct(null)}
             />
+
+            <CartAddedToast toasts={toasts} onDismiss={dismiss} />
         </WaveLayout>
     );
 }

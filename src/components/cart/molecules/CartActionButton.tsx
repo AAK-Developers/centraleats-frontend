@@ -19,7 +19,7 @@ const getConfig = (method: PaymentMethod): { label: string; sublabel: string; ic
     if (method === "tarjeta") {
         return {
             label: "Pagar con Tarjeta",
-            sublabel: "Serás redirigido al formulario",
+            sublabel: "Serás redirigido a la pasarela de pagos",
             icon: <CreditCard size={20} />,
         };
     }
@@ -40,7 +40,7 @@ export const CartActionButton = ({ paymentMethod, onClick }: CartActionButtonPro
             w="full"
             align="center"
             justify="space-between"
-            bg={isActive ? (paymentMethod === "efectivo" ? "#042E63" : "#30B2BC") : "gray.300"}
+            bg={isActive ? (paymentMethod === "efectivo" ? "#042E63" : "#30B2BC") : "#9c9e9e"}
             color="white"
             borderRadius="2xl"
             px={{ base: 4, md: 5 }}
@@ -51,7 +51,6 @@ export const CartActionButton = ({ paymentMethod, onClick }: CartActionButtonPro
             _hover={isActive ? { opacity: 0.92, transform: "translateY(-1px)", boxShadow: "lg" } : {}}
             gap={3}
         >
-            {/* Left icon */}
             <Flex
                 w={{ base: "36px", md: "40px" }}
                 h={{ base: "36px", md: "40px" }}
@@ -64,7 +63,6 @@ export const CartActionButton = ({ paymentMethod, onClick }: CartActionButtonPro
                 {icon}
             </Flex>
 
-            {/* Labels */}
             <Box flex={1} textAlign="left">
                 <Text fontWeight="bold" fontSize={{ base: "sm", md: "md" }} lineHeight="1.2">
                     {label}
@@ -74,7 +72,6 @@ export const CartActionButton = ({ paymentMethod, onClick }: CartActionButtonPro
                 </Text>
             </Box>
 
-            {/* Arrow */}
             {isActive && (
                 <Flex
                     w={{ base: "28px", md: "32px" }}
