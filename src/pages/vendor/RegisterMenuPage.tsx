@@ -26,18 +26,9 @@ interface MenuFormData {
 type EditableProduct = VendorProduct & { categoryId?: string };
 
 const CATEGORIES = [
-    {
-        id: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a",
-        name: "Almuerzos"
-    },
-    {
-        id: "b5003928-6d64-417b-8798-2726d16c8cfb",
-        name: "Bebidas"
-    },
-    {
-        id: "153a9f76-160d-4895-814d-9831c33088cd",
-        name: "Snacks"
-    }
+    { id: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a", name: "Almuerzos" },
+    { id: "b5003928-6d64-417b-8798-2726d16c8cfb", name: "Bebidas" },
+    { id: "153a9f76-160d-4895-814d-9831c33088cd", name: "Snacks" },
 ];
 
 export default function RegisterMenuPage() {
@@ -48,11 +39,12 @@ export default function RegisterMenuPage() {
     const editingProduct = (location.state as { product?: EditableProduct } | null)?.product;
     const isEditMode = !!editingProduct;
 
+    // Fix: include all referenced values in the dependency array
     useEffect(() => {
         if (editingProduct?.categoryId) {
             setValue("categoryId", editingProduct.categoryId);
         }
-    }, []);
+    }, [editingProduct?.categoryId, setValue]);
 
     const onSubmit = async (data: MenuFormData) => {
         try {
@@ -65,7 +57,6 @@ export default function RegisterMenuPage() {
             if (data.categoryId) {
                 formData.append('categoryId', data.categoryId);
             }
-
             formData.append('isAvailable', 'true');
             formData.append('isActive', 'true');
 
@@ -164,7 +155,6 @@ export default function RegisterMenuPage() {
                                             <option value="">
                                                 {isEditMode ? "Mantener categoría actual" : "Selecciona una categoría"}
                                             </option>
-
                                             {CATEGORIES.map((cat) => (
                                                 <option key={cat.id} value={cat.id}>
                                                     {cat.name}
