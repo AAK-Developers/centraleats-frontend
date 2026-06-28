@@ -11,10 +11,12 @@ import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
 import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <AuthInitializer>
         <Routes>
 
@@ -69,8 +71,17 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/edit-menu"
+            element={
+              <ProtectedRoute>
+                <RegisterMenuPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthInitializer>
+
     </BrowserRouter>
   );
 }
