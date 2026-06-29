@@ -1,33 +1,130 @@
-import { Box, VStack, Heading, Flex, Text } from "@chakra-ui/react";
+import { Box, VStack, Heading, Flex, Text, Badge, HStack, Icon, SimpleGrid } from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
 import { CloseButton } from "../../cart/atoms/CloseButton";
 import { UserProfileHeader } from "../../shared/molecules/UserProfileHeader";
 import { LogoutButton } from "../../shared/atoms/LogoutButton";
-
+import { useVendorOrders } from "../../../hooks/useVendorOrders";
+import { FaFire, FaBell, FaCreditCard, FaMoneyBillWave, FaClipboardList } from "react-icons/fa";
 
 interface ProfilePanelVendorProps {
     isOpen: boolean;
     onClose: () => void;
-    restaurantName?: string;
-    restaurantLogoUrl?: string;
+    restaurantId?: string;
+}
+
+interface StatCardProps {
+    icon: React.ElementType;
+    label: string;
+    count: number;
+    bg: string;
+    iconColor: string;
+    badgeColor: string;
+}
+
+function StatCard({ icon, label, count, bg, iconColor, badgeColor }: StatCardProps) {
+    return (
+        <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            bg={bg}
+            borderRadius="2xl"
+            p={4}
+            gap={2}
+            position="relative"
+            border="1px solid"
+            borderColor="gray.100"
+            minH="90px"
+        >
+            {count > 0 && (
+                <Badge
+                    position="absolute"
+                    top={2}
+                    right={2}
+                    colorScheme={badgeColor}
+                    borderRadius="full"
+                    fontSize="10px"
+                    fontWeight="bold"
+                    px={1.5}
+                >
+                    {count}
+                </Badge>
+            )}
+            <Flex
+                w="36px" h="36px"
+                borderRadius="xl"
+                bg="white"
+                align="center"
+                justify="center"
+                boxShadow="sm"
+            >
+                <Icon as={icon} boxSize={4} color={iconColor} />
+            </Flex>
+            <Text fontSize="xs" fontWeight="semibold" color="gray.600" textAlign="center" lineHeight="1.2">
+                {label}
+            </Text>
+        </Flex>
+    );
 }
 
 export const ProfilePanelVendor = ({
     isOpen,
     onClose,
-    restaurantName = "Restaurante Central 1",
-    restaurantLogoUrl = "/assets/restaurant-placeholder.png",
+    restaurantId,
 }: ProfilePanelVendorProps) => {
     const { user, isLoaded } = useUser();
-    const navigate = useNavigate();
+    const { nuevos, enCocina, listos } = useVendorOrders(restaurantId);
 
     if (!isOpen) return null;
 
-    const handleEditMenu = () => {
-        onClose();
-        navigate("/vendor/edit-menu");
-    };
+    const pendingPayment = nuevos.filter((o) => o.status === "PENDING_PAYMENT");
+    const paid = nuevos.filter((o) => o.status === "PAID");
+    const received = nuevos.filter((o) => o.status === "RECEIVED");
+
+    const stats = [
+        {
+            icon: FaMoneyBillWave,
+            label: "Pago pendiente",
+            count: pendingPayment.length,
+            bg: "orange.50",
+            iconColor: "orange.400",
+            badgeColor: "orange",
+        },
+        {
+            icon: FaCreditCard,
+            label: "Pagados",
+            count: paid.length,
+            bg: "green.50",
+            iconColor: "green.500",
+            badgeColor: "green",
+        },
+        {
+            icon: FaClipboardList,
+            label: "Aceptados",
+            count: received.length,
+            bg: "blue.50",
+            iconColor: "blue.500",
+            badgeColor: "blue",
+        },
+        {
+            icon: FaFire,
+            label: "En cocina",
+            count: enCocina.length,
+            bg: "yellow.50",
+            iconColor: "yellow.500",
+            badgeColor: "yellow",
+        },
+        {
+            icon: FaBell,
+            label: "Listos",
+            count: listos.length,
+            bg: "teal.50",
+            iconColor: "teal.500",
+            badgeColor: "teal",
+        },
+    ];
+
+    const totalActive = nuevos.length + enCocina.length + listos.length;
 
     return (
         <>
@@ -51,13 +148,16 @@ export const ProfilePanelVendor = ({
                 boxShadow="2xl"
                 overflow="hidden"
                 zIndex={999}
+                display="flex"
+                flexDirection="column"
             >
                 <Flex
                     align="center"
                     justify="space-between"
-                    p={{ base: 4, md: 5, lg: 6 }}
+                    p={{ base: 4, md: 5 }}
                     borderBottom="1px solid"
                     borderColor="gray.100"
+                    flexShrink={0}
                 >
                     <Heading size={{ base: "sm", md: "md" }} color="#042E63">
                         Mi Perfil
@@ -65,67 +165,64 @@ export const ProfilePanelVendor = ({
                     <CloseButton onClick={onClose} />
                 </Flex>
 
-                <Box
-                    p={{ base: 4, md: 5, lg: 6 }}
-                    overflowY="auto"
-                    h="calc(100% - 88px)"
-                >
+                <Box p={{ base: 4, md: 5 }} overflowY="auto" flex={1}>
                     {isLoaded && (
-                        <VStack gap={{ base: 4, md: 5, lg: 6 }} align="center">
-
+                        <VStack gap={6} align="stretch">
+                            {/* User info */}
                             <UserProfileHeader
                                 imageUrl={user?.imageUrl}
                                 fullName={user?.fullName || "Usuario"}
                                 email={user?.primaryEmailAddress?.emailAddress || ""}
                             />
 
-                            <Box w="full">
-                                <Heading
-                                    size={{ base: "xs", md: "sm" }}
-                                    color="#042E63"
-                                    mb={{ base: 2, md: 3 }}
-                                >
-                                    Editar Platos
-                                </Heading>
-                                <Flex
-                                    align="center"
-                                    gap={{ base: 2, md: 3 }}
-                                    p={{ base: 2, md: 3 }}
-                                    bg="white"
-                                    border="1px solid"
-                                    borderColor="gray.200"
-                                    borderRadius="xl"
-                                    cursor="pointer"
-                                    _hover={{ bg: "gray.50", borderColor: "#30B2BC" }}
-                                    transition="all 0.2s"
-                                    onClick={handleEditMenu}
-                                >
-                                    <img
-                                        src={restaurantLogoUrl}
-                                        alt={`Menú ${restaurantName}`}
-                                        width={40}
-                                        height={40}
-                                        style={{ objectFit: "contain", borderRadius: "6px" }}
-                                        onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.onerror = null;
-                                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(restaurantName)}&background=0D8ABC&color=fff&size=40`;
-                                        }}
+                            <Box>
+                                <HStack gap={2} mb={3}>
+                                    <Box
+                                        w="3px" h="16px"
+                                        bg="#2DC6B8"
+                                        borderRadius="full"
+                                        flexShrink={0}
                                     />
-                                    <Text
-                                        fontWeight="semibold"
-                                        color="#042E63"
-                                        fontSize={{ base: "xs", md: "sm" }}
+                                    <Heading size="sm" color="#042E63">
+                                        Pedidos del día
+                                    </Heading>
+                                    {totalActive > 0 && (
+                                        <Badge
+                                            colorScheme="teal"
+                                            borderRadius="full"
+                                            fontSize="10px"
+                                            fontWeight="bold"
+                                        >
+                                            {totalActive} activos
+                                        </Badge>
+                                    )}
+                                </HStack>
+
+                                {totalActive === 0 ? (
+                                    <Box
+                                        bg="gray.50"
+                                        borderRadius="xl"
+                                        p={4}
+                                        textAlign="center"
+                                        border="1px dashed"
+                                        borderColor="gray.200"
                                     >
-                                        Menú {restaurantName}
-                                    </Text>
-                                </Flex>
+                                        <Text fontSize="sm" color="gray.400">
+                                            Sin pedidos activos por ahora
+                                        </Text>
+                                    </Box>
+                                ) : (
+                                    <SimpleGrid columns={2} gap={3}>
+                                        {stats.map((s) => (
+                                            <StatCard key={s.label} {...s} />
+                                        ))}
+                                    </SimpleGrid>
+                                )}
                             </Box>
 
-                            <Flex pt={{ base: 2, md: 4 }} justify="center" w="full">
+                            <Flex pt={2} justify="center" w="full">
                                 <LogoutButton />
                             </Flex>
-
                         </VStack>
                     )}
                 </Box>
