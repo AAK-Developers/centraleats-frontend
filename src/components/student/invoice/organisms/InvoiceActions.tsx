@@ -24,7 +24,7 @@ export const InvoiceActions = ({
             url: window.location.href,
         };
         if (navigator.share && navigator.canShare?.(shareData)) {
-            try { await navigator.share(shareData); } catch (_) { }
+            try { await navigator.share(shareData); } catch { }
         } else {
             await navigator.clipboard.writeText(window.location.href);
             setShareState("copied");

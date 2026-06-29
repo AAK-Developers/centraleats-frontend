@@ -43,10 +43,13 @@ export function useProductFilters({ products, searchFiltered }: UseProductFilter
     const [page, setPage] = useState(1);
 
     useEffect(() => {
-        if (priceBounds.max > 0 && filters.priceRange.max === 0) {
-            setFilters((f) => ({ ...f, priceRange: { ...priceBounds } }));
-        }
-    }, [priceBounds.max]);
+        setFilters((f) => {
+            if (priceBounds.max > 0 && f.priceRange.max === 0) {
+                return { ...f, priceRange: { ...priceBounds } };
+            }
+            return f;
+        });
+    }, [priceBounds]);
 
     const availableVendors = useMemo(() => {
         const map = new Map<string, string>();
