@@ -107,8 +107,7 @@ export const DashboardHeaderVendor = ({
             <ProfilePanelVendor
                 isOpen={isProfileOpen}
                 onClose={() => setIsProfileOpen(false)}
-                restaurantName="Restaurante Central 1"
-                restaurantLogoUrl="/assets/restaurant.png"
+                restaurantId={restaurantId}
             />
         </>
     );
