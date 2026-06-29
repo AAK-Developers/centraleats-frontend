@@ -1,24 +1,17 @@
 import { Box } from "@chakra-ui/react";
+import { useRef } from "react";
 import { InvoiceHeader } from "../molecules/InvoiceHeader";
 import { InvoiceCustomerInfo } from "../molecules/InvoiceCustomerInfo";
-import { InvoiceItemsTable, type InvoiceItemData, } from "../../../cart/molecules/CartInvoiceItemsTable";
+import { InvoiceItemsTable, type InvoiceItemData } from "../../../cart/molecules/CartInvoiceItemsTable";
 import { InvoiceTotals } from "../atoms/InvoiceTotals";
 import { InvoiceQR } from "../atoms/InvoiceQR";
 import { InvoiceActions } from "./InvoiceActions";
 
-
 interface InvoicePanelProps {
     invoiceNumber: string;
     date: string;
-    restaurant: {
-        name: string;
-        address: string;
-        city: string;
-    };
-    customer: {
-        name: string;
-        address: string;
-    };
+    restaurant: { name: string; address: string; city: string };
+    customer: { name: string; address: string };
     items: InvoiceItemData[];
     paymentMethod: string;
     amountPaid: number;
@@ -35,16 +28,12 @@ export const InvoicePanel = ({
     items,
     paymentMethod,
     amountPaid,
-    onShare,
-    onDownload,
     onSeguirPedido,
 }: InvoicePanelProps) => {
-    const subtotal = items.reduce(
-        (acc, item) => acc + item.unitPrice * item.quantity,
-        0
-    );
+    const subtotal = items.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
     const change = amountPaid - subtotal;
     const qrValue = `Factura:${invoiceNumber}|Total:${subtotal.toFixed(2)}|Restaurante:${restaurant.name}`;
+    const invoiceContentRef = useRef<HTMLDivElement>(null);
 
     return (
         <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
@@ -57,34 +46,31 @@ export const InvoicePanel = ({
                 mx="auto"
                 w="full"
             >
-                <InvoiceHeader
-                    restaurantName={restaurant.name}
-                    invoiceNumber={invoiceNumber}
-                    date={date}
-                />
-
-                <InvoiceCustomerInfo
-                    customerName={customer.name}
-                    customerAddress={customer.address}
-                    paymentMethod={paymentMethod}
-                />
-
-                <InvoiceItemsTable items={items} />
-
-                <InvoiceTotals
-                    subtotal={subtotal}
-                    amountPaid={amountPaid}
-                    change={change}
-                />
-
-                <Box mb={6} />
-
-                <InvoiceQR value={qrValue} />
+                <Box ref={invoiceContentRef}>
+                    <InvoiceHeader
+                        restaurantName={restaurant.name}
+                        invoiceNumber={invoiceNumber}
+                        date={date}
+                    />
+                    <InvoiceCustomerInfo
+                        customerName={customer.name}
+                        customerAddress={customer.address}
+                        paymentMethod={paymentMethod}
+                    />
+                    <InvoiceItemsTable items={items} />
+                    <InvoiceTotals
+                        subtotal={subtotal}
+                        amountPaid={amountPaid}
+                        change={change}
+                    />
+                    <Box mb={6} />
+                    <InvoiceQR value={qrValue} />
+                </Box>
 
                 <InvoiceActions
-                    onShare={onShare}
-                    onDownload={onDownload}
                     onSeguirPedido={onSeguirPedido}
+                    invoiceNumber={invoiceNumber}
+                    invoiceRef={invoiceContentRef}
                 />
             </Box>
         </Box>
