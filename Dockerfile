@@ -22,8 +22,12 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Copy custom Nginx configuration template
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 
+# Copy environment injection script to docker-entrypoint.d
+COPY nginx/30-generate-env-config.sh /docker-entrypoint.d/30-generate-env-config.sh
+RUN chmod +x /docker-entrypoint.d/30-generate-env-config.sh
+
 # Expose port 80
 EXPOSE 80
 
-# Generate env-config.js from environment variables at runtime, then start Nginx
-CMD ["/bin/sh", "-c", "echo \"window.env = { VITE_API_BASE_URL: '${VITE_API_BASE_URL}', VITE_CLERK_PUBLISHABLE_KEY: '${VITE_CLERK_PUBLISHABLE_KEY}', VITE_APP_ENV: '${VITE_APP_ENV}' };\" > /usr/share/nginx/html/env-config.js && nginx -g 'daemon off;'"]
+# Use standard Nginx entrypoint execution
+CMD ["nginx", "-g", "daemon off;"]
