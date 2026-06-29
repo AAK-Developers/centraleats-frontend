@@ -7,8 +7,9 @@ import {
     Button,
     Spinner,
     Stack,
+    Icon,
 } from "@chakra-ui/react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaFilter } from "react-icons/fa";
 import { MdRestaurantMenu } from "react-icons/md";
 import { useUser } from "@clerk/clerk-react";
 import { useState, useMemo } from "react";
@@ -18,18 +19,21 @@ import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
 import { DashboardHeader } from "../../components/student/organisms/DashboardHeader";
 
-// New componentized pieces
 import { ProductCard } from "../../components/student/atoms/ProductCard";
 import type { Product } from "../../components/student/atoms/ProductCard";
 import { ActiveOrdersStrip } from "../../components/student/molecules/ActiveOrdersStrip";
 import { ConflictDialog } from "../../components/student/molecules/ConflictDialog";
 import { CartAddedToast } from "../../components/student/molecules/CartAddedToast";
+import { FilterSidebar } from "../../components/student/molecules/FilterSidebar";
+import { FilterMobileDrawer } from "../../components/student/molecules/FilterMobileDrawer";
+import { SortDropdown } from "../../components/student/molecules/SortDropdown";
+import { PaginationControls } from "../../components/student/molecules/PaginationControls";
 
 import { useAllProducts } from "../../hooks/useAllProducts";
 import { useCartStore } from "../../store/cartStore";
 import { useCartToast } from "../../hooks/useCartToast";
+import { useProductFilters } from "../../hooks/useProductFilters";
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function StudentDashboardPage() {
     const { user } = useUser();
@@ -38,13 +42,14 @@ export default function StudentDashboardPage() {
     const { toasts, notify, dismiss } = useCartToast();
 
     const [search, setSearch] = useState("");
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const [conflictProduct, setConflictProduct] = useState<{
         product: Product;
         vendorId: string;
         vendorName: string;
     } | null>(null);
 
-    const filtered = useMemo(() => {
+    const searchFiltered = useMemo(() => {
         const q = search.toLowerCase().trim();
         if (!q) return products;
         return products.filter(
@@ -54,6 +59,20 @@ export default function StudentDashboardPage() {
                 p.vendorName.toLowerCase().includes(q)
         );
     }, [products, search]);
+
+    const {
+        filters,
+        updateFilters,
+        resetFilters,
+        priceBounds,
+        availableVendors,
+        activeFilterCount,
+        results,
+        totalResults,
+        page,
+        totalPages,
+        setPage,
+    } = useProductFilters({ products, searchFiltered });
 
     const handleAddToCart = (product: Product) => {
         if (!product.vendorId) {
@@ -113,12 +132,20 @@ export default function StudentDashboardPage() {
         setConflictProduct(null);
     };
 
+    const filterSidebarProps = {
+        filters,
+        onChange: updateFilters,
+        onReset: resetFilters,
+        priceBounds,
+        availableVendors,
+        activeFilterCount,
+    };
+
     return (
         <WaveLayout>
             <AppContainer>
                 <DashboardHeader userName={user?.firstName || "Usuario"} />
 
-                {/* Hero */}
                 <Box mb={8} textAlign="center">
                     <Text
                         fontSize={{ base: "2xl", md: "4xl" }}
@@ -132,7 +159,6 @@ export default function StudentDashboardPage() {
                         Todos los platos de los restaurantes de la Universidad Central del Ecuador
                     </Text>
 
-                    {/* Search bar */}
                     <Box position="relative" maxW="560px" mx="auto" w="full">
                         <Box
                             position="absolute"
@@ -168,66 +194,135 @@ export default function StudentDashboardPage() {
                     </Box>
                 </Box>
 
-                {/* Active Orders */}
                 <ActiveOrdersStrip />
 
-                {/* Products Grid */}
-                {isLoading ? (
-                    <Flex justify="center" align="center" py={20}>
-                        <Stack align="center" gap={3}>
-                            <Spinner size="xl" color="#2DC6B8" borderWidth="4px" />
-                            <Text color="gray.500" fontSize="sm">
-                                Cargando platos...
-                            </Text>
-                        </Stack>
-                    </Flex>
-                ) : filtered.length === 0 ? (
-                    <Flex direction="column" align="center" justify="center" py={20} gap={3}>
-                        <MdRestaurantMenu size={64} color="#CBD5E0" />
-                        <Text color="gray.500" fontSize="lg" fontWeight="semibold">
-                            {search
-                                ? "Sin resultados para tu búsqueda"
-                                : "No hay platos disponibles"}
-                        </Text>
-                        {search && (
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                color="#2DC6B8"
-                                onClick={() => setSearch("")}
-                                borderRadius="full"
-                            >
-                                Limpiar búsqueda
-                            </Button>
-                        )}
-                    </Flex>
-                ) : (
-                    <>
-                        <Flex justify="space-between" align="center" mb={4}>
-                            <Text fontSize="sm" color="gray.500">
-                                {filtered.length} plato
-                                {filtered.length !== 1 ? "s" : ""} encontrado
-                                {filtered.length !== 1 ? "s" : ""}
-                                {search && ` para "${search}"`}
-                            </Text>
-                        </Flex>
-                        <SimpleGrid
-                            columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
-                            gap={{ base: 4, md: 6 }}
-                            pb={16}
-                            w="full"
+                <Flex gap={6} align="flex-start">
+                    <Box
+                        as="aside"
+                        display={{ base: "none", lg: "block" }}
+                        w="280px"
+                        flexShrink={0}
+                        bg="white"
+                        borderRadius="2xl"
+                        border="1px solid"
+                        borderColor="gray.100"
+                        boxShadow="0 4px 16px rgba(4,46,99,0.06)"
+                        p={5}
+                        position="sticky"
+                        top="20px"
+                    >
+                        <FilterSidebar {...filterSidebarProps} />
+                    </Box>
+
+                    <Box flex={1} minW={0}>
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            mb={4}
+                            gap={3}
+                            flexWrap="wrap"
                         >
-                            {filtered.map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                    onAddToCart={handleAddToCart}
+                            <Flex align="center" gap={3}>
+                                <Button
+                                    display={{ base: "flex", lg: "none" }}
+                                    onClick={() => setIsMobileFiltersOpen(true)}
+                                    bg="white"
+                                    border="1.5px solid"
+                                    borderColor={activeFilterCount > 0 ? "#2DC6B8" : "gray.200"}
+                                    color={activeFilterCount > 0 ? "#2DC6B8" : "gray.600"}
+                                    borderRadius="full"
+                                    size="sm"
+                                    _hover={{ borderColor: "#2DC6B8", color: "#2DC6B8" }}
+                                >
+                                    <Flex align="center" gap={2}>
+                                        <Icon as={FaFilter} boxSize={3} />
+                                        <Text fontSize="xs" fontWeight="bold">
+                                            Filtros{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+                                        </Text>
+                                    </Flex>
+                                </Button>
+
+                                <Text fontSize="sm" color="gray.500" display={{ base: "none", sm: "block" }}>
+                                    {totalResults} plato{totalResults !== 1 ? "s" : ""} encontrado{totalResults !== 1 ? "s" : ""}
+                                    {search && ` para "${search}"`}
+                                </Text>
+                            </Flex>
+
+                            <SortDropdown
+                                value={filters.sortBy}
+                                onChange={(sortBy) => updateFilters({ sortBy })}
+                            />
+                        </Flex>
+
+                        <Text fontSize="xs" color="gray.500" mb={3} display={{ base: "block", sm: "none" }}>
+                            {totalResults} plato{totalResults !== 1 ? "s" : ""} encontrado{totalResults !== 1 ? "s" : ""}
+                        </Text>
+
+                        {isLoading ? (
+                            <Flex justify="center" align="center" py={20}>
+                                <Stack align="center" gap={3}>
+                                    <Spinner size="xl" color="#2DC6B8" borderWidth="4px" />
+                                    <Text color="gray.500" fontSize="sm">
+                                        Cargando platos...
+                                    </Text>
+                                </Stack>
+                            </Flex>
+                        ) : totalResults === 0 ? (
+                            <Flex direction="column" align="center" justify="center" py={20} gap={3}>
+                                <MdRestaurantMenu size={64} color="#CBD5E0" />
+                                <Text color="gray.500" fontSize="lg" fontWeight="semibold">
+                                    {search || activeFilterCount > 0
+                                        ? "Sin resultados para tu búsqueda"
+                                        : "No hay platos disponibles"}
+                                </Text>
+                                {(search || activeFilterCount > 0) && (
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        color="#2DC6B8"
+                                        onClick={() => {
+                                            setSearch("");
+                                            resetFilters();
+                                        }}
+                                        borderRadius="full"
+                                    >
+                                        Limpiar búsqueda y filtros
+                                    </Button>
+                                )}
+                            </Flex>
+                        ) : (
+                            <>
+                                <SimpleGrid
+                                    columns={{ base: 1, sm: 2, md: 2, lg: 3 }}
+                                    gap={{ base: 4, md: 6 }}
+                                    w="full"
+                                >
+                                    {results.map((product) => (
+                                        <ProductCard
+                                            key={product.id}
+                                            product={product}
+                                            onAddToCart={handleAddToCart}
+                                        />
+                                    ))}
+                                </SimpleGrid>
+
+                                <PaginationControls
+                                    page={page}
+                                    totalPages={totalPages}
+                                    onPageChange={setPage}
                                 />
-                            ))}
-                        </SimpleGrid>
-                    </>
-                )}
+                            </>
+                        )}
+                    </Box>
+                </Flex>
             </AppContainer>
+
+            <FilterMobileDrawer
+                isOpen={isMobileFiltersOpen}
+                onClose={() => setIsMobileFiltersOpen(false)}
+                resultCount={totalResults}
+                {...filterSidebarProps}
+            />
 
             <ConflictDialog
                 isOpen={!!conflictProduct}
