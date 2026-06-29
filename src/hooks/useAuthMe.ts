@@ -17,19 +17,20 @@ export const useAuthMe = () => {
         setError(null);
         try {
             const response = await apiClient.get<BackendResponse | UserProfile>('/api/auth/me');
-            
+            console.log("RESPUESTA COMPLETA AUTH ME:", response.data);
+
             // Backend might return the profile directly or wrapped in { data: UserProfile }
             const responseData = response.data;
             const profileData = (responseData as BackendResponse).data || (responseData as UserProfile);
-            
+
             setProfile(profileData);
             return profileData;
         } catch (err: unknown) {
             let message = 'Failed to fetch user profile';
-            
+
             if (axios.isAxiosError(err)) {
                 message = err.response?.data?.message || message;
-                
+
                 if (err.response?.status === 404 || err.response?.status === 403) {
                     setProfile(null);
                 }

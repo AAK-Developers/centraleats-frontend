@@ -1,75 +1,243 @@
-import { Box, Flex, Text, Input, SimpleGrid, } from "@chakra-ui/react";
+import {
+    Box,
+    Flex,
+    Text,
+    Input,
+    SimpleGrid,
+    Button,
+    Spinner,
+    Stack,
+} from "@chakra-ui/react";
 import { FaSearch } from "react-icons/fa";
+import { MdRestaurantMenu } from "react-icons/md";
 import { useUser } from "@clerk/clerk-react";
+import { useState, useMemo } from "react";
+import toast from "react-hot-toast";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { RestaurantCard } from "../../components/molecules/RestaurantCard";
-import { useRestaurants } from "../../hooks/useRestaurants";
-import type { Restaurant } from "../../hooks/useRestaurants";
-import { DashboardHeader } from "../../components/organisms/DashboardHeader";
+import { DashboardHeader } from "../../components/student/organisms/DashboardHeader";
+
+// New componentized pieces
+import { ProductCard } from "../../components/student/atoms/ProductCard";
+import type { Product } from "../../components/student/atoms/ProductCard";
+import { ActiveOrdersStrip } from "../../components/student/molecules/ActiveOrdersStrip";
+import { ConflictDialog } from "../../components/student/molecules/ConflictDialog";
+import { CartAddedToast } from "../../components/student/molecules/CartAddedToast";
+
+import { useAllProducts } from "../../hooks/useAllProducts";
+import { useCartStore } from "../../store/cartStore";
+import { useCartToast } from "../../hooks/useCartToast";
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function StudentDashboardPage() {
     const { user } = useUser();
-    const { restaurants } = useRestaurants();
+    const { products, isLoading } = useAllProducts();
+    const { addItem, clearCart, vendorName: currentVendorName } = useCartStore();
+    const { toasts, notify, dismiss } = useCartToast();
+
+    const [search, setSearch] = useState("");
+    const [conflictProduct, setConflictProduct] = useState<{
+        product: Product;
+        vendorId: string;
+        vendorName: string;
+    } | null>(null);
+
+    const filtered = useMemo(() => {
+        const q = search.toLowerCase().trim();
+        if (!q) return products;
+        return products.filter(
+            (p) =>
+                p.name.toLowerCase().includes(q) ||
+                p.description.toLowerCase().includes(q) ||
+                p.vendorName.toLowerCase().includes(q)
+        );
+    }, [products, search]);
+
+    const handleAddToCart = (product: Product) => {
+        if (!product.vendorId) {
+            toast.error("Este plato no tiene un restaurante asociado.");
+            return;
+        }
+
+        const result = addItem(
+            {
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                imageUrl: product.imageUrl,
+            },
+            product.vendorId,
+            product.vendorName
+        );
+
+        if (result === "conflict") {
+            setConflictProduct({
+                product,
+                vendorId: product.vendorId,
+                vendorName: product.vendorName,
+            });
+            return;
+        }
+
+        notify({
+            productName: product.name,
+            vendorName: product.vendorName,
+            price: product.price,
+            imageUrl: product.imageUrl,
+        });
+    };
+
+    const handleConflictConfirm = () => {
+        if (!conflictProduct) return;
+        clearCart();
+        addItem(
+            {
+                id: conflictProduct.product.id,
+                name: conflictProduct.product.name,
+                description: conflictProduct.product.description,
+                price: conflictProduct.product.price,
+                imageUrl: conflictProduct.product.imageUrl,
+            },
+            conflictProduct.vendorId,
+            conflictProduct.vendorName
+        );
+        notify({
+            productName: conflictProduct.product.name,
+            vendorName: conflictProduct.product.vendorName,
+            price: conflictProduct.product.price,
+            imageUrl: conflictProduct.product.imageUrl,
+        });
+        setConflictProduct(null);
+    };
 
     return (
         <WaveLayout>
             <AppContainer>
-                <DashboardHeader
-                    userName={user?.firstName || "Usuario"}
-                />
-                <Flex
-                    justify="space-between"
-                    align="center"
-                    mb={8}
-                    gap={4}
-                    flexWrap="wrap"
-                >
+                <DashboardHeader userName={user?.firstName || "Usuario"} />
+
+                {/* Hero */}
+                <Box mb={8} textAlign="center">
                     <Text
-                        fontSize="4xl"
-                        fontWeight="bold"
+                        fontSize={{ base: "2xl", md: "4xl" }}
+                        fontWeight="extrabold"
                         color="#042E63"
-                        flex="1"
+                        mb={1}
                     >
-                        Los mejores restaurantes de la Universidad Central del Ecuador
+                        ¿Qué vas a pedir hoy?
+                    </Text>
+                    <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" mb={6}>
+                        Todos los platos de los restaurantes de la Universidad Central del Ecuador
                     </Text>
 
-                    <Box position="relative" maxW="300px" w="full">
-                        <Input
-                            placeholder="Buscar..."
-                            borderRadius="full"
-                            bg="white"
-                            shadow="sm"
-                            ps="10"
-                        />
+                    {/* Search bar */}
+                    <Box position="relative" maxW="560px" mx="auto" w="full">
                         <Box
                             position="absolute"
-                            left="3"
+                            left="18px"
                             top="50%"
                             transform="translateY(-50%)"
-                            zIndex="1"
+                            zIndex={1}
                             color="gray.400"
+                            pointerEvents="none"
                         >
                             <FaSearch />
                         </Box>
+                        <Input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar por plato, descripción o restaurante..."
+                            borderRadius="full"
+                            bg="white"
+                            boxShadow="lg"
+                            pl="48px"
+                            pr={5}
+                            h={{ base: "48px", md: "56px" }}
+                            fontSize={{ base: "sm", md: "md" }}
+                            border="2px solid"
+                            borderColor="gray.100"
+                            _focus={{
+                                borderColor: "#2DC6B8",
+                                boxShadow: "0 0 0 4px rgba(45,198,184,0.18)",
+                                outline: "none",
+                            }}
+                            _placeholder={{ color: "gray.400" }}
+                        />
                     </Box>
-                </Flex>
+                </Box>
 
-                <SimpleGrid
-                    columns={{ base: 1, md: 2, lg: 3 }}
-                    gap={10}
-                    pb={10}
-                    w="full"
-                >
-                    {restaurants.map((rest: Restaurant, index) => (
-                        <Box key={index} w="full">
-                            <RestaurantCard {...rest} />
-                        </Box>
-                    ))}
-                </SimpleGrid>
+                {/* Active Orders */}
+                <ActiveOrdersStrip />
 
+                {/* Products Grid */}
+                {isLoading ? (
+                    <Flex justify="center" align="center" py={20}>
+                        <Stack align="center" gap={3}>
+                            <Spinner size="xl" color="#2DC6B8" borderWidth="4px" />
+                            <Text color="gray.500" fontSize="sm">
+                                Cargando platos...
+                            </Text>
+                        </Stack>
+                    </Flex>
+                ) : filtered.length === 0 ? (
+                    <Flex direction="column" align="center" justify="center" py={20} gap={3}>
+                        <MdRestaurantMenu size={64} color="#CBD5E0" />
+                        <Text color="gray.500" fontSize="lg" fontWeight="semibold">
+                            {search
+                                ? "Sin resultados para tu búsqueda"
+                                : "No hay platos disponibles"}
+                        </Text>
+                        {search && (
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                color="#2DC6B8"
+                                onClick={() => setSearch("")}
+                                borderRadius="full"
+                            >
+                                Limpiar búsqueda
+                            </Button>
+                        )}
+                    </Flex>
+                ) : (
+                    <>
+                        <Flex justify="space-between" align="center" mb={4}>
+                            <Text fontSize="sm" color="gray.500">
+                                {filtered.length} plato
+                                {filtered.length !== 1 ? "s" : ""} encontrado
+                                {filtered.length !== 1 ? "s" : ""}
+                                {search && ` para "${search}"`}
+                            </Text>
+                        </Flex>
+                        <SimpleGrid
+                            columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
+                            gap={{ base: 4, md: 6 }}
+                            pb={16}
+                            w="full"
+                        >
+                            {filtered.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={handleAddToCart}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    </>
+                )}
             </AppContainer>
+
+            <ConflictDialog
+                isOpen={!!conflictProduct}
+                currentVendorName={currentVendorName}
+                newVendorName={conflictProduct?.vendorName || ""}
+                onConfirm={handleConflictConfirm}
+                onCancel={() => setConflictProduct(null)}
+            />
+
+            <CartAddedToast toasts={toasts} onDismiss={dismiss} />
         </WaveLayout>
     );
 }

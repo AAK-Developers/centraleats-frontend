@@ -1,13 +1,14 @@
 import axios from 'axios';
+import { VITE_API_BASE_URL } from '../config/env';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+const baseURL = VITE_API_BASE_URL;
 
 export const apiClient = axios.create({
     baseURL,
     withCredentials: true,
 });
 
-// Debug log to verify the URL being used
+
 console.log('API apiClient initialized with baseURL:', baseURL);
 
 apiClient.interceptors.response.use(
@@ -17,7 +18,6 @@ apiClient.interceptors.response.use(
             const { status } = error.response;
             if (status === 401) {
                 console.error('Sesión expirada o no autorizada');
-                // Aquí podrías forzar un logout o redirección si fuera necesario
             } else if (status === 403) {
                 console.error('Acceso denegado: permisos insuficientes o cuenta inactiva');
             }

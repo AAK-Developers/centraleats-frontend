@@ -5,20 +5,24 @@ import { AuthInitializer } from './components/auth/AuthInitializer';
 import PresentationPage from './pages/landing/PresentationPage';
 import RoleSelectionPage from './pages/auth/RoleSelectionPage';
 import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
 
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
 import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <AuthInitializer>
         <Routes>
 
           <Route path="/" element={<PresentationPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           <Route
             path="/role-selection"
@@ -67,8 +71,17 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/edit-menu"
+            element={
+              <ProtectedRoute>
+                <RegisterMenuPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthInitializer>
+
     </BrowserRouter>
   );
 }

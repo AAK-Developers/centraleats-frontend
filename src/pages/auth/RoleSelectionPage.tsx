@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VStack, Text } from '@chakra-ui/react';
 import toast from "react-hot-toast";
 import { SimpleGrid } from '@chakra-ui/react';
@@ -6,10 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 import { apiClient } from '../../api/axiosConfig';
+import { VITE_API_BASE_URL } from '../../config/env';
 
 import { WaveLayout } from '../../components/layout/WaveLayout';
-import { RoleCard } from '../../components/molecules/RoleCard';
-import { AuthHeader } from '../../components/organisms/AuthHeader';
+
 import CentralEatsLogo from "../../assets/CentralEatsLogo.png";
 import { AppContainer } from '../../components/layout/AppContainer';
 import studentImg from '../../assets/Student.png';
@@ -17,13 +17,30 @@ import vendorImg from '../../assets/Vendor.jpg';
 
 
 import { useAuthMe } from '../../hooks/useAuthMe';
+import { AuthHeader } from '../../components/shared/organisms/AuthHeader';
+import { RoleCard } from '../../components/shared/molecules/RoleCard';
 
 
 export default function RoleSelectionPage() {
     const navigate = useNavigate();
     const { user } = useUser();
-    const { fetchProfile } = useAuthMe();
+    const { profile, fetchProfile } = useAuthMe();
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Only redirect if the user has a profile in the backend database.
+    // If profile is null (database record is missing), we do NOT redirect, even if Clerk metadata has a role.
+    const rawRole = profile?.role;
+    const normalizedRole = rawRole?.toUpperCase();
+
+    useEffect(() => {
+        if (normalizedRole && normalizedRole !== 'PENDING') {
+            if (normalizedRole === 'STUDENT' || normalizedRole === 'ADMIN') {
+                navigate('/student-dashboard', { replace: true });
+            } else if (normalizedRole === 'VENDOR') {
+                navigate('/vendor-dashboard', { replace: true });
+            }
+        }
+    }, [normalizedRole, navigate]);
 
     const handleSelection = async (role: 'student' | 'vendor') => {
         if (isSubmitting) return;
@@ -31,13 +48,14 @@ export default function RoleSelectionPage() {
         console.log('--- Iniciando selección de rol ---');
         console.log('Rol seleccionado:', role);
         console.log('ID de Clerk (user.id):', 'Privado ########');
-        console.log('URL Base de API:', import.meta.env.VITE_API_BASE_URL);
+        console.log('URL Base de API:', VITE_API_BASE_URL);
 
         setIsSubmitting(true);
 
         try {
             const payload = {
                 role,
+
                 clerkId: user?.id,
             };
             console.log('Enviando POST a /api/users con payload:', payload);
