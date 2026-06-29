@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 import { apiClient } from '../../api/axiosConfig';
+import { VITE_API_BASE_URL } from '../../config/env';
 
 import { WaveLayout } from '../../components/layout/WaveLayout';
 
@@ -47,7 +48,7 @@ export default function RoleSelectionPage() {
         console.log('--- Iniciando selección de rol ---');
         console.log('Rol seleccionado:', role);
         console.log('ID de Clerk (user.id):', 'Privado ########');
-        console.log('URL Base de API:', import.meta.env.VITE_API_BASE_URL);
+        console.log('URL Base de API:', VITE_API_BASE_URL);
 
         setIsSubmitting(true);
 
