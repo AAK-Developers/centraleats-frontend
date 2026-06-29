@@ -24,6 +24,7 @@ export const InvoiceActions = ({
             url: window.location.href,
         };
         if (navigator.share && navigator.canShare?.(shareData)) {
+            // eslint-disable-next-line no-empty
             try { await navigator.share(shareData); } catch { }
         } else {
             await navigator.clipboard.writeText(window.location.href);
