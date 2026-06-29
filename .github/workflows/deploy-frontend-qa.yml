@@ -34,9 +34,6 @@ jobs:
       with:
         context: .
         push: true
-        build-args: |
-          VITE_API_BASE_URL=${{ secrets.VITE_API_URL_QA }}
-          VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_QA }}
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
           ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa-${{ github.sha }}
@@ -67,6 +64,9 @@ jobs:
           docker run -d --name centraleats-frontend-qa \
             -p 80:80 \
             -e BACKEND_ADDR="${{ secrets.BACKEND_ADDR_QA }}" \
+            -e VITE_API_BASE_URL="${{ secrets.VITE_API_URL_QA }}" \
+            -e VITE_CLERK_PUBLISHABLE_KEY="${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_QA }}" \
+            -e VITE_APP_ENV="qa" \
             ${{ secrets.DOCKERHUB_USERNAME }}/centraleats-frontend:qa
             
           # Smoke Test simple del Frontend en QA

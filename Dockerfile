@@ -3,15 +3,7 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Add build arguments for environment variables
-ARG VITE_API_BASE_URL
-ARG VITE_CLERK_PUBLISHABLE_KEY
-ARG VITE_APP_ENV
-
-# Set environment variables for the build process
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
-ENV VITE_APP_ENV=$VITE_APP_ENV
+# Build is environment-agnostic; variables are injected at runtime
 
 # Copy package files and install dependencies
 COPY package*.json ./
@@ -33,6 +25,5 @@ COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 # Expose port 80
 EXPOSE 80
 
-# The official nginx image supports environment variables in templates
-# It will replace ${BACKEND_ADDR} with the actual value at runtime
-CMD ["nginx", "-g", "daemon off;"]
+# Generate env-config.js from environment variables at runtime, then start Nginx
+CMD ["/bin/sh", "-c", "echo \"window.env = { VITE_API_BASE_URL: '${VITE_API_BASE_URL}', VITE_CLERK_PUBLISHABLE_KEY: '${VITE_CLERK_PUBLISHABLE_KEY}', VITE_APP_ENV: '${VITE_APP_ENV}' };\" > /usr/share/nginx/html/env-config.js && nginx -g 'daemon off;'"]

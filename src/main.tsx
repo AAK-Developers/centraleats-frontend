@@ -5,14 +5,15 @@ import { ClerkProvider } from '@clerk/clerk-react';
 
 import App from './App';
 import theme from './theme';
+import { VITE_CLERK_PUBLISHABLE_KEY, VITE_API_BASE_URL } from './config/env';
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const PUBLISHABLE_KEY = VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
     throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 }
 
-console.log("API BASE URL:", import.meta.env.VITE_API_BASE_URL);
+console.log("API BASE URL:", VITE_API_BASE_URL);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
