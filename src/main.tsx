@@ -7,6 +7,7 @@ import App from './App';
 import theme from './theme';
 import { VITE_CLERK_PUBLISHABLE_KEY, VITE_API_BASE_URL } from './config/env';
 
+// eslint-disable-next-line react-refresh/only-export-components
 const PUBLISHABLE_KEY = VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {

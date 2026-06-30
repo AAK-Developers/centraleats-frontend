@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiClient } from '../api/axiosConfig';
 
 export type OrderStatus =
@@ -20,7 +20,7 @@ export interface StudentOrderItem {
 export interface StudentOrder {
     id: string;
     status: OrderStatus;
-    totalAmount: number; // in cents
+    totalAmount: number;
     notes?: string;
     createdAt: string;
     vendorName?: string;
@@ -61,10 +61,10 @@ export const STATUS_COLORS: Record<OrderStatus, string> = {
 
 export const useStudentOrders = () => {
     const [orders, setOrders] = useState<StudentOrder[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const hasFetchedOnce = useRef(false);
 
     const fetchOrders = useCallback(async () => {
-        setIsLoading(true);
         try {
             const res = await apiClient.get('/api/orders/student');
             const list: StudentOrder[] = res.data?.data || res.data || [];
@@ -73,7 +73,10 @@ export const useStudentOrders = () => {
             console.error('Error fetching student orders:', err);
             setOrders([]);
         } finally {
-            setIsLoading(false);
+            if (!hasFetchedOnce.current) {
+                hasFetchedOnce.current = true;
+                setIsInitialLoading(false);
+            }
         }
     }, []);
 
@@ -94,5 +97,12 @@ export const useStudentOrders = () => {
 
     const hasReadyOrders = activeOrders.some((o) => o.status === 'READY');
 
-    return { orders, activeOrders, hasReadyOrders, isLoading, refresh: fetchOrders };
+    return {
+        orders,
+        activeOrders,
+        hasReadyOrders,
+        isLoading: isInitialLoading,
+        isInitialLoading,
+        refresh: fetchOrders,
+    };
 };
