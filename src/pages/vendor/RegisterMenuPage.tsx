@@ -78,8 +78,12 @@ export default function RegisterMenuPage() {
             formData.append('description', data.description);
             formData.append('price', String(Math.round(Number(data.price) * 100)));
             formData.append('stock', '999');
-            if (data.categoryId) {
-                formData.append('categoryId', data.categoryId);
+            let finalCategoryId = data.categoryId;
+            if (isEditMode && !finalCategoryId && editingProduct?.categoryId) {
+                finalCategoryId = editingProduct.categoryId;
+            }
+            if (finalCategoryId) {
+                formData.append('categoryId', finalCategoryId);
             }
             formData.append('isAvailable', 'true');
             formData.append('isActive', 'true');

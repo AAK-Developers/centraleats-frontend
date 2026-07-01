@@ -33,6 +33,7 @@ export interface VendorProduct {
     stock: number;
     imageUrl: string;
     isAvailable: boolean;
+    categoryId?: string;
 }
 
 export interface ApiProduct {
@@ -43,6 +44,7 @@ export interface ApiProduct {
     stock?: number;
     imageUrl?: string;
     isAvailable: boolean;
+    categoryId?: string;
 }
 
 // ─── Orders ───────────────────────────────────────────────────────────────────
