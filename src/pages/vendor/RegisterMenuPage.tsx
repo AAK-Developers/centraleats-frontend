@@ -32,13 +32,21 @@ const DEFAULT_CATEGORIES = [
 ];
 
 export default function RegisterMenuPage() {
-    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<MenuFormData>();
-    const [categories, setCategories] = useState<{ id: string; name: string }[]>(DEFAULT_CATEGORIES);
     const navigate = useNavigate();
     const location = useLocation();
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>(DEFAULT_CATEGORIES);
 
     const editingProduct = (location.state as { product?: EditableProduct } | null)?.product;
     const isEditMode = !!editingProduct;
+
+    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<MenuFormData>({
+        defaultValues: {
+            name: editingProduct?.name || "",
+            description: editingProduct?.description || "",
+            price: editingProduct ? Number((editingProduct.price / 100).toFixed(2)) : undefined,
+            categoryId: editingProduct?.categoryId || ""
+        }
+    });
 
     // Fetch categories dynamically with default local fallback
     useEffect(() => {
