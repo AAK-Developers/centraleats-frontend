@@ -105,11 +105,10 @@ export const ProfilePanelVendor = ({
                 flexDirection="column"
             >
                 <Box
-                    bgGradient="linear(135deg, #042E63 0%, #0a4a9e 60%, #2DC6B8 100%)"
+                    bg="linear-gradient(135deg, #042E63 0%, #0a4a9e 60%, #2DC6B8 100%)"
                     px={{ base: 5, md: 6 }}
-                    pt={{ base: 5, md: 6 }}
-                    pb={8}
-                    position="relative"
+                    pt={{ base: 4, md: 5 }}
+                    pb={{ base: 4, md: 5 }}
                     flexShrink={0}
                 >
                     <Flex align="center" justify="space-between" mb={4}>
@@ -123,7 +122,9 @@ export const ProfilePanelVendor = ({
                             fullName={user?.fullName || "Usuario"}
                             email={user?.primaryEmailAddress?.emailAddress || ""}
                             nameColor="white"
-                            emailColor="whiteAlpha.800"
+                            emailColor="whiteAlpha.700"
+                            layout="horizontal"
+                            avatarSize={100}
                         />
                     )}
                 </Box>
@@ -134,9 +135,7 @@ export const ProfilePanelVendor = ({
                     px={{ base: 4, md: 5 }}
                     pt={5}
                     pb={4}
-                    mt={-4}
                     bg="white"
-                    borderTopRadius="2xl"
                 >
                     <VStack gap={5} align="stretch">
 
@@ -149,7 +148,7 @@ export const ProfilePanelVendor = ({
                         >
                             <HStack gap={2} mb={3}>
                                 <Box w="3px" h="16px" bg="#2DC6B8" borderRadius="full" />
-                                <Heading size="md" color="#042E63" textTransform="uppercase" letterSpacing="wider">
+                                <Heading size="xs" color="#042E63" textTransform="uppercase" letterSpacing="wider">
                                     Restaurante
                                 </Heading>
                             </HStack>
@@ -266,7 +265,6 @@ export const ProfilePanelVendor = ({
                             )}
                         </Box>
 
-                        {/* ── Pedidos en curso (badges rápidos) ── */}
                         {(nuevos.length + enCocina.length + listos.length) > 0 && (
                             <Flex gap={2} flexWrap="wrap">
                                 {nuevos.length > 0 && (
