@@ -1,69 +1,54 @@
-import { Box, VStack, Heading, Flex, Text, Badge, HStack, Icon, SimpleGrid } from "@chakra-ui/react";
+import {
+    Box, VStack, Heading, Flex, Text, Badge, HStack, Icon,
+} from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
 import { CloseButton } from "../../cart/atoms/CloseButton";
 import { UserProfileHeader } from "../../shared/molecules/UserProfileHeader";
 import { LogoutButton } from "../../shared/atoms/LogoutButton";
 import { useVendorOrders } from "../../../hooks/useVendorOrders";
-import { FaFire, FaBell, FaCreditCard, FaMoneyBillWave, FaClipboardList } from "react-icons/fa";
+import { useVendorRestaurant } from "../../../hooks/useVendorRestaurant";
+import {
+    FaStore, FaClock, FaCheckCircle, FaDollarSign, FaReceipt,
+} from "react-icons/fa";
+import { HiStatusOnline, HiStatusOffline } from "react-icons/hi";
 
 interface ProfilePanelVendorProps {
     isOpen: boolean;
     onClose: () => void;
     restaurantId?: string;
+    vendorIsOpen?: boolean;
 }
 
-interface StatCardProps {
+interface StatRowProps {
     icon: React.ElementType;
     label: string;
-    count: number;
-    bg: string;
+    value: string;
+    iconBg: string;
     iconColor: string;
-    badgeColor: string;
+    isLast?: boolean;
 }
 
-function StatCard({ icon, label, count, bg, iconColor, badgeColor }: StatCardProps) {
+function StatRow({ icon, label, value, iconBg, iconColor, isLast = false }: StatRowProps) {
     return (
-        <Flex
-            direction="column"
-            align="center"
-            justify="center"
-            bg={bg}
-            borderRadius="2xl"
-            p={4}
-            gap={2}
-            position="relative"
-            border="1px solid"
-            borderColor="gray.100"
-            minH="90px"
-        >
-            {count > 0 && (
-                <Badge
-                    position="absolute"
-                    top={2}
-                    right={2}
-                    colorScheme={badgeColor}
-                    borderRadius="full"
-                    fontSize="10px"
-                    fontWeight="bold"
-                    px={1.5}
-                >
-                    {count}
-                </Badge>
-            )}
-            <Flex
-                w="36px" h="36px"
-                borderRadius="xl"
-                bg="white"
-                align="center"
-                justify="center"
-                boxShadow="sm"
-            >
-                <Icon as={icon} boxSize={4} color={iconColor} />
+        <Box>
+            <Flex align="center" justify="space-between" py={2.5}>
+                <HStack gap={3}>
+                    <Flex
+                        w="34px" h="34px"
+                        borderRadius="xl"
+                        bg={iconBg}
+                        align="center"
+                        justify="center"
+                        flexShrink={0}
+                    >
+                        <Icon as={icon} boxSize={3.5} color={iconColor} />
+                    </Flex>
+                    <Text fontSize="sm" color="gray.600" fontWeight="medium">{label}</Text>
+                </HStack>
+                <Text fontSize="sm" fontWeight="extrabold" color="#042E63">{value}</Text>
             </Flex>
-            <Text fontSize="xs" fontWeight="semibold" color="gray.600" textAlign="center" lineHeight="1.2">
-                {label}
-            </Text>
-        </Flex>
+            {!isLast && <Box h="1px" bg="gray.50" />}
+        </Box>
     );
 }
 
@@ -71,60 +56,28 @@ export const ProfilePanelVendor = ({
     isOpen,
     onClose,
     restaurantId,
+    vendorIsOpen = false,
 }: ProfilePanelVendorProps) => {
     const { user, isLoaded } = useUser();
-    const { nuevos, enCocina, listos } = useVendorOrders(restaurantId);
+    const { restaurant } = useVendorRestaurant();
+    const { nuevos, enCocina, listos, completedOrders } = useVendorOrders(restaurantId);
 
     if (!isOpen) return null;
 
-    const pendingPayment = nuevos.filter((o) => o.status === "PENDING_PAYMENT");
-    const paid = nuevos.filter((o) => o.status === "PAID");
-    const received = nuevos.filter((o) => o.status === "RECEIVED");
+    const completedToday = completedOrders;
+    const totalRevenue = completedToday.reduce((acc, o) => acc + o.totalAmount, 0) / 100;
+    const avgTicket = completedToday.length > 0 ? totalRevenue / completedToday.length : 0;
 
-    const stats = [
-        {
-            icon: FaMoneyBillWave,
-            label: "Pago pendiente",
-            count: pendingPayment.length,
-            bg: "orange.50",
-            iconColor: "orange.400",
-            badgeColor: "orange",
-        },
-        {
-            icon: FaCreditCard,
-            label: "Pagados",
-            count: paid.length,
-            bg: "green.50",
-            iconColor: "green.500",
-            badgeColor: "green",
-        },
-        {
-            icon: FaClipboardList,
-            label: "Aceptados",
-            count: received.length,
-            bg: "blue.50",
-            iconColor: "blue.500",
-            badgeColor: "blue",
-        },
-        {
-            icon: FaFire,
-            label: "En cocina",
-            count: enCocina.length,
-            bg: "yellow.50",
-            iconColor: "yellow.500",
-            badgeColor: "yellow",
-        },
-        {
-            icon: FaBell,
-            label: "Listos",
-            count: listos.length,
-            bg: "teal.50",
-            iconColor: "teal.500",
-            badgeColor: "teal",
-        },
-    ];
+    const openingTime = restaurant?.openingTime || "--:--";
+    const closingTime = restaurant?.closingTime || "--:--";
 
-    const totalActive = nuevos.length + enCocina.length + listos.length;
+    const formatTime = (t: string) => {
+        if (!t || t === "--:--") return t;
+        const [h, m] = t.split(":").map(Number);
+        const ampm = h >= 12 ? "PM" : "AM";
+        const h12 = h % 12 || 12;
+        return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
+    };
 
     return (
         <>
@@ -145,86 +98,199 @@ export const ProfilePanelVendor = ({
                 w={{ base: "calc(100% - 8px)", md: "380px", lg: "400px" }}
                 bg="white"
                 borderRadius="3xl"
-                boxShadow="2xl"
+                boxShadow="0 24px 60px rgba(4,46,99,0.18)"
                 overflow="hidden"
                 zIndex={999}
                 display="flex"
                 flexDirection="column"
             >
-                <Flex
-                    align="center"
-                    justify="space-between"
-                    p={{ base: 4, md: 5 }}
-                    borderBottom="1px solid"
-                    borderColor="gray.100"
+                <Box
+                    bgGradient="linear(135deg, #042E63 0%, #0a4a9e 60%, #2DC6B8 100%)"
+                    px={{ base: 5, md: 6 }}
+                    pt={{ base: 5, md: 6 }}
+                    pb={8}
+                    position="relative"
                     flexShrink={0}
                 >
-                    <Heading size={{ base: "sm", md: "md" }} color="#042E63">
-                        Mi Perfil
-                    </Heading>
-                    <CloseButton onClick={onClose} />
-                </Flex>
+                    <Flex align="center" justify="space-between" mb={4}>
+                        <Heading size="md" color="white">Mi Perfil</Heading>
+                        <CloseButton onClick={onClose} />
+                    </Flex>
 
-                <Box p={{ base: 4, md: 5 }} overflowY="auto" flex={1}>
                     {isLoaded && (
-                        <VStack gap={6} align="stretch">
-                            {/* User info */}
-                            <UserProfileHeader
-                                imageUrl={user?.imageUrl}
-                                fullName={user?.fullName || "Usuario"}
-                                email={user?.primaryEmailAddress?.emailAddress || ""}
-                            />
+                        <UserProfileHeader
+                            imageUrl={user?.imageUrl}
+                            fullName={user?.fullName || "Usuario"}
+                            email={user?.primaryEmailAddress?.emailAddress || ""}
+                            nameColor="white"
+                            emailColor="whiteAlpha.800"
+                        />
+                    )}
+                </Box>
 
-                            <Box>
-                                <HStack gap={2} mb={3}>
-                                    <Box
-                                        w="3px" h="16px"
-                                        bg="#2DC6B8"
-                                        borderRadius="full"
+                <Box
+                    flex={1}
+                    overflowY="auto"
+                    px={{ base: 4, md: 5 }}
+                    pt={5}
+                    pb={4}
+                    mt={-4}
+                    bg="white"
+                    borderTopRadius="2xl"
+                >
+                    <VStack gap={5} align="stretch">
+
+                        <Box
+                            bg="gray.50"
+                            borderRadius="2xl"
+                            p={4}
+                            border="1px solid"
+                            borderColor="gray.100"
+                        >
+                            <HStack gap={2} mb={3}>
+                                <Box w="3px" h="16px" bg="#2DC6B8" borderRadius="full" />
+                                <Heading size="md" color="#042E63" textTransform="uppercase" letterSpacing="wider">
+                                    Restaurante
+                                </Heading>
+                            </HStack>
+
+                            <HStack justify="space-between" align="flex-start" gap={3}>
+                                <HStack gap={3} flex={1} minW={0}>
+                                    <Flex
+                                        w="40px" h="40px"
+                                        borderRadius="xl"
+                                        bg="white"
+                                        align="center"
+                                        justify="center"
+                                        boxShadow="sm"
+                                        border="1px solid"
+                                        borderColor="gray.100"
                                         flexShrink={0}
-                                    />
-                                    <Heading size="sm" color="#042E63">
-                                        Pedidos del día
-                                    </Heading>
-                                    {totalActive > 0 && (
-                                        <Badge
-                                            colorScheme="teal"
-                                            borderRadius="full"
-                                            fontSize="10px"
-                                            fontWeight="bold"
-                                        >
-                                            {totalActive} activos
-                                        </Badge>
-                                    )}
+                                    >
+                                        <Icon as={FaStore} color="#2DC6B8" boxSize={4} />
+                                    </Flex>
+                                    <Box minW={0}>
+                                        <Text fontWeight="bold" color="#042E63" fontSize="md" lineClamp={1}>
+                                            {restaurant?.name || "Mi Restaurante"}
+                                        </Text>
+                                        <HStack gap={1} mt={0.5}>
+                                            <Icon as={FaClock} color="gray.400" boxSize={3} />
+                                            <Text fontSize="xs" color="gray.500">
+                                                {formatTime(openingTime)} – {formatTime(closingTime)}
+                                            </Text>
+                                        </HStack>
+                                    </Box>
                                 </HStack>
 
-                                {totalActive === 0 ? (
-                                    <Box
-                                        bg="gray.50"
-                                        borderRadius="xl"
-                                        p={4}
-                                        textAlign="center"
-                                        border="1px dashed"
-                                        borderColor="gray.200"
+                                <Flex
+                                    align="center"
+                                    gap={1.5}
+                                    bg={vendorIsOpen ? "green.50" : "red.50"}
+                                    border="1px solid"
+                                    borderColor={vendorIsOpen ? "green.200" : "red.200"}
+                                    borderRadius="full"
+                                    px={2.5}
+                                    py={1}
+                                    flexShrink={0}
+                                >
+                                    <Icon
+                                        as={vendorIsOpen ? HiStatusOnline : HiStatusOffline}
+                                        boxSize={3}
+                                        color={vendorIsOpen ? "green.500" : "red.400"}
+                                    />
+                                    <Text
+                                        fontSize="14px"
+                                        fontWeight="bold"
+                                        color={vendorIsOpen ? "green.600" : "red.500"}
                                     >
-                                        <Text fontSize="sm" color="gray.400">
-                                            Sin pedidos activos por ahora
-                                        </Text>
-                                    </Box>
-                                ) : (
-                                    <SimpleGrid columns={2} gap={3}>
-                                        {stats.map((s) => (
-                                            <StatCard key={s.label} {...s} />
-                                        ))}
-                                    </SimpleGrid>
-                                )}
-                            </Box>
+                                        {vendorIsOpen ? "Abierto" : "Cerrado"}
+                                    </Text>
+                                </Flex>
+                            </HStack>
+                        </Box>
 
-                            <Flex pt={2} justify="center" w="full">
-                                <LogoutButton />
+                        <Box
+                            bg="white"
+                            borderRadius="2xl"
+                            p={4}
+                            border="1px solid"
+                            borderColor="gray.100"
+                            boxShadow="0 2px 8px rgba(4,46,99,0.05)"
+                        >
+                            <HStack gap={2} mb={1}>
+                                <Box w="3px" h="16px" bg="#042E63" borderRadius="full" />
+                                <Heading size="md" color="#042E63" textTransform="uppercase" letterSpacing="wider">
+                                    Resumen del día
+                                </Heading>
+                            </HStack>
+
+                            {completedToday.length === 0 ? (
+                                <Box
+                                    bg="gray.50"
+                                    borderRadius="xl"
+                                    p={4}
+                                    textAlign="center"
+                                    border="1px dashed"
+                                    borderColor="gray.200"
+                                    mt={3}
+                                >
+                                    <Text fontSize="md" color="gray.400">
+                                        Aún no hay pedidos completados hoy
+                                    </Text>
+                                </Box>
+                            ) : (
+                                <VStack align="stretch" gap={0} mt={1}>
+                                    <StatRow
+                                        icon={FaCheckCircle}
+                                        label="Pedidos completados"
+                                        value={String(completedToday.length)}
+                                        iconBg="green.50"
+                                        iconColor="green.500"
+                                    />
+                                    <StatRow
+                                        icon={FaDollarSign}
+                                        label="Ingresos del día"
+                                        value={`$${totalRevenue.toFixed(2)}`}
+                                        iconBg="teal.50"
+                                        iconColor="#2DC6B8"
+                                    />
+                                    <StatRow
+                                        icon={FaReceipt}
+                                        label="Ticket promedio"
+                                        value={`$${avgTicket.toFixed(2)}`}
+                                        iconBg="blue.50"
+                                        iconColor="#042E63"
+                                        isLast
+                                    />
+                                </VStack>
+                            )}
+                        </Box>
+
+                        {/* ── Pedidos en curso (badges rápidos) ── */}
+                        {(nuevos.length + enCocina.length + listos.length) > 0 && (
+                            <Flex gap={2} flexWrap="wrap">
+                                {nuevos.length > 0 && (
+                                    <Badge colorScheme="orange" borderRadius="full" px={3} py={1} fontSize="md" fontWeight="bold">
+                                        {nuevos.length} nuevo{nuevos.length !== 1 ? "s" : ""}
+                                    </Badge>
+                                )}
+                                {enCocina.length > 0 && (
+                                    <Badge colorScheme="yellow" borderRadius="full" px={3} py={1} fontSize="md" fontWeight="bold">
+                                        {enCocina.length} en cocina
+                                    </Badge>
+                                )}
+                                {listos.length > 0 && (
+                                    <Badge colorScheme="teal" borderRadius="full" px={3} py={1} fontSize="md" fontWeight="bold">
+                                        {listos.length} listo{listos.length !== 1 ? "s" : ""}
+                                    </Badge>
+                                )}
                             </Flex>
-                        </VStack>
-                    )}
+                        )}
+
+                        <Flex pt={1} justify="center" w="full">
+                            <LogoutButton />
+                        </Flex>
+                    </VStack>
                 </Box>
             </Box>
         </>

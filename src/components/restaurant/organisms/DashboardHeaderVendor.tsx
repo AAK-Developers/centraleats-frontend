@@ -10,11 +10,13 @@ import { NotificationPanel } from '../../shared/organisms/NotificationPanel';
 type DashboardHeaderVendorProps = {
     userName: string;
     restaurantId?: string;
+    vendorIsOpen?: boolean;
 };
 
 export const DashboardHeaderVendor = ({
     userName,
     restaurantId,
+    vendorIsOpen = false,
 }: DashboardHeaderVendorProps) => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -38,11 +40,7 @@ export const DashboardHeaderVendor = ({
                     w={{ base: "160px", md: "200px", lg: "250px" }}
                 />
 
-                <HStack
-                    justify="center"
-                    wrap="wrap"
-                    gap={{ base: 2, md: 4 }}
-                >
+                <HStack justify="center" wrap="wrap" gap={{ base: 2, md: 4 }}>
                     <Box position="relative">
                         <IconButton
                             aria-label="Notificaciones"
@@ -87,10 +85,7 @@ export const DashboardHeaderVendor = ({
                     >
                         <HStack gap={{ base: 2, md: 3 }}>
                             <FaUser size="16px" />
-                            <Text
-                                fontSize={{ base: "xs", md: "sm", lg: "lg" }}
-                                fontWeight="semibold"
-                            >
+                            <Text fontSize={{ base: "xs", md: "sm", lg: "lg" }} fontWeight="semibold">
                                 Hola, {userName}
                             </Text>
                         </HStack>
@@ -108,6 +103,7 @@ export const DashboardHeaderVendor = ({
                 isOpen={isProfileOpen}
                 onClose={() => setIsProfileOpen(false)}
                 restaurantId={restaurantId}
+                vendorIsOpen={vendorIsOpen}
             />
         </>
     );

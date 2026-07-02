@@ -97,7 +97,7 @@ export default function VendorDashboardPage() {
     return (
         <WaveLayout>
             <AppContainer>
-                <DashboardHeaderVendor userName={user?.firstName || "Nombre"} restaurantId={restaurant.id} />
+                <DashboardHeaderVendor userName={user?.firstName || "Nombre"} restaurantId={restaurant.id} vendorIsOpen={isOpen} />
 
                 <RestaurantSelectorVendor
                     name={restaurant.name}

@@ -34,6 +34,7 @@ export function useVendorOrders(restaurantId?: string) {
     const nuevos = orders.filter((o) => o.status === "PENDING_PAYMENT" || o.status === "PAID" || o.status === "RECEIVED");
     const enCocina = orders.filter((o) => o.status === "PREPARING");
     const listos = orders.filter((o) => o.status === "READY" || o.status === "PICKED_UP");
+    const completedOrders = orders.filter((o) => o.status === "COMPLETED");
 
-    return { nuevos, enCocina, listos, refreshOrders: fetchOrders, isLoadingOrders };
+    return { nuevos, enCocina, listos, completedOrders, refreshOrders: fetchOrders, isLoadingOrders };
 }
