@@ -1,5 +1,5 @@
 import { VStack, Input, Textarea, Text, Box, SimpleGrid, Flex } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,19 +25,43 @@ interface MenuFormData {
 
 type EditableProduct = VendorProduct & { categoryId?: string };
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
     { id: "06542c60-ad6b-4844-b1b1-3ad6d5baf35a", name: "Almuerzos" },
     { id: "b5003928-6d64-417b-8798-2726d16c8cfb", name: "Bebidas" },
     { id: "153a9f76-160d-4895-814d-9831c33088cd", name: "Snacks" },
 ];
 
 export default function RegisterMenuPage() {
-    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<MenuFormData>();
     const navigate = useNavigate();
     const location = useLocation();
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>(DEFAULT_CATEGORIES);
 
     const editingProduct = (location.state as { product?: EditableProduct } | null)?.product;
     const isEditMode = !!editingProduct;
+
+    const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<MenuFormData>({
+        defaultValues: {
+            name: editingProduct?.name || "",
+            description: editingProduct?.description || "",
+            price: editingProduct ? Number((editingProduct.price / 100).toFixed(2)) : undefined,
+            categoryId: editingProduct?.categoryId || ""
+        }
+    });
+
+    // Fetch categories dynamically with default local fallback
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await apiClient.get<{ id: string; name: string }[]>('/api/categories');
+                if (Array.isArray(response.data)) {
+                    setCategories(response.data);
+                }
+            } catch (error) {
+                console.error("Error fetching categories, using fallback:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     // Fix: include all referenced values in the dependency array
     useEffect(() => {
@@ -54,8 +78,12 @@ export default function RegisterMenuPage() {
             formData.append('description', data.description);
             formData.append('price', String(Math.round(Number(data.price) * 100)));
             formData.append('stock', '999');
-            if (data.categoryId) {
-                formData.append('categoryId', data.categoryId);
+            let finalCategoryId = data.categoryId;
+            if (isEditMode && !finalCategoryId && editingProduct?.categoryId) {
+                finalCategoryId = editingProduct.categoryId;
+            }
+            if (finalCategoryId) {
+                formData.append('categoryId', finalCategoryId);
             }
             formData.append('isAvailable', 'true');
             formData.append('isActive', 'true');
@@ -155,7 +183,7 @@ export default function RegisterMenuPage() {
                                             <option value="">
                                                 {isEditMode ? "Mantener categoría actual" : "Selecciona una categoría"}
                                             </option>
-                                            {CATEGORIES.map((cat) => (
+                                            {categories.map((cat) => (
                                                 <option key={cat.id} value={cat.id}>
                                                     {cat.name}
                                                 </option>

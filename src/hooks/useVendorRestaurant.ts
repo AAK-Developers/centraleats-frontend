@@ -67,6 +67,7 @@ export function useVendorRestaurant() {
                                 p.imageUrl ||
                                 `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
                             isAvailable: p.isAvailable,
+                            categoryId: p.categoryId || (p as any).category?.id || "",
                         }))
                     );
                 } else {
