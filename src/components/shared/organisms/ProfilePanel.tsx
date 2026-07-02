@@ -47,21 +47,37 @@ export const ProfilePanel = ({ isOpen, onClose }: ProfilePanelProps) => {
                 display="flex"
                 flexDirection="column"
             >
-                <Flex align="center" justify="space-between" p={6} borderBottom="1px solid" borderColor="gray.100" flexShrink={0}>
-                    <Heading size="md" color="#042E63">Mi Perfil</Heading>
-                    <CloseButton onClick={onClose} />
-                </Flex>
+                <Box
+                    bg="linear-gradient(135deg, #042E63 0%, #0a4a9e 60%, #2DC6B8 100%)"
+                    px={{ base: 5, md: 6 }}
+                    pt={{ base: 4, md: 5 }}
+                    pb={{ base: 4, md: 5 }}
+                    flexShrink={0}
+                >
+                    <Flex align="center" justify="space-between" mb={4}>
+                        <Heading size="md" color="white">
+                            Mi Perfil
+                        </Heading>
+
+                        <CloseButton onClick={onClose} />
+                    </Flex>
+
+                    {isLoaded && (
+                        <UserProfileHeader
+                            imageUrl={user?.imageUrl}
+                            fullName={user?.fullName || "Usuario"}
+                            email={user?.primaryEmailAddress?.emailAddress || ""}
+                            nameColor="white"
+                            emailColor="whiteAlpha.700"
+                            layout="horizontal"
+                            avatarSize={100}
+                        />
+                    )}
+                </Box>
 
                 <Box p={6} overflowY="auto" flex={1}>
                     {isLoaded && (
                         <VStack gap={6} align="stretch">
-                            <UserProfileHeader
-                                imageUrl={user?.imageUrl}
-                                fullName={user?.fullName || "Usuario"}
-                                email={user?.primaryEmailAddress?.emailAddress || ""}
-                            />
-
-                            {/* Active Orders Section */}
                             <Box>
                                 <HStack gap={2} mb={3}>
                                     <FaClock color="#042E63" />
@@ -144,8 +160,6 @@ export const ProfilePanel = ({ isOpen, onClose }: ProfilePanelProps) => {
                                     </VStack>
                                 )}
                             </Box>
-
-                            {/* Completed Orders History */}
                             {completedOrders.length > 0 && (
                                 <Box>
                                     <HStack gap={2} mb={3}>
