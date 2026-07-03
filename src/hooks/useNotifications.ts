@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import { apiClient } from '../api/axiosConfig';
 import { useSocket } from './useSocket';
 
@@ -59,9 +60,9 @@ const saveDismissedIds = (storageKey: string, ids: Set<string>) => {
 
 export const useNotifications = (options: UseNotificationsOptions = {}) => {
     const { role = 'student', vendorId } = options;
+    const { getToken } = useAuth();
 
     const storageKey = getDismissedStorageKey(role, vendorId);
-
     const dismissedIdsRef = useRef<Set<string>>(loadDismissedIds(storageKey));
     const seenIdsRef = useRef<Set<string>>(new Set());
 
@@ -127,8 +128,7 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         }
     }, [role, vendorId]);
 
-    // Conectar a Socket.io y refrescar inmediatamente al recibir actualizaciones en tiempo real
-    useSocket('orderUpdated', fetchNotifications);
+    useSocket('orderUpdated', fetchNotifications, { getToken });
 
     useEffect(() => {
         const timer = setTimeout(() => fetchNotifications(), 0);
