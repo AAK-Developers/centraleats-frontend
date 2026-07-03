@@ -7,7 +7,6 @@ export interface UseSocketOptions {
   autoConnect?: boolean;
 }
 
-
 export const useSocket = (
   eventName: string,
   callback: (data: any) => void,
@@ -52,10 +51,8 @@ export const useSocket = (
       socketRef.current = s;
 
       s.on('connect', () => console.log('🔌 [Socket.io] Conectado exitosamente'));
-      s.on('disconnect', (reason) => console.log('🔌 [Socket.io] Desconectado por:', reason));
-      s.on('connect_error', (error) => console.error('❌ [Socket.io] Error de conexión:', error.message));
-
-
+      s.on('disconnect', (reason: string) => console.log('🔌 [Socket.io] Desconectado por:', reason));
+      s.on('connect_error', (error: Error) => console.error('❌ [Socket.io] Error de conexión:', error.message));
       s.on(eventName, callback);
 
       if (autoConnect) {
@@ -69,14 +66,13 @@ export const useSocket = (
     return () => {
       isMounted = false;
       if (socketRef.current) {
-        console.log(`🔌 [Socket.io] Removiendo listener del evento: "${eventName}"`);
-        socketRef.current.off(eventName, callback);
         socketRef.current.disconnect();
         socketRef.current.removeAllListeners();
         socketRef.current = null;
       }
     };
-  }, [eventName, getToken]);
+
+  }, [eventName, getToken, autoConnect]);
 
   useEffect(() => {
     const s = socketRef.current;
@@ -87,8 +83,6 @@ export const useSocket = (
       s.off(eventName, callback);
     };
   }, [callback, eventName]);
-
-  return socketRef.current;
 };
 
 export default useSocket;
