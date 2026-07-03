@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiClient } from '../api/axiosConfig';
+import { useSocket } from './useSocket';
 
 export interface AppNotification {
     id: string;
@@ -125,6 +126,9 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
             setIsLoading(false);
         }
     }, [role, vendorId]);
+
+    // Conectar a Socket.io y refrescar inmediatamente al recibir actualizaciones en tiempo real
+    useSocket('orderUpdated', fetchNotifications);
 
     useEffect(() => {
         const timer = setTimeout(() => fetchNotifications(), 0);
