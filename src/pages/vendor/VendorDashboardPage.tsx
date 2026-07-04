@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
+import { BarChart2 } from "lucide-react";
 
 // Existing components
 import { DashboardHeaderVendor } from "../../components/restaurant/organisms/DashboardHeaderVendor";
@@ -103,6 +104,20 @@ export default function VendorDashboardPage() {
                     name={restaurant.name}
                     logoUrl={restaurant.logoUrl}
                 />
+
+                <Flex justify="flex-end" px={{ base: 4, md: 8 }} mb={4}>
+                    <Button 
+                        variant="outline" 
+                        colorScheme="teal" 
+                        onClick={() => navigate("/vendor-dashboard/metrics")}
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                    >
+                        <BarChart2 size={18} />
+                        Ver Métricas
+                    </Button>
+                </Flex>
 
                 <PanelHeaderVendor
                     restaurantName={restaurant.name}
