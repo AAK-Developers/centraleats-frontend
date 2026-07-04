@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Box, Flex, Grid, Heading, Spinner, IconButton, Spacer, Center, Text, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { WaveLayout } from "../../components/templates/WaveLayout";
-import { AppContainer } from "../../components/templates/AppContainer";
+import { WaveLayout } from "../../components/layout/WaveLayout";
+import { AppContainer } from "../../components/layout/AppContainer";
 import { useVendorRestaurant } from "../../hooks/useVendorRestaurant";
 import type { MetricsRange, TimeseriesBucket } from "../../features/vendorMetrics/types/vendorMetrics.types";
 import {
@@ -43,20 +43,20 @@ export default function VendorMetricsPage() {
   const topCustomersQuery = useVendorTopCustomers(range);
   const recentOrdersQuery = useVendorRecentOrders();
 
-  const isLoading = 
-    summaryQuery.isLoading || 
-    ordersByStatusQuery.isLoading || 
-    salesTimeseriesQuery.isLoading || 
-    topProductsQuery.isLoading || 
-    topCustomersQuery.isLoading || 
+  const isLoading =
+    summaryQuery.isLoading ||
+    ordersByStatusQuery.isLoading ||
+    salesTimeseriesQuery.isLoading ||
+    topProductsQuery.isLoading ||
+    topCustomersQuery.isLoading ||
     recentOrdersQuery.isLoading;
 
-  const isError = 
-    summaryQuery.isError && 
-    ordersByStatusQuery.isError && 
-    salesTimeseriesQuery.isError && 
-    topProductsQuery.isError && 
-    topCustomersQuery.isError && 
+  const isError =
+    summaryQuery.isError &&
+    ordersByStatusQuery.isError &&
+    salesTimeseriesQuery.isError &&
+    topProductsQuery.isError &&
+    topCustomersQuery.isError &&
     recentOrdersQuery.isError;
 
   const refetchAll = () => {
@@ -74,13 +74,14 @@ export default function VendorMetricsPage() {
         <Box py={8}>
           <Flex alignItems="center" mb={6} flexWrap="wrap" gap={4}>
             <Flex alignItems="center">
-              <IconButton 
-                aria-label="Volver" 
-                icon={<ArrowLeft size={20} />} 
-                variant="ghost" 
+              <IconButton
+                aria-label="Volver"
+                variant="ghost"
                 onClick={() => navigate("/vendor-dashboard")}
                 mr={4}
-              />
+              >
+                <ArrowLeft size={20} />
+              </IconButton>
               <Heading size="lg" color="primaryBlue">
                 {restaurant?.name ? `${restaurant.name} - Métricas` : "Métricas del Local"}
               </Heading>
@@ -92,7 +93,7 @@ export default function VendorMetricsPage() {
           {isError ? (
             <Center py={20} flexDirection="column">
               <Text color="red.500" mb={4}>Ocurrió un error al cargar las métricas.</Text>
-              <Button onClick={refetchAll} colorScheme="blue">Reintentar</Button>
+              <Button onClick={refetchAll} colorPalette="blue">Reintentar</Button>
             </Center>
           ) : isLoading ? (
             <Center py={20}>
@@ -102,21 +103,21 @@ export default function VendorMetricsPage() {
             <Box display="flex" flexDirection="column" gap={6}>
               {/* Summary Cards */}
               <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={4}>
-                <MetricCard 
-                  label="Ingresos" 
-                  value={formatCentsToDollars(summaryQuery.data?.totalRevenue || 0)} 
+                <MetricCard
+                  label="Ingresos"
+                  value={formatCentsToDollars(summaryQuery.data?.totalRevenue || 0)}
                 />
-                <MetricCard 
-                  label="Órdenes Completadas" 
-                  value={summaryQuery.data?.totalOrders || 0} 
+                <MetricCard
+                  label="Órdenes Completadas"
+                  value={summaryQuery.data?.totalOrders || 0}
                 />
-                <MetricCard 
-                  label="Ticket Promedio" 
-                  value={formatCentsToDollars(summaryQuery.data?.averageTicket || 0)} 
+                <MetricCard
+                  label="Ticket Promedio"
+                  value={formatCentsToDollars(summaryQuery.data?.averageTicket || 0)}
                 />
-                <MetricCard 
-                  label="Órdenes Activas" 
-                  value={summaryQuery.data?.activeOrders || 0} 
+                <MetricCard
+                  label="Órdenes Activas"
+                  value={summaryQuery.data?.activeOrders || 0}
                 />
               </Grid>
 

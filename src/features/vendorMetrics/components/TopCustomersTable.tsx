@@ -1,4 +1,4 @@
-import { Box, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer } from "@chakra-ui/react";
+import { Box, Text, Table } from "@chakra-ui/react";
 import type { TopCustomerItem } from "../types/vendorMetrics.types";
 import { formatCentsToDollars } from "../utils/formatters";
 
@@ -14,28 +14,26 @@ export function TopCustomersTable({ data }: { data: TopCustomerItem[] }) {
   return (
     <Box p={4} bg="white" shadow="sm" borderRadius="lg" borderWidth="1px" overflow="hidden">
       <Text fontSize="md" fontWeight="semibold" mb={4} color="gray.700">Top Clientes</Text>
-      <TableContainer>
-        <Table size="sm" variant="simple">
-          <Thead>
-            <Tr>
-              <Th>#</Th>
-              <Th>Nombre</Th>
-              <Th isNumeric>Órdenes</Th>
-              <Th isNumeric>Total Gastado</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {data.slice(0, 10).map((customer, index) => (
-              <Tr key={customer.userId}>
-                <Td>{index + 1}</Td>
-                <Td>{customer.fullName}</Td>
-                <Td isNumeric>{customer.totalOrders}</Td>
-                <Td isNumeric>{formatCentsToDollars(customer.totalSpent)}</Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
+      <Table.Root size="sm" variant="outline">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>#</Table.ColumnHeader>
+            <Table.ColumnHeader>Nombre</Table.ColumnHeader>
+            <Table.ColumnHeader textAlign="end">Órdenes</Table.ColumnHeader>
+            <Table.ColumnHeader textAlign="end">Total Gastado</Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {data.slice(0, 10).map((customer, index) => (
+            <Table.Row key={customer.userId}>
+              <Table.Cell>{index + 1}</Table.Cell>
+              <Table.Cell>{customer.fullName}</Table.Cell>
+              <Table.Cell textAlign="end">{customer.totalOrders}</Table.Cell>
+              <Table.Cell textAlign="end">{formatCentsToDollars(customer.totalSpent)}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
     </Box>
   );
 }

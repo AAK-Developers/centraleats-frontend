@@ -25,7 +25,7 @@ export function RecentOrdersList({ data }: { data: RecentVendorOrder[] }) {
   return (
     <Box p={4} bg="white" shadow="sm" borderRadius="lg" borderWidth="1px">
       <Text fontSize="md" fontWeight="semibold" mb={4} color="gray.700">Órdenes Recientes</Text>
-      <Stack spacing={3}>
+      <Stack gap={3}>
         {data.slice(0, 10).map((order) => (
           <Box key={order.id} p={3} borderWidth="1px" borderRadius="md" bg="gray.50">
             <Flex alignItems="center" mb={2}>

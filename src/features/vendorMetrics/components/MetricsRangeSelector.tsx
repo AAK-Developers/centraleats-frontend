@@ -8,7 +8,7 @@ interface Props {
 
 export function MetricsRangeSelector({ value, onChange }: Props) {
   return (
-    <ButtonGroup size="sm" isAttached variant="outline">
+    <ButtonGroup size="sm" attached variant="outline">
       <Button 
         onClick={() => onChange("today")} 
         bg={value === "today" ? "primaryOrange" : "white"}

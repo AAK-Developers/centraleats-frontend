@@ -33,8 +33,8 @@ export function SalesTimeseriesChart({ data }: { data: SalesTimeseriesItem[] }) 
             <YAxis tickFormatter={(val) => `$${val}`} tick={{ fontSize: 12 }} />
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <Tooltip 
-              formatter={(value: number, name: string) => [
-                name === 'revenueDollars' ? `$${value.toFixed(2)}` : value,
+              formatter={(value, name) => [
+                name === 'revenueDollars' ? `$${(value as number).toFixed(2)}` : value,
                 name === 'revenueDollars' ? 'Ingresos' : 'Órdenes'
               ]}
             />
