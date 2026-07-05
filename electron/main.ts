@@ -1,7 +1,11 @@
-import { app, BrowserWindow, shell, ipcMain } from "electron";
+import { app, BrowserWindow, shell, ipcMain, net } from "electron";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const isDev = process.env.NODE_ENV === "development";
 
 // Remote URL configuration
@@ -31,7 +35,7 @@ ipcMain.on("window-maximize", () => {
 ipcMain.on("window-close", () => mainWindow?.close());
 
 // Cache storage (simple file-based)
-const CACHE_DIR = path.join(app.getPath("userData"), "metrics-cache");
+const CACHE_DIR = join(app.getPath("userData"), "metrics-cache");
 
 function ensureCacheDir(): void {
   if (!fs.existsSync(CACHE_DIR)) {
@@ -43,7 +47,7 @@ ipcMain.handle(
   "cache-get",
   async (_event, key: string): Promise<string | null> => {
     ensureCacheDir();
-    const filePath = path.join(CACHE_DIR, `${key}.json`);
+    const filePath = join(CACHE_DIR, `${key}.json`);
     try {
       return fs.readFileSync(filePath, "utf-8");
     } catch {
@@ -56,7 +60,7 @@ ipcMain.handle(
   "cache-set",
   async (_event, key: string, value: string): Promise<void> => {
     ensureCacheDir();
-    const filePath = path.join(CACHE_DIR, `${key}.json`);
+    const filePath = join(CACHE_DIR, `${key}.json`);
     fs.writeFileSync(filePath, value, "utf-8");
   }
 );
@@ -65,12 +69,12 @@ ipcMain.handle("cache-clear", async (): Promise<void> => {
   ensureCacheDir();
   const files = fs.readdirSync(CACHE_DIR);
   for (const file of files) {
-    fs.unlinkSync(path.join(CACHE_DIR, file));
+    fs.unlinkSync(join(CACHE_DIR, file));
   }
 });
 
 // Device token storage (secure file in userData)
-const TOKEN_FILE = path.join(app.getPath("userData"), ".device-token");
+const TOKEN_FILE = join(app.getPath("userData"), ".device-token");
 
 ipcMain.handle("device-token-get", async (): Promise<string | null> => {
   try {
@@ -97,7 +101,7 @@ ipcMain.handle("device-token-clear", async (): Promise<void> => {
 
 // --- Network monitoring ---
 function setupNetworkMonitoring(): void {
-  const { net } = require("electron");
+  // The setupNetworkMonitoring function will use the imported net module
   setInterval(() => {
     const isOnline = net.isOnline();
     mainWindow?.webContents.send("online-status-changed", isOnline);
@@ -112,9 +116,9 @@ function createWindow(): void {
     minWidth: 900,
     minHeight: 600,
     title: "CentralEats - Panel de Vendedor",
-    icon: path.join(__dirname, "../resources/icon.png"),
+    icon: join(__dirname, "../resources/icon.png"),
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: join(__dirname, "preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
