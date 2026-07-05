@@ -1,5 +1,4 @@
 import { app, BrowserWindow, shell, ipcMain, net } from "electron";
-import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -17,13 +16,10 @@ const DEV_URL = "http://localhost:5173";
 let mainWindow: BrowserWindow | null = null;
 
 // --- IPC Handlers ---
-
-// App version
 ipcMain.on("get-app-version", (event) => {
   event.returnValue = app.getVersion();
 });
 
-// Window controls
 ipcMain.on("window-minimize", () => mainWindow?.minimize());
 ipcMain.on("window-maximize", () => {
   if (mainWindow?.isMaximized()) {
@@ -34,7 +30,7 @@ ipcMain.on("window-maximize", () => {
 });
 ipcMain.on("window-close", () => mainWindow?.close());
 
-// Cache storage (simple file-based)
+// Cache storage
 const CACHE_DIR = join(app.getPath("userData"), "metrics-cache");
 
 function ensureCacheDir(): void {
@@ -43,27 +39,21 @@ function ensureCacheDir(): void {
   }
 }
 
-ipcMain.handle(
-  "cache-get",
-  async (_event, key: string): Promise<string | null> => {
-    ensureCacheDir();
-    const filePath = join(CACHE_DIR, `${key}.json`);
-    try {
-      return fs.readFileSync(filePath, "utf-8");
-    } catch {
-      return null;
-    }
+ipcMain.handle("cache-get", async (_event, key: string): Promise<string | null> => {
+  ensureCacheDir();
+  const filePath = join(CACHE_DIR, `${key}.json`);
+  try {
+    return fs.readFileSync(filePath, "utf-8");
+  } catch {
+    return null;
   }
-);
+});
 
-ipcMain.handle(
-  "cache-set",
-  async (_event, key: string, value: string): Promise<void> => {
-    ensureCacheDir();
-    const filePath = join(CACHE_DIR, `${key}.json`);
-    fs.writeFileSync(filePath, value, "utf-8");
-  }
-);
+ipcMain.handle("cache-set", async (_event, key: string, value: string): Promise<void> => {
+  ensureCacheDir();
+  const filePath = join(CACHE_DIR, `${key}.json`);
+  fs.writeFileSync(filePath, value, "utf-8");
+});
 
 ipcMain.handle("cache-clear", async (): Promise<void> => {
   ensureCacheDir();
@@ -73,7 +63,7 @@ ipcMain.handle("cache-clear", async (): Promise<void> => {
   }
 });
 
-// Device token storage (secure file in userData)
+// Device token
 const TOKEN_FILE = join(app.getPath("userData"), ".device-token");
 
 ipcMain.handle("device-token-get", async (): Promise<string | null> => {
@@ -84,24 +74,18 @@ ipcMain.handle("device-token-get", async (): Promise<string | null> => {
   }
 });
 
-ipcMain.handle(
-  "device-token-set",
-  async (_event, token: string): Promise<void> => {
-    fs.writeFileSync(TOKEN_FILE, token, "utf-8");
-  }
-);
+ipcMain.handle("device-token-set", async (_event, token: string): Promise<void> => {
+  fs.writeFileSync(TOKEN_FILE, token, "utf-8");
+});
 
 ipcMain.handle("device-token-clear", async (): Promise<void> => {
   try {
     fs.unlinkSync(TOKEN_FILE);
-  } catch {
-    // File doesn't exist, ignore
-  }
+  } catch { }
 });
 
 // --- Network monitoring ---
 function setupNetworkMonitoring(): void {
-  // The setupNetworkMonitoring function will use the imported net module
   setInterval(() => {
     const isOnline = net.isOnline();
     mainWindow?.webContents.send("online-status-changed", isOnline);
@@ -121,22 +105,25 @@ function createWindow(): void {
       preload: join(__dirname, "preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: true,
+      // NO sandbox — preload needs Node.js APIs
     },
     autoHideMenuBar: true,
     show: false,
   });
 
-  // Show window when ready to avoid white flash
+  // Remove "Electron" from userAgent to prevent HashRouter activation
+  mainWindow.webContents.setUserAgent(
+    mainWindow.webContents.getUserAgent().replace(/\sElectron\/\S+/, "")
+  );
+
   mainWindow.once("ready-to-show", () => {
     mainWindow?.show();
     setupNetworkMonitoring();
   });
 
-  // Load URL based on environment
+  // Load base URL — let the app's routing handle navigation
   const targetUrl = isDev ? DEV_URL : REMOTE_URL;
-  const metricsPath = "/vendor-dashboard/metrics";
-  mainWindow.loadURL(`${targetUrl}${metricsPath}`);
+  mainWindow.loadURL(targetUrl);
 
   // Open external links in default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -146,7 +133,6 @@ function createWindow(): void {
     return { action: "deny" };
   });
 
-  // Open DevTools in development
   if (isDev) {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
@@ -156,7 +142,7 @@ function createWindow(): void {
   });
 }
 
-// Prevent multiple instances
+// Single instance lock
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
