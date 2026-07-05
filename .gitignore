@@ -28,3 +28,7 @@ dist-ssr
 # Mock Socket Server
 mock-server/node_modules/
 
+# Electron
+dist-electron/
+release/
+.env.electron.local
