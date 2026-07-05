@@ -20,6 +20,7 @@ import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
 import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPage';
 import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
+import VendorMetricsPage from './pages/vendor/VendorMetricsPage';
 import { Toaster } from 'react-hot-toast';
 
 export default function App() {
@@ -57,6 +58,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <VendorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/vendor-dashboard/metrics"
+            element={
+              <ProtectedRoute>
+                <VendorMetricsPage />
               </ProtectedRoute>
             }
           />
