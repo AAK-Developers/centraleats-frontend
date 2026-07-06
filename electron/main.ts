@@ -10,7 +10,7 @@ const isDev = process.env.NODE_ENV === "development";
 // Remote URL configuration
 const REMOTE_URL =
   process.env.CENTRALEATS_URL ||
-  "https://centraleatsqa.programacionwebuce.net";
+  "https://centraleats.programacionwebuce.net";
 const DEV_URL = "http://localhost:5173";
 
 let mainWindow: BrowserWindow | null = null;
@@ -124,15 +124,56 @@ function createWindow(): void {
     mainWindow.webContents.getUserAgent().replace(/\sElectron\/\S+/, "")
   );
 
-  // Allow Clerk cookies to work without SameSite restrictions
-  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-    const responseHeaders = { ...details.responseHeaders };
-    if (details.url.includes("clerk") || details.url.includes("accounts.dev")) {
-      delete responseHeaders["x-frame-options"];
-      delete responseHeaders["X-Frame-Options"];
-    }
-    callback({ responseHeaders });
-  });
+  // Bypass CORS restrictions in development mode
+  // (In production, the app loads from the same origin as the API — no CORS)
+  if (isDev) {
+    mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+      (details, callback) => {
+        // Remove the origin header so the server doesn't see localhost
+        const requestHeaders = { ...details.requestHeaders };
+        delete requestHeaders["Origin"];
+        callback({ requestHeaders });
+      }
+    );
+    // Override response headers to allow cross-origin requests
+    mainWindow.webContents.session.webRequest.onHeadersReceived(
+      (details, callback) => {
+        const responseHeaders = { ...details.responseHeaders };
+        responseHeaders["access-control-allow-origin"] = ["http://localhost:5173"];
+        responseHeaders["access-control-allow-credentials"] = ["true"];
+        responseHeaders["access-control-allow-headers"] = [
+          "Authorization, Content-Type, X-Requested-With",
+        ];
+        responseHeaders["access-control-allow-methods"] = [
+          "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        ];
+        // Also handle Clerk cookies
+        if (
+          details.url.includes("clerk") ||
+          details.url.includes("accounts.dev")
+        ) {
+          delete responseHeaders["x-frame-options"];
+          delete responseHeaders["X-Frame-Options"];
+        }
+        callback({ responseHeaders });
+      }
+    );
+  } else {
+    // Production: only handle Clerk headers
+    mainWindow.webContents.session.webRequest.onHeadersReceived(
+      (details, callback) => {
+        const responseHeaders = { ...details.responseHeaders };
+        if (
+          details.url.includes("clerk") ||
+          details.url.includes("accounts.dev")
+        ) {
+          delete responseHeaders["x-frame-options"];
+          delete responseHeaders["X-Frame-Options"];
+        }
+        callback({ responseHeaders });
+      }
+    );
+  }
 
   mainWindow.once("ready-to-show", () => {
     mainWindow?.show();
