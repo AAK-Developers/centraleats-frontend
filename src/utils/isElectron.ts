@@ -1,3 +1,4 @@
+/// <reference path="../types/electron.d.ts" />
 /**
  * Detect if the app is running inside Electron.
  * Uses the bridge API exposed by preload.ts.
