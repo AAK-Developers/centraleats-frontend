@@ -21,7 +21,8 @@ function getRemoteUrl(): string {
     const configPath = join(__dirname, "../resources/app-config.json");
     const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
     if (config.remoteUrl) return config.remoteUrl;
-  } catch (_error) {
+  // eslint-disable-next-line no-empty
+  } catch {
     // Config not found — use fallback
   }
   // 3. Fallback (safe default = QA)
@@ -136,7 +137,8 @@ ipcMain.handle("device-token-set", async (_event, token: string): Promise<void> 
 ipcMain.handle("device-token-clear", async (): Promise<void> => {
   try {
     fs.unlinkSync(TOKEN_FILE);
-  } catch (_error) {
+  // eslint-disable-next-line no-empty
+  } catch {
     // File does not exist — safe to ignore
   }
 });
