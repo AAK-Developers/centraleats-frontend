@@ -43,3 +43,11 @@ release/
 
 # OS files
 Thumbs.db
+
+# Capacitor / Android
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+android/.idea/
+android/app/release/
