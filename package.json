@@ -20,8 +20,8 @@
     "electron:compile": "tsc -p electron/tsconfig.json && tsc -p electron/tsconfig.preload.json && node -e \"const fs=require('fs'); if(fs.existsSync('dist-electron/preload.js')){fs.renameSync('dist-electron/preload.js','dist-electron/preload.cjs')}\"",
     "electron:dev": "concurrently \"vite --mode electron\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
     "electron:build": "npm run electron:compile && electron-builder",
-    "electron:build:win:qa": "npm run electron:compile && electron-builder --win",
-    "electron:build:win:prod": "npm run electron:compile && cross-env CENTRALEATS_URL=https://centraleats.programacionwebuce.net electron-builder --win",
+    "electron:build:win:qa": "npm run electron:compile && node -e \"require('fs').writeFileSync('resources/app-config.json',JSON.stringify({remoteUrl:'https://centraleatsqa.programacionwebuce.net'},null,2))\" && electron-builder --win",
+    "electron:build:win:prod": "npm run electron:compile && node -e \"require('fs').writeFileSync('resources/app-config.json',JSON.stringify({remoteUrl:'https://centraleatsprod.programacionwebuce.net'},null,2))\" && electron-builder --win",
     "electron:build:mac": "npm run electron:compile && electron-builder --mac",
     "electron:build:linux": "npm run electron:compile && electron-builder --linux"
   },

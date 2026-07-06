@@ -8,10 +8,26 @@ const __dirname = dirname(__filename);
 const isDev = process.env.NODE_ENV === "development";
 
 // Remote URL configuration
-const REMOTE_URL =
-  process.env.CENTRALEATS_URL ||
-  "https://centraleats.programacionwebuce.net";
+// In dev: loads localhost (Vite dev server)
+// In .exe: reads from bundled app-config.json (generated at build time)
 const DEV_URL = "http://localhost:5173";
+function getRemoteUrl(): string {
+  // 1. Environment variable (works in dev/CI)
+  if (process.env.CENTRALEATS_URL) {
+    return process.env.CENTRALEATS_URL;
+  }
+  // 2. Bundled config file (written by build scripts, packaged in .exe)
+  try {
+    const configPath = join(__dirname, "../resources/app-config.json");
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    if (config.remoteUrl) return config.remoteUrl;
+  } catch {
+    // Config not found — use fallback
+  }
+  // 3. Fallback (safe default = QA)
+  return "https://centraleatsqa.programacionwebuce.net";
+}
+const REMOTE_URL = getRemoteUrl();
 
 // Window state persistence
 const WINDOW_STATE_FILE = join(app.getPath("userData"), "window-state.json");
