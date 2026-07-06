@@ -2,19 +2,18 @@ import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthInitializer } from './components/auth/AuthInitializer';
 
-// Detect natively wrapped environments (Capacitor/Electron)
-const isNative = typeof window !== 'undefined' && (
-  !!(window as any).Capacitor || 
-  window.location.protocol === 'file:' || 
-  navigator.userAgent.toLowerCase().includes('electron')
-);
+import { isCapacitorNative } from './mobile';
 
-const Router = isNative ? HashRouter : BrowserRouter;
+// Router selection: HashRouter ONLY for Capacitor (file:// or capacitor:// protocol)
+// Electron uses BrowserRouter because it loads real HTTP URLs (localhost or remote)
+// Web uses BrowserRouter (standard)
+const Router = isCapacitorNative() ? HashRouter : BrowserRouter;
 
 import PresentationPage from './pages/landing/PresentationPage';
 import RoleSelectionPage from './pages/auth/RoleSelectionPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
 
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage';
@@ -33,6 +32,7 @@ export default function App() {
           <Route path="/" element={<PresentationPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/oauth-callback" element={<OAuthCallbackPage />} />
 
           <Route
             path="/role-selection"
