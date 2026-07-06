@@ -21,7 +21,7 @@ export default function LoginPage() {
       try {
         const result = await signIn.create({
           strategy: "oauth_google",
-          redirectUrl: "https://centraleatsqa.programacionwebuce.net/oauth-callback",
+          redirectUrl: "centraleats://oauth-callback",
         });
         const authUrl =
           result.firstFactorVerification?.externalVerificationRedirectURL?.toString();

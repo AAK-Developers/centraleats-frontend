@@ -63,5 +63,4 @@ In Clerk Dashboard → Native API → Android:
 - **Package name**: `ec.net.programacionwebuce.centraleats`
 - **SHA-256**: (from your keystore)
 - **Redirect URLs**:
-  - `https://centraleatsqa.programacionwebuce.net/oauth-callback`
-  - `https://centraleatsprod.programacionwebuce.net/oauth-callback`
+  - `centraleats://oauth-callback`
