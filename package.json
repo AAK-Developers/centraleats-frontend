@@ -17,11 +17,12 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "tsc -p electron/tsconfig.json && electron-builder",
-    "electron:build:win": "tsc -p electron/tsconfig.json && electron-builder --win",
-    "electron:build:mac": "tsc -p electron/tsconfig.json && electron-builder --mac",
-    "electron:build:linux": "tsc -p electron/tsconfig.json && electron-builder --linux"
+    "electron:compile": "tsc -p electron/tsconfig.json && tsc -p electron/tsconfig.preload.json && node -e \"const fs=require('fs'); if(fs.existsSync('dist-electron/preload.js')){fs.renameSync('dist-electron/preload.js','dist-electron/preload.cjs')}\"",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && npm run electron:compile && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run electron:compile && electron-builder",
+    "electron:build:win": "npm run electron:compile && electron-builder --win",
+    "electron:build:mac": "npm run electron:compile && electron-builder --mac",
+    "electron:build:linux": "npm run electron:compile && electron-builder --linux"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",

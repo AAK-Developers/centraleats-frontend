@@ -15,6 +15,15 @@ const DEV_URL = "http://localhost:5173";
 
 let mainWindow: BrowserWindow | null = null;
 
+// ══════════════════════════════════════════════════════════
+// CRITICAL: Allow third-party cookies for Clerk auth
+// Electron 43+ (Chromium 128+) blocks these by default
+// ══════════════════════════════════════════════════════════
+app.commandLine.appendSwitch(
+  "disable-features",
+  "ThirdPartyCookieBlocking,SameSiteByDefaultCookies"
+);
+
 // --- IPC Handlers ---
 ipcMain.on("get-app-version", (event) => {
   event.returnValue = app.getVersion();
@@ -102,10 +111,9 @@ function createWindow(): void {
     title: "CentralEats - Panel de Vendedor",
     icon: join(__dirname, "../resources/icon.png"),
     webPreferences: {
-      preload: join(__dirname, "preload.js"),
+      preload: join(__dirname, "preload.cjs"),
       nodeIntegration: false,
       contextIsolation: true,
-      // NO sandbox — preload needs Node.js APIs
     },
     autoHideMenuBar: true,
     show: false,
@@ -116,23 +124,37 @@ function createWindow(): void {
     mainWindow.webContents.getUserAgent().replace(/\sElectron\/\S+/, "")
   );
 
+  // Allow Clerk cookies to work without SameSite restrictions
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    const responseHeaders = { ...details.responseHeaders };
+    if (details.url.includes("clerk") || details.url.includes("accounts.dev")) {
+      delete responseHeaders["x-frame-options"];
+      delete responseHeaders["X-Frame-Options"];
+    }
+    callback({ responseHeaders });
+  });
+
   mainWindow.once("ready-to-show", () => {
     mainWindow?.show();
     setupNetworkMonitoring();
   });
 
-  // Load base URL — let the app's routing handle navigation
+  // Load base URL
   const targetUrl = isDev ? DEV_URL : REMOTE_URL;
   mainWindow.loadURL(targetUrl);
 
-  // Open external links in default browser
+  // Allow Clerk popups, block everything else
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.includes("clerk") || url.includes("accounts.dev")) {
+      return { action: "allow" };
+    }
     if (url.startsWith("http")) {
       shell.openExternal(url);
     }
     return { action: "deny" };
   });
 
+  // Open DevTools in development (and temporarily in production for debugging)
   if (isDev) {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
