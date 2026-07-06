@@ -1,8 +1,9 @@
 {
   "name": "centraleats-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -15,7 +16,14 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "electron:compile": "tsc -p electron/tsconfig.json && tsc -p electron/tsconfig.preload.json && node -e \"const fs=require('fs'); if(fs.existsSync('dist-electron/preload.js')){fs.renameSync('dist-electron/preload.js','dist-electron/preload.cjs')}\"",
+    "electron:dev": "concurrently \"vite --mode electron\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run electron:compile && electron-builder",
+    "electron:build:win:qa": "npm run electron:compile && node -e \"require('fs').writeFileSync('resources/app-config.json',JSON.stringify({remoteUrl:'https://centraleatsqa.programacionwebuce.net'},null,2))\" && electron-builder --win",
+    "electron:build:win:prod": "npm run electron:compile && node -e \"require('fs').writeFileSync('resources/app-config.json',JSON.stringify({remoteUrl:'https://centraleatsprod.programacionwebuce.net'},null,2))\" && electron-builder --win",
+    "electron:build:mac": "npm run electron:compile && electron-builder --mac",
+    "electron:build:linux": "npm run electron:compile && electron-builder --linux"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
@@ -54,6 +62,10 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/ui": "^4.1.9",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
@@ -62,6 +74,7 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "wait-on": "^9.0.10"
   }
 }

@@ -28,3 +28,18 @@ dist-ssr
 # Mock Socket Server
 mock-server/node_modules/
 
+# Electron
+dist-electron/
+release/
+*.exe
+*.dmg
+*.AppImage
+*.deb
+
+# Environment overrides
+.env.local
+.env.*.local
+.env.electron.local
+
+# OS files
+Thumbs.db
