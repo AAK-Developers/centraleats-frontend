@@ -13,6 +13,36 @@ const REMOTE_URL =
   "https://centraleats.programacionwebuce.net";
 const DEV_URL = "http://localhost:5173";
 
+// Window state persistence
+const WINDOW_STATE_FILE = join(app.getPath("userData"), "window-state.json");
+interface WindowState {
+  width: number;
+  height: number;
+  x?: number;
+  y?: number;
+  isMaximized: boolean;
+}
+function loadWindowState(): WindowState {
+  try {
+    const data = fs.readFileSync(WINDOW_STATE_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return { width: 1280, height: 800, isMaximized: false };
+  }
+}
+function saveWindowState(): void {
+  if (!mainWindow) return;
+  const bounds = mainWindow.getBounds();
+  const state: WindowState = {
+    width: bounds.width,
+    height: bounds.height,
+    x: bounds.x,
+    y: bounds.y,
+    isMaximized: mainWindow.isMaximized(),
+  };
+  fs.writeFileSync(WINDOW_STATE_FILE, JSON.stringify(state));
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 // ══════════════════════════════════════════════════════════
@@ -103,12 +133,15 @@ function setupNetworkMonitoring(): void {
 
 // --- Main Window ---
 function createWindow(): void {
+  const windowState = loadWindowState();
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: windowState.width,
+    height: windowState.height,
+    x: windowState.x,
+    y: windowState.y,
     minWidth: 900,
     minHeight: 600,
-    title: "CentralEats - Panel de Vendedor",
+    title: "CentralEats",
     icon: join(__dirname, "../resources/icon.png"),
     webPreferences: {
       preload: join(__dirname, "preload.cjs"),
@@ -118,6 +151,11 @@ function createWindow(): void {
     autoHideMenuBar: true,
     show: false,
   });
+
+  // Restore maximized state
+  if (windowState.isMaximized) {
+    mainWindow.maximize();
+  }
 
   // Remove "Electron" from userAgent to prevent HashRouter activation
   mainWindow.webContents.setUserAgent(
@@ -199,6 +237,20 @@ function createWindow(): void {
   if (isDev) {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
+
+  // F12 to toggle DevTools in dev mode
+  if (isDev) {
+    mainWindow.webContents.on("before-input-event", (event, input) => {
+      if (input.key === "F12") {
+        mainWindow?.webContents.toggleDevTools();
+        event.preventDefault();
+      }
+    });
+  }
+
+  mainWindow.on("close", () => {
+    saveWindowState();
+  });
 
   mainWindow.on("closed", () => {
     mainWindow = null;
