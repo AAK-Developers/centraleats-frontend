@@ -1,6 +1,6 @@
-appId: com.centraleats.vendor-desktop
-productName: CentralEats Desktop
-copyright: Copyright © 2026 CentralEats
+appId: com.centraleats.desktop
+productName: CentralEats
+copyright: Copyright © 2026 CentralEats - AAK Developers
 
 directories:
   output: release
@@ -32,7 +32,7 @@ nsis:
   installerHeaderIcon: resources/icon.ico
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: CentralEats Desktop
+  shortcutName: CentralEats
 
 # macOS
 mac:
