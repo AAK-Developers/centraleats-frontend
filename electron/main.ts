@@ -136,7 +136,9 @@ ipcMain.handle("device-token-set", async (_event, token: string): Promise<void> 
 ipcMain.handle("device-token-clear", async (): Promise<void> => {
   try {
     fs.unlinkSync(TOKEN_FILE);
-  } catch { }
+  } catch {
+    // File does not exist — nothing to delete, safe to ignore
+  }
 });
 
 // --- Network monitoring ---
