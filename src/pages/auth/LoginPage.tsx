@@ -38,9 +38,13 @@ export default function LoginPage() {
           });
           await openOAuthBrowser(authUrl);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Native OAuth error:", err);
         setNativeLoading(false);
+        const errMsg = err?.message || err?.toString() || "";
+        if (err?.errors?.[0]?.code === "session_exists" || errMsg.includes("already signed in")) {
+          navigate("/role-selection", { replace: true });
+        }
       }
     };
   
@@ -49,7 +53,7 @@ export default function LoginPage() {
       return (
         <Box display="flex" justifyContent="center" alignItems="center" minH="100vh" p={4} bg="gray.50">
           <VStack gap={6} w="full" maxW="sm" textAlign="center">
-            <img src="/assets/CentralEatsLogo.png" alt="CentralEats" style={{ width: "120px", height: "120px" }} />
+            <img src="/CentralEatsLogo.png" alt="CentralEats" style={{ width: "120px", height: "120px" }} />
             <Text fontSize="2xl" fontWeight="bold" color="gray.800">
               Iniciar Sesión
             </Text>
