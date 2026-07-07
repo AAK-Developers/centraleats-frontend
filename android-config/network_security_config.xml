@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Este archivo permite tráfico HTTP (cleartext) SOLO hacia la IP de tu
+  backend, en lugar de desactivar la seguridad para toda la app.
+  Ubicación final dentro del proyecto Android generado por Capacitor:
+    android/app/src/main/res/xml/network_security_config.xml
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">98.81.131.147</domain>
+    </domain-config>
+</network-security-config>
