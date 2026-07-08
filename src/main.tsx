@@ -12,8 +12,6 @@ if (!rootElement) {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Si una petición falla, no la des por "vieja" de inmediato;
-      // sigue mostrando el último dato bueno mientras reintenta.
       staleTime: 5_000,
     },
   },

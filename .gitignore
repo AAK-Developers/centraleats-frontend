@@ -17,3 +17,5 @@ yarn-error.log*
 # Capacitor / Android
 android/
 ios/
+*storybook.log
+storybook-static
