@@ -11,8 +11,20 @@ export const apiClient = axios.create({
 
 console.log('API apiClient initialized with baseURL:', baseURL);
 
+import type { ApiResponse } from '../types/api';
+
 apiClient.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        // Normalize response to JSend format if it's not already
+        if (response.data && typeof response.data === 'object' && !('status' in response.data && 'data' in response.data)) {
+            const normalizedData: ApiResponse<any> = {
+                status: 'success',
+                data: response.data.data ? response.data.data : response.data,
+            };
+            response.data = normalizedData;
+        }
+        return response;
+    },
     (error) => {
         if (error.response) {
             const { status } = error.response;
@@ -20,6 +32,15 @@ apiClient.interceptors.response.use(
                 console.error('Sesión expirada o no autorizada');
             } else if (status === 403) {
                 console.error('Acceso denegado: permisos insuficientes o cuenta inactiva');
+            }
+            
+            // Normalize error response
+            if (error.response.data && typeof error.response.data === 'object' && !('status' in error.response.data)) {
+                 error.response.data = {
+                     status: 'error',
+                     message: error.response.data.message || 'Ocurrió un error en la solicitud',
+                     data: null
+                 };
             }
         }
         return Promise.reject(error);
