@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/axiosConfig';
 import { useRestaurants, type Restaurant } from './useRestaurants';
+import type { ApiResponse } from '../types/api';
 
 export interface Product {
     id: string;
@@ -27,17 +28,17 @@ interface ApiProduct {
 }
 
 export const useAllProducts = () => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const { restaurants } = useRestaurants();
 
-    useEffect(() => {
-        const fetchAll = async () => {
-            setIsLoading(true);
+    const { data: products = [], isLoading, error } = useQuery({
+        queryKey: ['all-products', restaurants.length],
+        queryFn: async () => {
+            if (restaurants.length === 0) return [];
+
             try {
                 // Try to fetch all products at once
-                const res = await apiClient.get('/api/products');
-                const list: ApiProduct[] = res.data?.data || res.data || [];
+                const res = await apiClient.get<ApiResponse<ApiProduct[]>>('/api/products');
+                const list = res.data.data || [];
 
                 // Build a vendorName lookup map from restaurants already fetched
                 const vendorMap: Record<string, string> = {};
@@ -45,70 +46,56 @@ export const useAllProducts = () => {
                     if (r.id) vendorMap[r.id] = r.name;
                 });
 
-                setProducts(
-                    list.map((p) => ({
-                        id: p.id,
-                        name: p.name,
-                        description: p.description || '',
-                        price: p.price,
-                        stock: p.stock ?? 0,
-                        imageUrl:
-                            p.imageUrl ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
-                        isAvailable: p.isAvailable,
-                        vendorId: p.vendorId || '',
-                        vendorName:
-                            p.vendorName ||
-                            (p.vendorId ? vendorMap[p.vendorId] : '') ||
-                            'Restaurante',
-                    }))
-                );
+                return list.map((p) => ({
+                    id: p.id,
+                    name: p.name,
+                    description: p.description || '',
+                    price: p.price,
+                    stock: p.stock ?? 0,
+                    imageUrl:
+                        p.imageUrl ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
+                    isAvailable: p.isAvailable,
+                    vendorId: p.vendorId || '',
+                    vendorName:
+                        p.vendorName ||
+                        (p.vendorId ? vendorMap[p.vendorId] : '') ||
+                        'Restaurante',
+                }));
             } catch (err) {
-                console.error('Error fetching all products:', err);
+                console.warn('Error fetching all products, attempting fallback...', err);
                 // Fallback: fetch products per restaurant
-                if (restaurants.length > 0) {
-                    try {
-                        const perVendor = await Promise.all(
-                            restaurants
-                                .filter((r) => r.id)
-                                .map((r) =>
-                                    apiClient
-                                        .get(`/api/products?vendorId=${r.id}`)
-                                        .then((res) => {
-                                            const list: ApiProduct[] =
-                                                res.data?.data || res.data || [];
-                                            return list.map((p) => ({
-                                                id: p.id,
-                                                name: p.name,
-                                                description: p.description || '',
-                                                price: p.price,
-                                                stock: p.stock ?? 0,
-                                                imageUrl:
-                                                    p.imageUrl ||
-                                                    `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
-                                                isAvailable: p.isAvailable,
-                                                vendorId: r.id || '',
-                                                vendorName: r.name,
-                                            }));
-                                        })
-                                        .catch(() => [] as Product[])
-                                )
-                        );
-                        setProducts(perVendor.flat());
-                    } catch (fallbackErr) {
-                        console.error('Fallback fetch failed:', fallbackErr);
-                    }
-                }
-            } finally {
-                setIsLoading(false);
+                const perVendor = await Promise.all(
+                    restaurants
+                        .filter((r) => r.id)
+                        .map((r) =>
+                            apiClient
+                                .get<ApiResponse<ApiProduct[]>>(`/api/products?vendorId=${r.id}`)
+                                .then((res) => {
+                                    const list = res.data.data || [];
+                                    return list.map((p) => ({
+                                        id: p.id,
+                                        name: p.name,
+                                        description: p.description || '',
+                                        price: p.price,
+                                        stock: p.stock ?? 0,
+                                        imageUrl:
+                                            p.imageUrl ||
+                                            `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
+                                        isAvailable: p.isAvailable,
+                                        vendorId: r.id || '',
+                                        vendorName: r.name,
+                                    }));
+                                })
+                                .catch(() => [] as Product[])
+                        )
+                );
+                return perVendor.flat();
             }
-        };
+        },
+        enabled: restaurants.length > 0,
+        staleTime: 5 * 60 * 1000, // 5 minutes cache
+    });
 
-        if (restaurants.length > 0 || !isLoading) {
-            fetchAll();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [restaurants]);
-
-    return { products, isLoading };
+    return { products, isLoading, error };
 };
