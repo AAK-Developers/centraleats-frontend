@@ -65,6 +65,7 @@ export interface DashboardStats {
 }
 
 export interface DashboardApiResponse {
-  success: boolean
-  data: DashboardStats
+  status: 'success' | 'error'
+  data: DashboardStats | null
+  message?: string
 }

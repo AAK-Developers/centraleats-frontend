@@ -9,8 +9,8 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     { timeout: 10000 },
   )
 
-  if (!data?.success) {
-    throw new Error('El backend respondió sin success=true')
+  if (data?.status !== 'success') {
+    throw new Error(data?.message || 'El backend respondió con un error')
   }
-  return data.data
+  return data.data as DashboardStats
 }
