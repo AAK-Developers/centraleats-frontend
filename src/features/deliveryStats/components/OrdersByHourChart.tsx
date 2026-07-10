@@ -11,7 +11,7 @@ export default function OrdersByHourChart({ ordersByHour }: Props) {
 
   return (
     <section className="block">
-      <BlockHeader title="Pedidos por hora" subtitle="DistribuciÃ³n de pedidos en el dÃ­a" />
+      <BlockHeader title="Pedidos por hora" subtitle="Distribución de pedidos en el día" />
       <ResponsiveContainer width="100%" height={160}>
         <AreaChart data={data} margin={{ left: -20, right: 8, top: 4 }}>
           <CartesianGrid vertical={false} stroke="#eaecf4" />

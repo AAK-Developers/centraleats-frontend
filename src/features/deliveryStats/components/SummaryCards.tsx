@@ -21,7 +21,7 @@ export default function SummaryCards({ summary }: Props) {
       accent: ACCENTS[3],
       label: 'Productos',
       value: summary.products,
-      caption: 'En catÃ¡logo',
+      caption: 'En catálogo',
     },
     {
       icon: <ShoppingBag size={17} strokeWidth={2.3} />,

@@ -17,7 +17,7 @@ export default function DeliveryRankingList({ deliveryRanking }: Props) {
 
   return (
     <section className="block">
-      <BlockHeader title="Tiempo de entrega promedio" subtitle="Por restaurante, de mÃ¡s rÃ¡pido a mÃ¡s lento" />
+      <BlockHeader title="Tiempo de entrega promedio" subtitle="Por restaurante, de más rápido a más lento" />
       <div className="row-list">
         {sorted.map((r) => {
           const c = speedColor(r.averageMinutes)

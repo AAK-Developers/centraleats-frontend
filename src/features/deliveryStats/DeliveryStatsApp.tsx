@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDashboardStats } from './hooks/useDashboardStats'
 import { ACCENTS } from './theme'
 import logoUrl from '../../assets/CentralEatsLogo.png'
@@ -14,7 +14,7 @@ import { WaveBottom, WaveTop } from './components/Waves'
 import './deliveryStats.css'
 
 export default function DeliveryStatsApp() {
-  const { data: stats, error, isLoading, isFetching } = useDashboardStats()
+  const { data: stats, error, isLoading, isFetching, isError } = useDashboardStats()
 
   // Inyectar clase al body solo cuando se renderiza este app
   useEffect(() => {
@@ -38,20 +38,19 @@ export default function DeliveryStatsApp() {
             </div>
             <h1>Panel de Pedidos</h1>
             {stats && (
-              <div className="updated">
-                <span className={`live-dot ${isFetching ? 'pulsing' : ''}`} />
-                Actualizado {new Date(stats.generatedAt).toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' })}
+              <div className="updated" style={isError ? { color: '#888' } : undefined}>
+                <span className={`live-dot ${isFetching && !isError ? 'pulsing' : ''}`} style={isError ? { backgroundColor: '#888' } : undefined} />
+                {isError ? 'Offline (Última vez: ' : 'Actualizado '}{new Date(stats.generatedAt).toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' })}{isError ? ')' : ''}
               </div>
             )}
           </div>
         </div>
 
-        {isLoading && <p className="state-msg">Cargando estadÃ­sticasâ€¦</p>}
+        {isLoading && <p className="state-msg">Cargando estadísticas…</p>}
 
-        {error && (
+        {error && !stats && (
           <p className="state-msg error">
-            {error instanceof Error ? error.message : 'No se pudo conectar con el servidor'}. Verifica que el
-            backend estÃ© encendido.
+            {error instanceof Error ? error.message : 'No se pudo conectar con el servidor'}.
           </p>
         )}
 

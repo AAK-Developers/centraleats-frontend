@@ -1,6 +1,8 @@
 import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthInitializer } from './components/auth/AuthInitializer';
+import { useState, useEffect } from 'react';
+import { SplashScreen } from './components/shared/organisms/SplashScreen';
 
 // Detect natively wrapped environments (Capacitor/Electron)
 const isNative = typeof window !== 'undefined' && (
@@ -24,6 +26,21 @@ import VendorMetricsPage from './pages/vendor/VendorMetricsPage';
 import { Toaster } from 'react-hot-toast';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(isNative);
+
+  useEffect(() => {
+    if (isNative) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  if (showSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <Router>
       <Toaster position="top-right" />
