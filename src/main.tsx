@@ -8,6 +8,8 @@ import theme from './theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VITE_CLERK_PUBLISHABLE_KEY, VITE_API_BASE_URL } from './config/env';
 
+import DeliveryStatsApp from './features/deliveryStats/DeliveryStatsApp';
+
 // eslint-disable-next-line react-refresh/only-export-components
 const PUBLISHABLE_KEY = VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -27,12 +29,18 @@ const queryClient = new QueryClient({
   },
 });
 
+const isNative = typeof window !== 'undefined' && (
+  !!(window as any).Capacitor || 
+  window.location.protocol === 'file:' || 
+  navigator.userAgent.toLowerCase().includes('electron')
+);
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
             <QueryClientProvider client={queryClient}>
                 <ChakraProvider value={theme}>
-                    <App />
+                    {isNative ? <DeliveryStatsApp /> : <App />}
                 </ChakraProvider>
             </QueryClientProvider>
         </ClerkProvider>

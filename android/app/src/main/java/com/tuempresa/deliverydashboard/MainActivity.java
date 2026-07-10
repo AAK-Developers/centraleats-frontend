@@ -1,4 +1,4 @@
-package ec.net.programacionwebuce.centraleats;
+package com.tuempresa.deliverydashboard;
 
 import com.getcapacitor.BridgeActivity;
 
