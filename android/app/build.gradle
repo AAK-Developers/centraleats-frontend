@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "ec.net.programacionwebuce.centraleats"
+    namespace = "com.tuempresa.deliverydashboard"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "ec.net.programacionwebuce.centraleats"
+        applicationId "com.tuempresa.deliverydashboard"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
