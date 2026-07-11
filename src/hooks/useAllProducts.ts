@@ -56,51 +56,17 @@ export const useAllProducts = () => {
         queryFn: async () => {
             if (restaurants.length === 0) return [];
 
+            const vendorMap: Record<string, string> = {};
+            const waitTimeMap: Record<string, number> = {};
+            restaurants.forEach((r: Restaurant) => {
+                if (r.id) {
+                    vendorMap[r.id] = r.name;
+                    waitTimeMap[r.id] = r.deliveryTime || 20;
+                }
+            });
+
             try {
-                // Try to fetch all products at once
-                const res = await apiClient.get<any>('/api/products');
-                const list = res.data?.data || res.data || [];
-
-                // Build a lookup map for restaurants
-                const vendorMap: Record<string, string> = {};
-                const waitTimeMap: Record<string, number> = {};
-                restaurants.forEach((r: Restaurant) => {
-                    if (r.id) {
-                        vendorMap[r.id] = r.name;
-                        waitTimeMap[r.id] = r.deliveryTime || 20;
-                    }
-                });
-
-                return (Array.isArray(list) ? list : []).map((p) => ({
-                    id: p.id,
-                    name: p.name,
-                    description: p.description || '',
-                    price: p.price,
-                    stock: p.stock ?? 0,
-                    imageUrl:
-                        fixImageUrl(p.imageUrl) ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
-                    isAvailable: p.isAvailable,
-                    vendorId: p.vendorId || '',
-                    vendorName:
-                        p.vendorName ||
-                        (p.vendorId ? vendorMap[p.vendorId] : '') ||
-                        'Restaurante',
-                    categoryName: getCategoryName(p),
-                    vendorWaitTime: p.vendorWaitTime || (p.vendorId ? waitTimeMap[p.vendorId] : 20),
-                }));
-            } catch (err) {
-                console.warn('Error fetching all products, attempting fallback...', err);
-                // Fallback: fetch products per restaurant
-                const vendorMap: Record<string, string> = {};
-                const waitTimeMap: Record<string, number> = {};
-                restaurants.forEach((r: Restaurant) => {
-                    if (r.id) {
-                        vendorMap[r.id] = r.name;
-                        waitTimeMap[r.id] = r.deliveryTime || 20;
-                    }
-                });
-
+                // Fetch products per restaurant concurrently for maximum reliability
                 const perVendor = await Promise.all(
                      restaurants
                         .filter((r) => r.id)
@@ -129,6 +95,9 @@ export const useAllProducts = () => {
                         )
                 );
                 return perVendor.flat();
+            } catch (err) {
+                console.warn('Error fetching products per vendor:', err);
+                return [];
             }
         },
         enabled: restaurants.length > 0,
