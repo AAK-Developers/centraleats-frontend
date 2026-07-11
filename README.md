@@ -105,24 +105,43 @@ To become the leading platform for smart food ordering systems in university set
 
 ## Project Architecture (Isolated Multi-Entrypoint)
 
-To prevent cross-platform code pollution and dependency conflicts, the frontend implements a **Multi-page Vite** architecture with separate entry points at compile time:
+To prevent cross-platform code pollution and dependency conflicts, the frontend implements a **Multi-page Vite** architecture with separate entry points at compile time, organized under a strict **Atomic Design** system:
 
 ```text
-├── index.html                  # HTML entry point for Web and Desktop
-├── index.mobile.html           # Exclusive HTML entry point for Mobile
-├── vite.config.ts              # Vite configuration for Web/Desktop (Compiles to /dist)
-├── vite.mobile.config.ts       # Vite configuration for Mobile (Compiles to /dist-mobile)
-├── capacitor.config.json       # Configures Capacitor to point to /dist-mobile
-├── electron-builder.yml        # Configures Desktop executable builder (.exe)
-└── src/
-    ├── main.tsx                # Bootstrapping script for Web/Desktop (loads Clerk, Routers, etc.)
-    ├── mobile-main.tsx         # Lightweight bootstrapping script for Mobile (Clerk-free)
-    ├── api/                    # Axios instance and request configuration
-    ├── components/             # Atoms, Molecules, Organisms, and Layouts (Atomic Design)
-    ├── features/               # Specific features (deliveryStats, vendorMetrics)
-    ├── hooks/                  # Business logic and queries (React Query)
-    ├── utils/                  # Global utilities (file sanitization, Electron detection)
-    └── App.tsx                 # Route definitions and Web/Desktop route protection
+├── index.html                    # HTML entry point for Web and Desktop clients
+├── index.mobile.html             # HTML entry point for Mobile Rider client
+├── vite.config.ts                # Vite configuration for Web/Desktop (compiles to /dist)
+├── vite.mobile.config.ts         # Vite configuration for Mobile (compiles to /dist-mobile)
+├── capacitor.config.json         # Capacitor configuration for mobile native assets
+├── electron-builder.yml          # Electron builder configuration for desktop executables (.exe)
+├── Dockerfile                    # Docker build configuration for web deployment
+├── docker-compose.yml            # Docker container deployment orchestration
+├── nginx/                        # Nginx reverse proxy templates and configurations
+│   ├── default.conf.template     # Nginx server block proxy routing setup
+│   └── 30-generate-env-config.sh # Runtime injection of environmental script
+├── electron/                     # Electron desktop client wrapper files
+│   ├── main.ts                   # Main process bootstrap script
+│   ├── preload.ts                # Preload context bridge script
+│   └── tsconfig.json             # TypeScript rules for Electron compilation
+└── src/                          # Main source directory (Atomic Design Model)
+    ├── main.tsx                  # Bootstrapping script for Web and Desktop clients
+    ├── mobile-main.tsx           # Lightweight, independent bootstrapper for Mobile
+    ├── App.tsx                   # Main router wrapper and path protection
+    ├── theme.ts                  # Shared theme settings (Chakra UI v3)
+    ├── api/                      # Axios configuration, endpoints, and client setup
+    ├── store/                    # Zustand global store files (e.g., auth, cart)
+    ├── hooks/                    # Custom React Query custom hooks (e.g. useAllProducts)
+    ├── utils/                    # Global helper utilities (filename sanitization)
+    └── components/               # Atomic Design Hierarchy
+        ├── auth/                 # Sign-in and route security guards
+        ├── cart/                 # Cart views, items list, and status
+        ├── layout/               # Global containers and background wave layouts
+        ├── student/              # Ordering interface and cards for students
+        ├── vendor/               # Vendor settings and profile dashboard views
+        └── shared/               # Reusable Atomic UI units
+            ├── atoms/            # Standard primitive inputs, buttons, labels
+            ├── molecules/        # Interactive groups (e.g., UserProfileHeader)
+            └── organisms/        # Complex structural components (e.g., AuthHeader)
 ```
 
 ---
@@ -254,4 +273,6 @@ The project leverages **GitHub Actions** to automate builds and deploy directly 
 ---
 
 ## Authors
-*   **Kevin Moyon** - Lead Developer & Architect
+*   **Amawta Chacha**
+*   **Antony Coello**
+*   **Kevin Moyon**
