@@ -1,157 +1,157 @@
 # 🛒 CentralEats - Frontend 🚀
 
-CentralEats es una plataforma de gestión de comida tipo "Click & Collect" de alto rendimiento, diseñada específicamente para la comunidad de la Universidad Central del Ecuador (UCE). Su arquitectura desacoplada y optimizada garantiza tiempos de carga ultra rápidos y una experiencia de usuario fluida tanto en dispositivos móviles (Android/iOS) como en ordenadores (Web/Desktop).
+CentralEats is a high-performance "Click & Collect" food management platform specifically designed for the community at the Universidad Central del Ecuador (UCE). Its decoupled and optimized architecture ensures ultra-fast loading times and a seamless user experience across mobile (Android/iOS) and computer (Web/Desktop) clients.
 
 ---
 
-## 👨‍💻 Dirección del Proyecto
-*   **Desarrollador Principal y Arquitecto UI/UX:** Kevin Moyon
+## 👨‍💻 Project Direction
+*   **Lead Developer & UI/UX Architect:** Kevin Moyon
 
 ---
 
-## 🛠️ Tecnologías y Stack Técnico
-El proyecto utiliza un ecosistema moderno, fuertemente tipado y reactivo:
+## 🛠️ Technology Stack
+The project utilizes a modern, strongly-typed, and reactive ecosystem:
 
-*   **Entorno & Framework:** React 19, TypeScript, Vite.
-*   **Sistema de Diseño:** Chakra UI v3.
-*   **Gestión de Estado & Caché:** React Query (TanStack Query v5) & Zustand.
-*   **Seguridad / Autenticación:** Clerk (Autenticación institucional y social).
-*   **Cliente HTTP:** Axios (configurado con interceptores para propagar tokens y gestionar timeouts).
-*   **Entornos Nativos / Híbridos:**
+*   **Runtime & Framework:** React 19, TypeScript, Vite.
+*   **Design System:** Chakra UI v3.
+*   **State Management & Caching:** React Query (TanStack Query v5) & Zustand.
+*   **Authentication & Security:** Clerk (Institutional and social authentication).
+*   **HTTP Client:** Axios (configured with interceptors to propagate tokens and manage timeouts).
+*   **Native / Hybrid Environments:**
     *   **Desktop:** Electron.
     *   **Mobile:** Capacitor.
 
 ---
 
-## 📐 Arquitectura del Proyecto (Multi-Entrada Aislada)
-Para evitar la contaminación cruzada de código y librerías entre plataformas, el frontend implementa una arquitectura **Multi-page Vite** con puntos de entrada separados a nivel de compilación:
+## 📐 Project Architecture (Isolated Multi-Entrypoint)
+To prevent cross-platform code pollution and dependency conflicts, the frontend implements a **Multi-page Vite** architecture with separate entry points at compile time:
 
 ```text
-├── index.html                  # Punto de entrada HTML para Web y Desktop
-├── index.mobile.html           # Punto de entrada HTML exclusivo para Mobile
-├── vite.config.ts              # Configuración de Vite para Web/Desktop (Carpeta /dist)
-├── vite.mobile.config.ts       # Configuración de Vite para Mobile (Carpeta /dist-mobile)
-├── capacitor.config.json       # Configura Capacitor apuntando a /dist-mobile
-├── electron-builder.yml        # Configura la compilación del instalador de escritorio (.exe)
+├── index.html                  # HTML entry point for Web and Desktop
+├── index.mobile.html           # Exclusive HTML entry point for Mobile
+├── vite.config.ts              # Vite configuration for Web/Desktop (Compiles to /dist)
+├── vite.mobile.config.ts       # Vite configuration for Mobile (Compiles to /dist-mobile)
+├── capacitor.config.json       # Configures Capacitor to point to /dist-mobile
+├── electron-builder.yml        # Configures Desktop executable builder (.exe)
 └── src/
-    ├── main.tsx                # Script de arranque para Web y Desktop (Carga Clerk, Routers, etc.)
-    ├── mobile-main.tsx         # Script de arranque para Mobile (Aislado, ligero, sin Clerk)
-    ├── api/                    # Instancia de Axios y configuración de llamadas
-    ├── components/             # Átomos, Moléculas, Organismos y Layouts (Atomic Design)
-    ├── features/               # Módulos específicos (deliveryStats, vendorMetrics)
-    ├── hooks/                  # Lógica de negocio y queries (React Query)
-    ├── utils/                  # Herramientas globales (saneamiento de archivos, detección de Electron)
-    └── App.tsx                 # Definición de rutas y lógica de protección de rutas Web/Desktop
+    ├── main.tsx                # Bootstrapping script for Web/Desktop (loads Clerk, Routers, etc.)
+    ├── mobile-main.tsx         # Lightweight bootstrapping script for Mobile (Clerk-free)
+    ├── api/                    # Axios instance and request configuration
+    ├── components/             # Atoms, Molecules, Organisms, and Layouts (Atomic Design)
+    ├── features/               # Specific features (deliveryStats, vendorMetrics)
+    ├── hooks/                  # Business logic and queries (React Query)
+    ├── utils/                  # Global utilities (file sanitization, Electron detection)
+    └── App.tsx                 # Route definitions and Web/Desktop route protection
 ```
 
 ---
 
-## 🚀 Guía de Instalación y Desarrollo Local
+## 🚀 Installation & Local Development Guide
 
-### 1. Requisitos Previos
-*   **Node.js:** Versión 22 o superior.
-*   **NPM:** Incluido con Node.js.
+### 1. Prerequisites
+*   **Node.js:** Version 22 or higher.
+*   **NPM:** Packaged with Node.js.
 
-### 2. Variables de Entorno (`.env`)
-Crea un archivo `.env` en la raíz del proyecto basándote en `.env.example`:
+### 2. Environment Variables (`.env`)
+Create a `.env` file in the project root based on `.env.example`:
 ```env
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_... # Llave pública de Clerk
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_... # Public Clerk key
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-### 3. Instalación
-Instala las dependencias necesarias omitiendo conflictos de versiones antiguas si las hubiera:
+### 3. Installation
+Install the project dependencies (using legacy-peer-deps fallback if necessary):
 ```bash
 npm install
 ```
 
-### 4. Ejecución en Modo Desarrollo
-Elige el entorno que deseas probar localmente:
+### 4. Running in Development Mode
+Choose the environment you want to run locally:
 
-*   **Ejecutar Web:**
+*   **Run Web:**
     ```bash
     npm run dev
     ```
-    *Servidor local por defecto en: http://localhost:5173*
+    *Local server defaults to: http://localhost:5173*
 
-*   **Ejecutar Mobile (Simulador Web):**
+*   **Run Mobile (Web Simulator):**
     ```bash
     npm run dev:mobile
     ```
-    *Servidor local exclusivo para móvil en: http://localhost:5174*
+    *Local server exclusive to mobile: http://localhost:5174*
 
-*   **Ejecutar Desktop (Electron en Caliente):**
+*   **Run Desktop (Hot-Reload Electron):**
     ```bash
     npm run electron:dev
     ```
 
 ---
 
-## 📦 Compilación y Generación de Ejecutables (.exe / .apk)
+## 📦 Building and Packaging Executables (.exe / .apk)
 
 ### 🖥️ Desktop (Windows `.exe`)
-La aplicación de escritorio se genera utilizando **Electron Builder**. Nota que el ejecutable de escritorio actúa como un visor web optimizado y seguro conectado a las instancias oficiales de QA o Producción para mantener persistencia e integridad de datos:
+The desktop application is packaged using **Electron Builder**. Note that the desktop executable serves as an optimized, secure web view wrapper connected directly to the official QA or Production instances to preserve data integrity:
 
-1.  **Compilar y empaquetar para QA:**
+1.  **Build and Package for QA:**
     ```bash
     npm run electron:build:win:qa
     ```
-2.  **Compilar y empaquetar para Producción:**
+2.  **Build and Package for Production:**
     ```bash
     npm run electron:build:win:prod
     ```
-*El instalador generado se guardará en la carpeta `/release` con el formato: `CentralEats-Setup-X.X.X.exe`.*
+*The generated installer is saved in the `/release` directory with the format: `CentralEats-Setup-X.X.X.exe`.*
 
 ### 📱 Mobile (Android `.apk` / iOS)
-La aplicación móvil (Panel de Pedidos para Repartidores) está desacoplada y compila a su propio directorio `/dist-mobile` sin incluir la sobrecarga de Clerk o vistas web:
+The mobile app (Delivery Dashboard for riders) is decoupled and compiles to its own `/dist-mobile` folder, omitting Clerk and heavy web-only dependencies:
 
-1.  **Compilar el Frontend Móvil:**
+1.  **Build the Mobile Frontend:**
     ```bash
-    npm run build:mobile:dev    # Para desarrollo
-    npm run build:mobile:qa     # Para pruebas QA
-    npm run build:mobile:prod   # Para producción
+    npm run build:mobile:dev    # For development environment
+    npm run build:mobile:qa     # For QA testing environment
+    npm run build:mobile:prod   # For production environment
     ```
-    *(Este comando compila el proyecto y ejecuta `npx cap sync` automáticamente para sincronizar los assets en las carpetas nativas).*
+    *(This command compiles the project and automatically runs `npx cap sync` to synchronize static assets into the native folders).*
 
-2.  **Generar el ejecutable móvil (Android / iOS):**
-    *   **Abrir en Android Studio (Para generar APK/AAB):**
+2.  **Generate Native Executables (Android / iOS):**
+    *   **Open in Android Studio (to build APK/AAB):**
         ```bash
         npx cap open android
         ```
-        *Desde Android Studio, selecciona **Build > Build Bundle(s) / APK(s) > Build APK(s)**.*
-    *   **Abrir en Xcode (Para iOS):**
+        *Inside Android Studio, select **Build > Build Bundle(s) / APK(s) > Build APK(s)**.*
+    *   **Open in Xcode (for iOS):**
         ```bash
         npx cap open ios
         ```
 
 ---
 
-## ⚙️ Saneamiento de Archivos e Imágenes (Accentos y Caracteres Especiales)
-Para evitar problemas de **CORS**, **Mojibake** (ej. ver imágenes rotas con nombres como `Sopa_wantÃ¡n.jpg`) y respuestas **404 (Not Found)** en servidores Linux/Nginx:
+## ⚙️ Image & Filename Sanitization (Handling Special Characters)
+To prevent **CORS** issues, **Mojibake** (e.g. broken images with names like `Sopa_wantÃ¡n.jpg`), and **404 (Not Found)** errors on Linux/Nginx servers:
 
-1.  **En Subida de Archivos:** El cliente sanea el nombre de las imágenes antes de enviarlas al servidor mediante la utilidad `prepareFileForUpload` de `src/utils/imageUtils.ts`. Se eliminan las tildes, caracteres especiales y espacios en blanco, reemplazándolos con caracteres limpios (ej. `á` -> `a`, espacios -> `_`).
-2.  **En Renderizado:** Para archivos históricos que ya cuenten con nombres corruptos en la base de datos, el cliente ejecuta la función `fixImageUrl` al instanciar las URLs de las imágenes, recuperando automáticamente las codificaciones UTF-8 rotas.
+1.  **During Uploads**: The frontend sanitizes image filenames before dispatching them to the API via the `prepareFileForUpload` utility in `src/utils/imageUtils.ts`. Accents, special characters, and spaces are removed or replaced with safe ASCII equivalents (e.g., `á` -> `a`, spaces -> `_`).
+2.  **During Rendering**: For older database entries featuring corrupted filenames, the application runs the `fixImageUrl` helper on the returned URLs, automatically resolving UTF-8 decoding anomalies to ensure the browser requests the actual file from Nginx.
 
 ---
 
-## 🌐 Flujo de Integración y Despliegue Continuo (CI/CD)
+## 🌐 Continuous Integration & Continuous Deployment (CI/CD)
 
-El proyecto utiliza **GitHub Actions** para el despliegue automático en la infraestructura de AWS (EC2) mediante contenedores Docker.
+The project leverages **GitHub Actions** to automate builds and deploy directly to AWS EC2 containerized environments.
 
-### 🧪 Entorno de Pruebas (QA)
-*   **Desencadenante:** Push a la rama `QA` (o dispatch automático desde el despliegue del backend).
-*   **Proceso:**
-    1.  Se descarga el repositorio y se genera la imagen Docker del frontend.
-    2.  Se publica la imagen en Docker Hub (`centraleats-frontend:qa`).
-    3.  Se conecta mediante SSH al servidor EC2 de QA.
-    4.  Se descarga la nueva imagen y se realiza un despliegue seguro "Hot Swap" con rollback automático si el Smoke Test de salud falla.
-    5.  Envía notificaciones del estado a Discord.
+### 🧪 QA Testing Environment
+*   **Trigger:** Push to the `QA` branch (or dispatch event triggered by a successful backend deploy).
+*   **Workflow:**
+    1.  Downloads the code and builds the frontend Docker image.
+    2.  Pushes the image to Docker Hub (`centraleats-frontend:qa`).
+    3.  Establishes an SSH connection to the QA EC2 server.
+    4.  Pulls the new image and performs a safe "Hot Swap" deployment, with automatic rollback if the HTTP smoke test fails.
+    5.  Dispatches status notifications to Discord.
 
-### 🚀 Entorno de Producción (Prod)
-*   **Desencadenante:** Push a la rama `main` (o despacho manual).
-*   **Proceso:**
-    1.  Calcula y crea una nueva etiqueta Git de versión semántica (ej. `v1.0.2`).
-    2.  Promueve la imagen aprobada en QA a Producción en Docker Hub.
-    3.  Descarga y despliega el nuevo contenedor en el servidor EC2 de producción en el puerto `8080`.
-    4.  Crea una GitHub Release automática con el registro de cambios.
-    5.  Envía notificaciones de éxito/fallo a Discord.
+### 🚀 Production Environment
+*   **Trigger:** Push to the `main` branch (or manual workflow dispatch).
+*   **Workflow:**
+    1.  Calculates and creates a new semantic version tag (e.g., `v1.0.2`).
+    2.  Promotes the Docker image from QA to Production in Docker Hub.
+    3.  Downloads and launches the production container on the EC2 server (port `8080`).
+    4.  Autogenerates a GitHub Release with the changelog.
+    5.  Dispatches success/failure notifications to Discord.
