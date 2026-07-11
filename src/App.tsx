@@ -1,11 +1,15 @@
 import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthInitializer } from './components/auth/AuthInitializer';
+import { useState, useEffect } from 'react';
+import { SplashScreen } from './components/shared/organisms/SplashScreen';
 
 // Detect natively wrapped environments (Capacitor/Electron)
+
+
 const isNative = typeof window !== 'undefined' && (
-  !!(window as any).Capacitor || 
-  window.location.protocol === 'file:' || 
+  !!(window as any).Capacitor ||
+  window.location.protocol === 'file:' ||
   navigator.userAgent.toLowerCase().includes('electron')
 );
 
@@ -22,8 +26,28 @@ import RestaurantRegistrationPage from './pages/vendor/RestaurantRegistrationPag
 import RegisterMenuPage from './pages/vendor/RegisterMenuPage';
 import VendorMetricsPage from './pages/vendor/VendorMetricsPage';
 import { Toaster } from 'react-hot-toast';
+import { SplashScreen as CapacitorSplashScreen } from '@capacitor/splash-screen'; 
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(isNative);
+  const [splashFadingOut, setSplashFadingOut] = useState(false);
+
+  useEffect(() => {
+    if (isNative) {
+      CapacitorSplashScreen.hide();
+      const fadeTimer = setTimeout(() => setSplashFadingOut(true), 1600);
+      const removeTimer = setTimeout(() => setShowSplash(false), 2200);
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(removeTimer);
+      };
+    }
+  }, []);
+
+  if (showSplash) {
+    return <SplashScreen fadeOut={splashFadingOut} />;
+  }
+
   return (
     <Router>
       <Toaster position="top-right" />

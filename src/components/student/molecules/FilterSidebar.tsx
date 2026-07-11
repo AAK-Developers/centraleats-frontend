@@ -1,4 +1,4 @@
-import { Box, VStack, Text, HStack, Checkbox, Flex, Icon, Button, Badge } from "@chakra-ui/react";
+import { Box, VStack, Text, HStack, Checkbox, Flex, Icon, Button } from "@chakra-ui/react";
 import { FaTags, FaStore, FaCheckCircle, FaClock, FaUndoAlt } from "react-icons/fa";
 import type { ProductFiltersState } from "../../../hooks/useProductFilters";
 
@@ -25,21 +25,6 @@ const SectionLabel = ({ icon, children }: { icon: React.ElementType; children: R
     </HStack>
 );
 
-const ComingSoonRow = ({ label }: { label: string }) => (
-    <Flex
-        align="center"
-        justify="space-between"
-        opacity={0.45}
-        cursor="not-allowed"
-        py={1.5}
-    >
-        <Text fontSize="sm" color="gray.500">{label}</Text>
-        <Badge fontSize="9px" colorScheme="gray" borderRadius="full" px={2}>
-            Próximamente
-        </Badge>
-    </Flex>
-);
-
 export const FilterSidebar = ({
     filters,
     onChange,
@@ -61,6 +46,22 @@ export const FilterSidebar = ({
             ? filters.vendorIds.filter((id) => id !== vendorId)
             : [...filters.vendorIds, vendorId];
         onChange({ vendorIds: next });
+    };
+
+    const toggleCategory = (cat: string) => {
+        const current = filters.categories || [];
+        const next = current.includes(cat)
+            ? current.filter((c) => c !== cat)
+            : [...current, cat];
+        onChange({ categories: next });
+    };
+
+    const toggleWaitTime = (time: string) => {
+        const current = filters.waitTimes || [];
+        const next = current.includes(time)
+            ? current.filter((t) => t !== time)
+            : [...current, time];
+        onChange({ waitTimes: next });
     };
 
     return (
@@ -199,10 +200,21 @@ export const FilterSidebar = ({
 
             <Box>
                 <SectionLabel icon={FaTags}>Categoría</SectionLabel>
-                <VStack align="stretch" gap={0.5}>
-                    <ComingSoonRow label="Almuerzos" />
-                    <ComingSoonRow label="Bebidas" />
-                    <ComingSoonRow label="Snacks" />
+                <VStack align="stretch" gap={2} pr={1}>
+                    {["Almuerzos", "Bebidas", "Snacks"].map((cat) => (
+                        <Checkbox.Root
+                            key={cat}
+                            checked={(filters.categories || []).includes(cat)}
+                            onCheckedChange={() => toggleCategory(cat)}
+                            colorPalette="teal"
+                        >
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control borderColor="gray.300" />
+                            <Checkbox.Label>
+                                <Text fontSize="sm" color="gray.700">{cat}</Text>
+                            </Checkbox.Label>
+                        </Checkbox.Root>
+                    ))}
                 </VStack>
             </Box>
 
@@ -210,10 +222,21 @@ export const FilterSidebar = ({
 
             <Box>
                 <SectionLabel icon={FaClock}>Tiempo de entrega</SectionLabel>
-                <VStack align="stretch" gap={0.5}>
-                    <ComingSoonRow label="Menos de 15 min" />
-                    <ComingSoonRow label="15 - 30 min" />
-                    <ComingSoonRow label="30+ min" />
+                <VStack align="stretch" gap={2} pr={1}>
+                    {["Menos de 15 min", "15 - 30 min", "30+ min"].map((time) => (
+                        <Checkbox.Root
+                            key={time}
+                            checked={(filters.waitTimes || []).includes(time)}
+                            onCheckedChange={() => toggleWaitTime(time)}
+                            colorPalette="teal"
+                        >
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control borderColor="gray.300" />
+                            <Checkbox.Label>
+                                <Text fontSize="sm" color="gray.700">{time}</Text>
+                            </Checkbox.Label>
+                        </Checkbox.Root>
+                    ))}
                 </VStack>
             </Box>
         </VStack>

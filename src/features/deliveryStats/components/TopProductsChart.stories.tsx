@@ -14,8 +14,8 @@ export const Default: Story = {
     args: {
         products: [
             { productId: 'p1', productName: 'Pizza Margarita', imageUrl: null, vendorName: 'La Nonna', totalSold: 120 },
-            { productId: 'p2', productName: 'Burger ClÃ¡sica', imageUrl: null, vendorName: 'Grill House', totalSold: 95 },
-            { productId: 'p3', productName: 'Tacos al Pastor', imageUrl: null, vendorName: 'El SazÃ³n', totalSold: 80 },
+            { productId: 'p2', productName: 'Burger Clásica', imageUrl: null, vendorName: 'Grill House', totalSold: 95 },
+            { productId: 'p3', productName: 'Tacos al Pastor', imageUrl: null, vendorName: 'El Sazón', totalSold: 80 },
         ],
     },
     play: async ({ canvas }) => {

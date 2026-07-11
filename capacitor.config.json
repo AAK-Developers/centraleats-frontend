@@ -9,6 +9,14 @@
   "plugins": {
     "CapacitorHttp": {
       "enabled": true
+    },
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "launchAutoHide": false,
+      "backgroundColor": "#ffffff"
     }
+  },
+  "android": {
+    "backgroundColor": "#ffffff"
   }
 }

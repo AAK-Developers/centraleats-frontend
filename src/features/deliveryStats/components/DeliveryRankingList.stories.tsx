@@ -15,7 +15,7 @@ export const Default: Story = {
         deliveryRanking: [
             { vendorId: 'r1', vendorName: 'La Nonna', averageMinutes: 24 },
             { vendorId: 'r2', vendorName: 'Grill House', averageMinutes: 31 },
-            { vendorId: 'r3', vendorName: 'El SazÃ³n', averageMinutes: 40 },
+            { vendorId: 'r3', vendorName: 'El Sazón', averageMinutes: 40 },
         ],
     },
     play: async ({ canvas }) => {

@@ -12,7 +12,7 @@ export default function TopProductsChart({ products }: Props) {
 
   return (
     <section className="block">
-      <BlockHeader title="Platos mÃ¡s vendidos" subtitle="Top productos por unidades vendidas" />
+      <BlockHeader title="Platos más vendidos" subtitle="Top productos por unidades vendidas" />
       <div className="row-list">
         {top.map((p, i) => {
           const accent = accentFor(i)

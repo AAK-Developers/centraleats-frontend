@@ -13,6 +13,8 @@ export interface ProductFiltersState {
     vendorIds: string[];
     onlyAvailable: boolean;
     sortBy: SortOption;
+    categories?: string[];
+    waitTimes?: string[];
 }
 
 const DEFAULT_FILTERS: ProductFiltersState = {
@@ -20,6 +22,8 @@ const DEFAULT_FILTERS: ProductFiltersState = {
     vendorIds: [],
     onlyAvailable: false,
     sortBy: "relevancia",
+    categories: [],
+    waitTimes: [],
 };
 
 const PAGE_SIZE = 12;
@@ -62,7 +66,7 @@ export function useProductFilters({ products, searchFiltered }: UseProductFilter
     const filtered = useMemo(() => {
         let list = searchFiltered;
 
-        const { priceRange, vendorIds, onlyAvailable } = filters;
+        const { priceRange, vendorIds, onlyAvailable, categories, waitTimes } = filters;
 
         if (priceRange.max > 0) {
             list = list.filter((p) => {
@@ -77,6 +81,24 @@ export function useProductFilters({ products, searchFiltered }: UseProductFilter
 
         if (onlyAvailable) {
             list = list.filter((p) => p.isAvailable && p.stock > 0);
+        }
+
+        if (categories && categories.length > 0) {
+            // Requiere que el backend envíe 'categoryName' o 'category' en el objeto Product
+            list = list.filter((p) => categories.includes((p as any).categoryName || (p as any).category));
+        }
+
+        if (waitTimes && waitTimes.length > 0) {
+            // Requiere que el backend envíe 'vendorWaitTime' u otra métrica de espera
+            list = list.filter((p) => {
+                const wait = (p as any).vendorWaitTime || 0;
+                let matches = false;
+                if (waitTimes.includes("Menos de 15 min") && wait > 0 && wait < 15) matches = true;
+                if (waitTimes.includes("15 - 30 min") && wait >= 15 && wait <= 30) matches = true;
+                if (waitTimes.includes("30+ min") && wait > 30) matches = true;
+                // Si el backend aún no provee tiempos, podríamos dejar pasar o bloquear (actualmente bloqueará si wait=0)
+                return matches;
+            });
         }
 
         return list;
@@ -112,6 +134,8 @@ export function useProductFilters({ products, searchFiltered }: UseProductFilter
     const activeFilterCount =
         (filters.vendorIds.length > 0 ? 1 : 0) +
         (filters.onlyAvailable ? 1 : 0) +
+        ((filters.categories?.length || 0) > 0 ? 1 : 0) +
+        ((filters.waitTimes?.length || 0) > 0 ? 1 : 0) +
         (priceBounds.max > 0 &&
             (filters.priceRange.min > priceBounds.min || filters.priceRange.max < priceBounds.max)
             ? 1

@@ -10,7 +10,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
   )
 
   if (data?.status !== 'success') {
-    throw new Error(data?.message || 'El backend respondi├│ con un error')
+    throw new Error(data?.message || 'El backend respondió con un error')
   }
   return data.data as DashboardStats
 }
