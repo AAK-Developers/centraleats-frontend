@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { WaveLayout } from '../../components/layout/WaveLayout';
 import { AppContainer } from '../../components/layout/AppContainer';
@@ -35,6 +36,7 @@ const DEFAULT_CATEGORIES = [
 export default function RegisterMenuPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const queryClient = useQueryClient();
     const [categories, setCategories] = useState<{ id: string; name: string }[]>(DEFAULT_CATEGORIES);
 
     const editingProduct = (location.state as { product?: EditableProduct } | null)?.product;
@@ -105,6 +107,9 @@ export default function RegisterMenuPage() {
                 });
                 toast.success("¡Plato publicado!");
             }
+
+            // Invalidate products query key so that dashboard caches are refreshed immediately
+            await queryClient.invalidateQueries({ queryKey: ['all-products'] });
 
             navigate("/vendor-dashboard");
         } catch (error) {

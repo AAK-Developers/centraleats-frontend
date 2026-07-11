@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/axiosConfig';
 import { useRestaurants, type Restaurant } from './useRestaurants';
-import type { ApiResponse } from '../types/api';
 
 export interface Product {
     id: string;
@@ -59,8 +58,8 @@ export const useAllProducts = () => {
 
             try {
                 // Try to fetch all products at once
-                const res = await apiClient.get<ApiResponse<ApiProduct[]>>('/api/products');
-                const list = res.data.data || [];
+                const res = await apiClient.get<any>('/api/products');
+                const list = res.data?.data || res.data || [];
 
                 // Build a lookup map for restaurants
                 const vendorMap: Record<string, string> = {};
@@ -72,7 +71,7 @@ export const useAllProducts = () => {
                     }
                 });
 
-                return list.map((p) => ({
+                return (Array.isArray(list) ? list : []).map((p) => ({
                     id: p.id,
                     name: p.name,
                     description: p.description || '',
@@ -107,10 +106,10 @@ export const useAllProducts = () => {
                         .filter((r) => r.id)
                         .map((r) =>
                             apiClient
-                                .get<ApiResponse<ApiProduct[]>>(`/api/products?vendorId=${r.id}`)
+                                .get<any>(`/api/products?vendorId=${r.id}`)
                                 .then((res) => {
-                                    const list = res.data.data || [];
-                                    return list.map((p) => ({
+                                    const list = res.data?.data || res.data || [];
+                                    return (Array.isArray(list) ? list : []).map((p) => ({
                                         id: p.id,
                                         name: p.name,
                                         description: p.description || '',
@@ -133,7 +132,7 @@ export const useAllProducts = () => {
             }
         },
         enabled: restaurants.length > 0,
-        staleTime: 5 * 60 * 1000, // 5 minutes cache
+        staleTime: 10 * 1000, // 10 seconds cache
     });
 
     return { products, isLoading, error };
