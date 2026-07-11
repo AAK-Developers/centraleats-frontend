@@ -23,6 +23,9 @@ self.addEventListener("fetch", (event) => {
   if (request.url.includes("/api/")) return;
   if (request.url.includes("socket.io")) return;
   
+  // Skip navigation requests to prevent Clerk auth redirects from failing with 503
+  if (request.mode === "navigate") return;
+  
   event.respondWith(
     caches.match(request).then((cached) => {
       return fetch(request)
@@ -37,3 +40,4 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+

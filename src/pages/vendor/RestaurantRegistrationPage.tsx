@@ -14,6 +14,7 @@ import { TimeRangeInput } from "../../components/shared/molecules/TimeRangeInput
 import { AppButton } from "../../components/restaurant/atoms/RestaurantAppButton";
 import { FormCard } from "../../components/restaurant/molecules/FormCard";
 import { AuthHeader } from "../../components/shared/organisms/AuthHeader";
+import { prepareFileForUpload } from "../../utils/imageUtils";
 
 interface RestaurantFormData {
     name: string;
@@ -46,7 +47,8 @@ export default function RestaurantRegistrationPage() {
             formData.append("deliveryTime", String(data.deliveryTime));
 
             if (data.image instanceof File) {
-                formData.append("image", data.image);
+                const cleanFile = prepareFileForUpload(data.image);
+                formData.append("image", cleanFile);
             }
 
             if (user?.id) {

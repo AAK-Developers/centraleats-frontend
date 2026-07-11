@@ -27,6 +27,8 @@ interface ApiProduct {
     vendorName?: string;
 }
 
+import { fixImageUrl } from '../utils/imageUtils';
+
 export const useAllProducts = () => {
     const { restaurants } = useRestaurants();
 
@@ -53,7 +55,7 @@ export const useAllProducts = () => {
                     price: p.price,
                     stock: p.stock ?? 0,
                     imageUrl:
-                        p.imageUrl ||
+                        fixImageUrl(p.imageUrl) ||
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
                     isAvailable: p.isAvailable,
                     vendorId: p.vendorId || '',
@@ -66,7 +68,7 @@ export const useAllProducts = () => {
                 console.warn('Error fetching all products, attempting fallback...', err);
                 // Fallback: fetch products per restaurant
                 const perVendor = await Promise.all(
-                    restaurants
+                     restaurants
                         .filter((r) => r.id)
                         .map((r) =>
                             apiClient
@@ -80,7 +82,7 @@ export const useAllProducts = () => {
                                         price: p.price,
                                         stock: p.stock ?? 0,
                                         imageUrl:
-                                            p.imageUrl ||
+                                            fixImageUrl(p.imageUrl) ||
                                             `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
                                         isAvailable: p.isAvailable,
                                         vendorId: r.id || '',
