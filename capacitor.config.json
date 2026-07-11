@@ -1,7 +1,7 @@
 {
   "appId": "com.tuempresa.deliverydashboard",
   "appName": "CentralEats",
-  "webDir": "dist",
+  "webDir": "dist-mobile",
   "server": {
     "cleartext": true,
     "androidScheme": "http"

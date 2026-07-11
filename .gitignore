@@ -43,3 +43,5 @@ release/
 
 # OS files
 Thumbs.db
+
+dist-mobile
