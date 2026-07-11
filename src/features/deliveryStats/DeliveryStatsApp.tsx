@@ -11,6 +11,8 @@ import StatusDistributionChart from './components/StatusDistributionChart'
 import DeliveryRankingList from './components/DeliveryRankingList'
 import RecentOrdersList from './components/RecentOrdersList'
 import { WaveBottom, WaveTop } from './components/Waves'
+import { SplashScreen as CapacitorSplashScreen } from '@capacitor/splash-screen'
+import { Capacitor } from '@capacitor/core'
 import './deliveryStats.css'
 
 export default function DeliveryStatsApp() {
@@ -19,6 +21,12 @@ export default function DeliveryStatsApp() {
   // Inyectar clase al body solo cuando se renderiza este app
   useEffect(() => {
     document.body.classList.add('is-native')
+    
+    // Hide splash screen since this is the mobile entry point
+    if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
+      CapacitorSplashScreen.hide();
+    }
+    
     return () => {
       document.body.classList.remove('is-native')
     }
