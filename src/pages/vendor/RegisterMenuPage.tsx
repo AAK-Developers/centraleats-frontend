@@ -14,6 +14,7 @@ import { FormCard } from "../../components/restaurant/molecules/FormCard";
 import { apiClient } from "../../api/axiosConfig";
 import { AuthHeader } from "../../components/shared/organisms/AuthHeader";
 import type { VendorProduct } from "../../components/restaurant/types/vendor.types";
+import { prepareFileForUpload } from "../../utils/imageUtils";
 
 interface MenuFormData {
     name: string;
@@ -89,7 +90,8 @@ export default function RegisterMenuPage() {
             formData.append('isActive', 'true');
 
             if (data.image instanceof File) {
-                formData.append('image', data.image);
+                const cleanFile = prepareFileForUpload(data.image);
+                formData.append('image', cleanFile);
             }
 
             if (isEditMode && editingProduct) {

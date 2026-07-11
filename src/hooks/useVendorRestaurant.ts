@@ -3,6 +3,8 @@ import { useAuthStore } from "../store/authStore";
 import { apiClient } from "../api/axiosConfig";
 import type { VendorRestaurant, VendorProduct, ApiRestaurant, ApiProduct } from "../components/restaurant/types/vendor.types";
 
+import { fixImageUrl } from "../utils/imageUtils";
+
 export function useVendorRestaurant() {
     const profile = useAuthStore((state) => state.profile);
 
@@ -44,7 +46,7 @@ export function useVendorRestaurant() {
                         id: myRest.id,
                         name: myRest.name,
                         logoUrl:
-                            myRest.logoUrl ||
+                            fixImageUrl(myRest.logoUrl) ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(myRest.name)}&background=0D8ABC&color=fff&size=200`,
                         description: myRest.description || "",
                         location: myRest.location || "",
@@ -64,7 +66,7 @@ export function useVendorRestaurant() {
                             price: p.price,
                             stock: p.stock || 0,
                             imageUrl:
-                                p.imageUrl ||
+                                fixImageUrl(p.imageUrl) ||
                                 `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
                             isAvailable: p.isAvailable,
                             categoryId: p.categoryId || (p as any).category?.id || "",
