@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/axiosConfig';
 import { useRestaurants, type Restaurant } from './useRestaurants';
-import type { ApiResponse } from '../types/api';
 
 export interface Product {
     id: string;
@@ -13,6 +12,8 @@ export interface Product {
     isAvailable: boolean;
     vendorId: string;
     vendorName: string;
+    categoryName: string;
+    vendorWaitTime: number;
 }
 
 interface ApiProduct {
@@ -25,7 +26,25 @@ interface ApiProduct {
     isAvailable: boolean;
     vendorId?: string;
     vendorName?: string;
+    categoryId?: string;
+    categoryName?: string;
+    category?: string | { id: string; name: string };
+    vendorWaitTime?: number;
 }
+
+const CATEGORY_MAP: Record<string, string> = {
+    "06542c60-ad6b-4844-b1b1-3ad6d5baf35a": "Almuerzos",
+    "b5003928-6d64-417b-8798-2726d16c8cfb": "Bebidas",
+    "153a9f76-160d-4895-814d-9831c33088cd": "Snacks"
+};
+
+const getCategoryName = (p: ApiProduct): string => {
+    if (p.categoryName) return p.categoryName;
+    if (typeof p.category === 'string') return p.category;
+    if (p.category && typeof p.category === 'object' && p.category.name) return p.category.name;
+    if (p.categoryId && CATEGORY_MAP[p.categoryId]) return CATEGORY_MAP[p.categoryId];
+    return "Almuerzos"; // default fallback
+};
 
 import { fixImageUrl } from '../utils/imageUtils';
 
@@ -37,45 +56,26 @@ export const useAllProducts = () => {
         queryFn: async () => {
             if (restaurants.length === 0) return [];
 
+            const vendorMap: Record<string, string> = {};
+            const waitTimeMap: Record<string, number> = {};
+            restaurants.forEach((r: Restaurant) => {
+                if (r.id) {
+                    vendorMap[r.id] = r.name;
+                    waitTimeMap[r.id] = r.deliveryTime || 20;
+                }
+            });
+
             try {
-                // Try to fetch all products at once
-                const res = await apiClient.get<ApiResponse<ApiProduct[]>>('/api/products');
-                const list = res.data.data || [];
-
-                // Build a vendorName lookup map from restaurants already fetched
-                const vendorMap: Record<string, string> = {};
-                restaurants.forEach((r: Restaurant) => {
-                    if (r.id) vendorMap[r.id] = r.name;
-                });
-
-                return list.map((p) => ({
-                    id: p.id,
-                    name: p.name,
-                    description: p.description || '',
-                    price: p.price,
-                    stock: p.stock ?? 0,
-                    imageUrl:
-                        fixImageUrl(p.imageUrl) ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
-                    isAvailable: p.isAvailable,
-                    vendorId: p.vendorId || '',
-                    vendorName:
-                        p.vendorName ||
-                        (p.vendorId ? vendorMap[p.vendorId] : '') ||
-                        'Restaurante',
-                }));
-            } catch (err) {
-                console.warn('Error fetching all products, attempting fallback...', err);
-                // Fallback: fetch products per restaurant
+                // Fetch products per restaurant concurrently for maximum reliability
                 const perVendor = await Promise.all(
                      restaurants
                         .filter((r) => r.id)
                         .map((r) =>
                             apiClient
-                                .get<ApiResponse<ApiProduct[]>>(`/api/products?vendorId=${r.id}`)
+                                .get<any>(`/api/products?vendorId=${r.id}`)
                                 .then((res) => {
-                                    const list = res.data.data || [];
-                                    return list.map((p) => ({
+                                    const list = res.data?.data || res.data || [];
+                                    return (Array.isArray(list) ? list : []).map((p) => ({
                                         id: p.id,
                                         name: p.name,
                                         description: p.description || '',
@@ -87,16 +87,21 @@ export const useAllProducts = () => {
                                         isAvailable: p.isAvailable,
                                         vendorId: r.id || '',
                                         vendorName: r.name,
+                                        categoryName: getCategoryName(p),
+                                        vendorWaitTime: p.vendorWaitTime || (r.id ? waitTimeMap[r.id] : 20),
                                     }));
                                 })
                                 .catch(() => [] as Product[])
                         )
                 );
                 return perVendor.flat();
+            } catch (err) {
+                console.warn('Error fetching products per vendor:', err);
+                return [];
             }
         },
         enabled: restaurants.length > 0,
-        staleTime: 5 * 60 * 1000, // 5 minutes cache
+        staleTime: 10 * 1000, // 10 seconds cache
     });
 
     return { products, isLoading, error };
