@@ -11,7 +11,7 @@ export function VendorProductCard({ product }: VendorProductCardProps) {
     const navigate = useNavigate();
 
     const handleEdit = () => {
-        navigate("/edit-menu", { state: { product } });
+        navigate("/register-menu", { state: { product } });
     };
 
     return (

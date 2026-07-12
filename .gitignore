@@ -45,3 +45,8 @@ release/
 Thumbs.db
 
 dist-mobile
+
+.claude/
+CLAUDE.md
+claudeignore
+SETUP.md
