@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiClient } from '../api/axiosConfig';
+import { useAuth } from '@clerk/clerk-react';
+import { useSocket } from './useSocket';
 
 export type OrderStatus =
     | 'PENDING_PAYMENT'
@@ -88,6 +90,10 @@ export const useStudentOrders = () => {
             clearTimeout(timer);
         };
     }, [fetchOrders]);
+
+    const { getToken } = useAuth();
+    useSocket('orderUpdated', fetchOrders, { getToken });
+    useSocket('orderCreated', fetchOrders, { getToken });
 
     const activeOrders = orders.filter((o) =>
         ACTIVE_STATUSES.includes(o.status)
