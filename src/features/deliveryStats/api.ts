@@ -14,7 +14,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     return data.data as DashboardStats
   } catch (error: any) {
     if (error.response?.status === 403) {
-      throw new Error('No tienes permisos para ver las estadísticas.')
+      throw new Error('No tienes permisos para ver las estadísticas.', { cause: error })
     }
     throw error
   }
