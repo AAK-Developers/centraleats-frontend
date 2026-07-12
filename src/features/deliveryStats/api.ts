@@ -1,9 +1,15 @@
-import { apiClient } from '../../api/axiosConfig'
+import axios from 'axios'
 import type { DashboardApiResponse, DashboardStats } from './types'
+import { VITE_API_BASE_URL } from '../../config/env'
+
+// Cliente axios aislado exclusivo para móvil (no manda cookies, ni interceptores de Clerk)
+const mobileApiClient = axios.create({
+  baseURL: VITE_API_BASE_URL,
+})
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   try {
-    const { data } = await apiClient.get<DashboardApiResponse>(
+    const { data } = await mobileApiClient.get<DashboardApiResponse>(
       `/api/stats/dashboard`,
       { timeout: 10000 },
     )
