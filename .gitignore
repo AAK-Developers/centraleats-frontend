@@ -24,3 +24,29 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Mock Socket Server
+mock-server/node_modules/
+
+# Electron
+dist-electron/
+release/
+*.exe
+*.dmg
+*.AppImage
+*.deb
+
+# Environment overrides
+.env.local
+.env.*.local
+.env.electron.local
+
+# OS files
+Thumbs.db
+
+dist-mobile
+
+.claude/
+CLAUDE.md
+claudeignore
+SETUP.md

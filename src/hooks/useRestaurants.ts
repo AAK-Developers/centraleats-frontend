@@ -9,6 +9,7 @@ export interface Restaurant {
     time: string;
     rating: number;
     image: string;
+    deliveryTime?: number;
 }
 
 interface ApiRestaurant {
@@ -23,6 +24,8 @@ interface ApiRestaurant {
     rating?: number;
     image?: string;
     logoUrl?: string;
+    deliveryTime?: number;
+    delivery_time?: number;
 }
 
 export const useRestaurants = () => {
@@ -31,7 +34,7 @@ export const useRestaurants = () => {
     useEffect(() => {
         const fetchRestaurants = async () => {
             try {
-                const response = await apiClient.get('/api/restaurants');
+                const response = await apiClient.get('/api/vendors');
                 // Backend wraps responses in a { data: [...] } structure
                 const responseData = response.data.data || response.data;
                 const mappedData = (Array.isArray(responseData) ? responseData : []).map((r: ApiRestaurant) => ({
@@ -42,6 +45,7 @@ export const useRestaurants = () => {
                     time: r.time || (r.openingTime && r.closingTime ? `${r.openingTime} - ${r.closingTime}` : "08:00 - 17:00"),
                     rating: r.rating || 4.8,
                     image: r.image || r.logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name)}&background=0D8ABC&color=fff&size=200`,
+                    deliveryTime: Number(r.deliveryTime || r.delivery_time || 20),
                 }));
                 setRestaurants(mappedData);
             } catch (error) {

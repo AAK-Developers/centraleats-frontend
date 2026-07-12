@@ -1,0 +1,22 @@
+{
+  "appId": "com.tuempresa.deliverydashboard",
+  "appName": "CentralEats",
+  "webDir": "dist-mobile",
+  "server": {
+    "cleartext": true,
+    "androidScheme": "http"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "launchAutoHide": false,
+      "backgroundColor": "#ffffff"
+    }
+  },
+  "android": {
+    "backgroundColor": "#ffffff"
+  }
+}

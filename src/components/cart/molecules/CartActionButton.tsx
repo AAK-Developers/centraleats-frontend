@@ -1,5 +1,5 @@
 import { Flex, Text, Box } from "@chakra-ui/react";
-import { ArrowUp, ShoppingBag, CreditCard, ChevronRight } from "lucide-react";
+import { FaArrowUp as ArrowUp, FaShoppingBag as ShoppingBag, FaCreditCard as CreditCard, FaChevronRight as ChevronRight } from "react-icons/fa";
 
 type PaymentMethod = "efectivo" | "tarjeta" | null;
 

@@ -33,7 +33,7 @@ import { useAllProducts } from "../../hooks/useAllProducts";
 import { useCartStore } from "../../store/cartStore";
 import { useCartToast } from "../../hooks/useCartToast";
 import { useProductFilters } from "../../hooks/useProductFilters";
-
+import { useDebounce } from "../../hooks/useDebounce";
 
 export default function StudentDashboardPage() {
     const { user } = useUser();
@@ -42,6 +42,7 @@ export default function StudentDashboardPage() {
     const { toasts, notify, dismiss } = useCartToast();
 
     const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 300);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const [conflictProduct, setConflictProduct] = useState<{
         product: Product;
@@ -50,7 +51,7 @@ export default function StudentDashboardPage() {
     } | null>(null);
 
     const searchFiltered = useMemo(() => {
-        const q = search.toLowerCase().trim();
+        const q = debouncedSearch.toLowerCase().trim();
         if (!q) return products;
         return products.filter(
             (p) =>
@@ -58,7 +59,7 @@ export default function StudentDashboardPage() {
                 p.description.toLowerCase().includes(q) ||
                 p.vendorName.toLowerCase().includes(q)
         );
-    }, [products, search]);
+    }, [products, debouncedSearch]);
 
     const {
         filters,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { apiClient } from '../api/axiosConfig';
+import { useSocket } from './useSocket';
 
 export interface AppNotification {
     id: string;
@@ -7,6 +7,11 @@ export interface AppNotification {
     restaurant: string;
     status: string;
     receivedAt: number;
+}
+
+interface OrderUpdatedPayload {
+    orderId: string;
+    status: string;
 }
 
 const STUDENT_NOTIFICATION_STATUSES = ['RECEIVED', 'PREPARING', 'READY'];
@@ -60,12 +65,10 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
     const { role = 'student', vendorId } = options;
 
     const storageKey = getDismissedStorageKey(role, vendorId);
-
     const dismissedIdsRef = useRef<Set<string>>(loadDismissedIds(storageKey));
     const seenIdsRef = useRef<Set<string>>(new Set());
 
     const [notifications, setNotifications] = useState<AppNotification[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         dismissedIdsRef.current = loadDismissedIds(storageKey);
@@ -73,67 +76,34 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         setNotifications([]);
     }, [storageKey]);
 
-    const fetchNotifications = useCallback(async () => {
-        if (role === 'vendor' && (!vendorId || vendorId === 'test-restaurant-id')) {
-            setIsLoading(false);
-            return;
-        }
+    const handleOrderUpdated = useCallback((payload: OrderUpdatedPayload) => {
+        if (role === 'vendor' && (!vendorId || vendorId === 'test-restaurant-id')) return;
 
-        try {
-            const url = role === 'vendor'
-                ? `/api/orders/vendor?vendorId=${vendorId}`
-                : '/api/orders/student';
+        const relevantStatuses = role === 'vendor'
+            ? VENDOR_NOTIFICATION_STATUSES
+            : STUDENT_NOTIFICATION_STATUSES;
 
-            const response = await apiClient.get(url);
-            const rawData = response.data?.data || response.data || [];
-            const responseData = Array.isArray(rawData) ? rawData : [];
+        if (!relevantStatuses.includes(payload.status)) return;
 
-            const relevantStatuses = role === 'vendor'
-                ? VENDOR_NOTIFICATION_STATUSES
-                : STUDENT_NOTIFICATION_STATUSES;
+        const cardId = `${payload.orderId}-${payload.status}`;
+        if (dismissedIdsRef.current.has(cardId) || seenIdsRef.current.has(cardId)) return;
 
-            const titleMap = role === 'vendor'
-                ? VENDOR_NOTIFICATION_TITLES
-                : STUDENT_NOTIFICATION_TITLES;
+        seenIdsRef.current.add(cardId);
 
-            const relevantOrders = responseData.filter((o: any) =>
-                relevantStatuses.includes(o.status)
-            );
+        const titleMap = role === 'vendor' ? VENDOR_NOTIFICATION_TITLES : STUDENT_NOTIFICATION_TITLES;
 
-            const newCards: AppNotification[] = [];
-            for (const o of relevantOrders) {
-                const cardId = `${o.id}-${o.status}`;
-                if (dismissedIdsRef.current.has(cardId)) continue;
-                if (seenIdsRef.current.has(cardId)) continue;
+        const newCard: AppNotification = {
+            id: cardId,
+            title: titleMap[payload.status] ?? '📦 Actualización de tu pedido',
+            restaurant: `Pedido #${payload.orderId.slice(0, 8)}`,
+            status: payload.status,
+            receivedAt: Date.now(),
+        };
 
-                seenIdsRef.current.add(cardId);
-                newCards.push({
-                    id: cardId,
-                    title: titleMap[o.status] ?? '📦 Actualización de tu pedido',
-                    restaurant: o.vendorName || 'Restaurante',
-                    status: o.status,
-                    receivedAt: Date.now(),
-                });
-            }
-
-            if (newCards.length > 0) {
-                setNotifications((prev) => [...newCards, ...prev]);
-            }
-        } catch (error) {
-            console.error('Failed to load notifications:', error);
-        } finally {
-            setIsLoading(false);
-        }
+        setNotifications((prev) => [newCard, ...prev]);
     }, [role, vendorId]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => fetchNotifications(), 0);
-        const interval = setInterval(fetchNotifications, 8000);
-        return () => {
-            clearTimeout(timer);
-            clearInterval(interval);
-        };
-    }, [fetchNotifications]);
+    useSocket('orderUpdated', handleOrderUpdated);
 
     const clearAll = () => {
         notifications.forEach((n) => dismissedIdsRef.current.add(n.id));
@@ -141,5 +111,5 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         setNotifications([]);
     };
 
-    return { notifications, isLoading, clearAll, refresh: fetchNotifications };
+    return { notifications, clearAll };
 };

@@ -3,24 +3,12 @@ import { useAuthStore } from "../store/authStore";
 import { apiClient } from "../api/axiosConfig";
 import type { VendorRestaurant, VendorProduct, ApiRestaurant, ApiProduct } from "../components/restaurant/types/vendor.types";
 
+import { fixImageUrl } from "../utils/imageUtils";
+
 export function useVendorRestaurant() {
     const profile = useAuthStore((state) => state.profile);
 
-    const [restaurant, setRestaurant] = useState<VendorRestaurant | null>(() => {
-        if (!profile?.id) {
-            return {
-                id: "test-restaurant-id",
-                name: "Restaurante Central 1",
-                logoUrl: "/assets/restaurant-placeholder.png",
-                description: "",
-                location: "",
-                phone: "",
-                openingTime: "08:00",
-                closingTime: "17:00",
-            };
-        }
-        return null;
-    });
+    const [restaurant, setRestaurant] = useState<VendorRestaurant | null>(null);
 
     const [products, setProducts] = useState<VendorProduct[]>([]);
     const [isLoading, setIsLoading] = useState(() => !!profile?.id);
@@ -30,7 +18,7 @@ export function useVendorRestaurant() {
             if (!profile?.id) return;
             setIsLoading(true);
             try {
-                const res = await apiClient.get("/api/restaurants");
+                const res = await apiClient.get("/api/vendors");
                 const list: ApiRestaurant[] = res.data?.data || res.data || [];
 
                 const myRest = list.find(
@@ -44,7 +32,7 @@ export function useVendorRestaurant() {
                         id: myRest.id,
                         name: myRest.name,
                         logoUrl:
-                            myRest.logoUrl ||
+                            fixImageUrl(myRest.logoUrl) ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(myRest.name)}&background=0D8ABC&color=fff&size=200`,
                         description: myRest.description || "",
                         location: myRest.location || "",
@@ -64,7 +52,7 @@ export function useVendorRestaurant() {
                             price: p.price,
                             stock: p.stock || 0,
                             imageUrl:
-                                p.imageUrl ||
+                                fixImageUrl(p.imageUrl) ||
                                 `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
                             isAvailable: p.isAvailable,
                             categoryId: p.categoryId || (p as any).category?.id || "",

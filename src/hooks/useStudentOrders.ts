@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiClient } from '../api/axiosConfig';
+import { useSocket } from './useSocket';
+import { useDebouncedCallback } from './useDebouncedCallback';
 
 export type OrderStatus =
     | 'PENDING_PAYMENT'
@@ -84,12 +86,14 @@ export const useStudentOrders = () => {
         const timer = setTimeout(() => {
             fetchOrders();
         }, 0);
-        const interval = setInterval(fetchOrders, 8000);
         return () => {
             clearTimeout(timer);
-            clearInterval(interval);
         };
     }, [fetchOrders]);
+
+    const debouncedFetchOrders = useDebouncedCallback(fetchOrders, 300);
+    useSocket('orderUpdated', debouncedFetchOrders);
+    useSocket('orderCreated', debouncedFetchOrders);
 
     const activeOrders = orders.filter((o) =>
         ACTIVE_STATUSES.includes(o.status)

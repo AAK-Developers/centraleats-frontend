@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { apiClient } from "../api/axiosConfig";
+import { useSocket } from "./useSocket";
+import { useDebouncedCallback } from "./useDebouncedCallback";
 import type { VendorOrder } from "../components/restaurant/types/vendor.types";
 
 export function useVendorOrders(restaurantId?: string) {
@@ -23,13 +25,15 @@ export function useVendorOrders(restaurantId?: string) {
         if (!restaurantId || restaurantId === "test-restaurant-id") return;
 
         const timer = setTimeout(() => fetchOrders(), 0);
-        const interval = setInterval(fetchOrders, 4000);
 
         return () => {
             clearTimeout(timer);
-            clearInterval(interval);
         };
     }, [restaurantId, fetchOrders]);
+
+    const debouncedFetchOrders = useDebouncedCallback(fetchOrders, 300);
+    useSocket('orderUpdated', debouncedFetchOrders);
+    useSocket('orderCreated', debouncedFetchOrders);
 
     const nuevos = orders.filter((o) => o.status === "PENDING_PAYMENT" || o.status === "PAID" || o.status === "RECEIVED");
     const enCocina = orders.filter((o) => o.status === "PREPARING");
