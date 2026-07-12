@@ -26,7 +26,11 @@ interface CartState {
     totalAmount: () => number; // in cents
 }
 
-export const useCartStore = create<CartState>((set, get) => ({
+import { persist } from 'zustand/middleware';
+
+export const useCartStore = create<CartState>()(
+    persist(
+        (set, get) => ({
     items: [],
     vendorId: null,
     vendorName: '',
@@ -91,4 +95,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 
     totalAmount: () =>
         get().items.reduce((acc, i) => acc + i.product.price * i.quantity, 0),
-}));
+    }),
+    {
+        name: 'cart-storage',
+    }
+    )
+);

@@ -1,4 +1,4 @@
-﻿import { Timer } from 'lucide-react'
+import { FaClock as Timer } from 'react-icons/fa'
 import type { DeliveryRankingEntry } from '../types'
 import { BlockHeader } from './shared'
 

@@ -84,10 +84,8 @@ export const useStudentOrders = () => {
         const timer = setTimeout(() => {
             fetchOrders();
         }, 0);
-        const interval = setInterval(fetchOrders, 8000);
         return () => {
             clearTimeout(timer);
-            clearInterval(interval);
         };
     }, [fetchOrders]);
 

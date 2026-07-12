@@ -1,16 +1,21 @@
-﻿import axios from 'axios'
+import { apiClient } from '../../api/axiosConfig'
 import type { DashboardApiResponse, DashboardStats } from './types'
 
-export const API_BASE_URL = 'http://98.81.131.147:3001'
-
 export async function fetchDashboardStats(): Promise<DashboardStats> {
-  const { data } = await axios.get<DashboardApiResponse>(
-    `${API_BASE_URL}/api/stats/dashboard`,
-    { timeout: 10000 },
-  )
+  try {
+    const { data } = await apiClient.get<DashboardApiResponse>(
+      `/api/stats/dashboard`,
+      { timeout: 10000 },
+    )
 
-  if (data?.status !== 'success') {
-    throw new Error(data?.message || 'El backend respondió con un error')
+    if (data?.status !== 'success') {
+      throw new Error(data?.message || 'El backend respondió con un error')
+    }
+    return data.data as DashboardStats
+  } catch (error: any) {
+    if (error.response?.status === 403) {
+      throw new Error('No tienes permisos para ver las estadísticas.', { cause: error })
+    }
+    throw error
   }
-  return data.data as DashboardStats
 }

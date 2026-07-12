@@ -23,11 +23,9 @@ export function useVendorOrders(restaurantId?: string) {
         if (!restaurantId || restaurantId === "test-restaurant-id") return;
 
         const timer = setTimeout(() => fetchOrders(), 0);
-        const interval = setInterval(fetchOrders, 4000);
 
         return () => {
             clearTimeout(timer);
-            clearInterval(interval);
         };
     }, [restaurantId, fetchOrders]);
 

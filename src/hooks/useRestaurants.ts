@@ -34,7 +34,7 @@ export const useRestaurants = () => {
     useEffect(() => {
         const fetchRestaurants = async () => {
             try {
-                const response = await apiClient.get('/api/restaurants');
+                const response = await apiClient.get('/api/vendors');
                 // Backend wraps responses in a { data: [...] } structure
                 const responseData = response.data.data || response.data;
                 const mappedData = (Array.isArray(responseData) ? responseData : []).map((r: ApiRestaurant) => ({

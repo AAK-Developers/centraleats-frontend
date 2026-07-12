@@ -17,7 +17,6 @@ export const useAuthMe = () => {
         setError(null);
         try {
             const response = await apiClient.get<BackendResponse | UserProfile>('/api/auth/me');
-            console.log("RESPUESTA COMPLETA AUTH ME:", response.data);
 
             // Backend might return the profile directly or wrapped in { data: UserProfile }
             const responseData = response.data;

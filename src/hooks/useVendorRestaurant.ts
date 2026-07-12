@@ -8,21 +8,7 @@ import { fixImageUrl } from "../utils/imageUtils";
 export function useVendorRestaurant() {
     const profile = useAuthStore((state) => state.profile);
 
-    const [restaurant, setRestaurant] = useState<VendorRestaurant | null>(() => {
-        if (!profile?.id) {
-            return {
-                id: "test-restaurant-id",
-                name: "Restaurante Central 1",
-                logoUrl: "/assets/restaurant-placeholder.png",
-                description: "",
-                location: "",
-                phone: "",
-                openingTime: "08:00",
-                closingTime: "17:00",
-            };
-        }
-        return null;
-    });
+    const [restaurant, setRestaurant] = useState<VendorRestaurant | null>(null);
 
     const [products, setProducts] = useState<VendorProduct[]>([]);
     const [isLoading, setIsLoading] = useState(() => !!profile?.id);
@@ -32,7 +18,7 @@ export function useVendorRestaurant() {
             if (!profile?.id) return;
             setIsLoading(true);
             try {
-                const res = await apiClient.get("/api/restaurants");
+                const res = await apiClient.get("/api/vendors");
                 const list: ApiRestaurant[] = res.data?.data || res.data || [];
 
                 const myRest = list.find(

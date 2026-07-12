@@ -12,7 +12,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { profile, isLoadingProfile, fetchProfile, error } = useAuthMe();
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const location = useLocation();
-    console.log("AUTH PROFILE:", profile);
 
     useEffect(() => {
         // Only attempt to sync if no previous error occurred to avoid infinite request loops

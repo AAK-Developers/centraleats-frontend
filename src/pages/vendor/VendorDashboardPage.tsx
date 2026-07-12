@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
-import { BarChart2 } from "lucide-react";
+import { FaChartBar as BarChart2 } from "react-icons/fa";
 
 // Existing components
 import { DashboardHeaderVendor } from "../../components/restaurant/organisms/DashboardHeaderVendor";

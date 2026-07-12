@@ -99,9 +99,14 @@ export function useCartCheckout({ onClose }: UseCartCheckoutOptions) {
             clearCart();
             setCompletedOrder(snapshot);
             setView("factura");
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error placing order:", err);
-            toast.error("Error al procesar el pedido. Intenta de nuevo.");
+            const errorMsg = err.response?.data?.message || err.message || "";
+            if (err.response?.status === 409 || errorMsg.toLowerCase().includes("stock")) {
+                toast.error("Lamentablemente, el producto se ha agotado justo ahora. Por favor, actualiza tu carrito.", { duration: 5000 });
+            } else {
+                toast.error("Error al procesar el pedido. Intenta de nuevo.");
+            }
         } finally {
             setIsSubmitting(false);
         }
