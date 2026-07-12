@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { apiClient } from "../api/axiosConfig";
 import { useAuth } from "@clerk/clerk-react";
 import { useSocket } from "./useSocket";
@@ -7,13 +7,9 @@ import type { VendorOrder } from "../components/restaurant/types/vendor.types";
 export function useVendorOrders(restaurantId?: string) {
     const [orders, setOrders] = useState<VendorOrder[]>([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
-    const isFetchingRef = useRef(false);
 
     const fetchOrders = useCallback(async () => {
         if (!restaurantId || restaurantId === "test-restaurant-id") return;
-        if (isFetchingRef.current) return; // Prevent parallel overlapping requests
-        
-        isFetchingRef.current = true;
         setIsLoadingOrders(true);
         try {
             const res = await apiClient.get(`/api/orders/vendor?vendorId=${restaurantId}`);
@@ -22,10 +18,6 @@ export function useVendorOrders(restaurantId?: string) {
             console.error("Error fetching vendor orders:", err);
         } finally {
             setIsLoadingOrders(false);
-            // Pequeño retardo para evitar spam de peticiones si hay ráfagas de websockets
-            setTimeout(() => {
-                isFetchingRef.current = false;
-            }, 300);
         }
     }, [restaurantId]);
 

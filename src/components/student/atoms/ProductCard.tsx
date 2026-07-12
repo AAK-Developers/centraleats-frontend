@@ -142,10 +142,10 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                 <Button
                     mt={1}
                     size={{ base: "xs", md: "sm" }}
-                    bg={isOrderable ? (inCart ? "teal.500" : "#042E63") : "gray.200"}
+                    bg={isOrderable ? "#042E63" : "gray.200"}
                     color={isOrderable ? "white" : "gray.400"}
                     borderRadius="xl"
-                    _hover={isOrderable ? { bg: inCart ? "teal.600" : "#031F44", transform: "scale(1.02)" } : {}}
+                    _hover={isOrderable ? { bg: "#031F44", transform: "scale(1.02)" } : {}}
                     onClick={() => onAddToCart(product)}
                     disabled={!isOrderable}
                     transition="all 0.2s"
@@ -154,7 +154,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                     <HStack gap={1} justify="center">
                         <FaShoppingCart size={11} />
                         <Text fontSize={{ base: "11px", md: "xs" }}>
-                            {inCart ? "Ya en carrito" : "Agregar al carrito"}
+                            {inCart ? "Agregar más" : "Agregar al carrito"}
                         </Text>
                     </HStack>
                 </Button>

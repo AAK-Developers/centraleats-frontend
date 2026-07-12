@@ -24,52 +24,38 @@ export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrders
     const [pendingDelivery, setPendingDelivery] = useState<PendingDelivery | null>(null);
     const [pickupError, setPickupError] = useState("");
     const [isConfirmingDelivery, setIsConfirmingDelivery] = useState(false);
-    const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
 
     const handleAccept = async (orderId: string) => {
-        if (processingOrderId) return;
-        setProcessingOrderId(orderId);
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "RECEIVED" });
             toast.success("Pedido aceptado. Ahora pasa a cocina.");
             onRefresh();
         } catch {
             toast.error("Error al aceptar pedido");
-        } finally {
-            setProcessingOrderId(null);
         }
     };
 
     const handleStartCooking = async (orderId: string) => {
-        if (processingOrderId) return;
-        setProcessingOrderId(orderId);
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "PREPARING" });
             toast.success("¡Pedido en preparación!");
             onRefresh();
         } catch {
             toast.error("Error al iniciar preparación");
-        } finally {
-            setProcessingOrderId(null);
         }
     };
 
     const handleReady = async (orderId: string) => {
-        if (processingOrderId) return;
-        setProcessingOrderId(orderId);
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "READY" });
             toast.success("¡Pedido marcado como listo para retirar!");
             onRefresh();
         } catch {
             toast.error("Error al actualizar estado");
-        } finally {
-            setProcessingOrderId(null);
         }
     };
 
     const handleDeliver = (orderId: string, pickupCode?: string | null) => {
-        if (processingOrderId) return;
         if (pickupCode) {
             const order = orders.find((o) => o.id === orderId);
             setPickupError("");
@@ -83,8 +69,8 @@ export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrders
         completeDelivery(orderId);
     };
 
+
     const completeDelivery = async (orderId: string) => {
-        setProcessingOrderId(orderId);
         try {
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "PICKED_UP" });
             await apiClient.patch(`/api/orders/${orderId}/status`, { status: "COMPLETED" });
@@ -92,8 +78,6 @@ export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrders
             onRefresh();
         } catch {
             toast.error("Error al entregar pedido");
-        } finally {
-            setProcessingOrderId(null);
         }
     };
 
@@ -134,7 +118,6 @@ export function VendorOrdersPanel({ orders, activeTab, onRefresh }: VendorOrders
                     <VendorOrderCard
                         key={order.id}
                         order={order}
-                        isProcessing={processingOrderId === order.id}
                         onAccept={
                             activeTab === "nuevos" &&
                                 (order.status === "PENDING_PAYMENT" || order.status === "PAID")

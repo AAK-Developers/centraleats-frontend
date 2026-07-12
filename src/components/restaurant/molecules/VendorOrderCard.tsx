@@ -7,7 +7,6 @@ import {
     Icon,
     HStack,
     Stack,
-    Spinner,
 } from "@chakra-ui/react";
 import {
     FaCheckCircle,
@@ -23,12 +22,12 @@ import { STATUS_BADGE } from "../types/vendor.types";
 
 interface VendorOrderCardProps {
     order: VendorOrder;
-    isProcessing?: boolean;
     onAccept?: () => void;
     onStartCooking?: () => void;
     onReady?: () => void;
     onDeliver?: () => void;
 }
+
 
 interface ActionButtonProps {
     onClick: () => void;
@@ -38,31 +37,29 @@ interface ActionButtonProps {
     iconColor: string;
     shadow: string;
     shadowHover: string;
-    isDisabled?: boolean;
 }
 
-function ActionButton({ onClick, label, icon, gradient, iconColor, shadow, shadowHover, isDisabled }: ActionButtonProps) {
+function ActionButton({ onClick, label, icon, gradient, iconColor, shadow, shadowHover }: ActionButtonProps) {
     return (
         <Flex
             as="button"
-            onClick={isDisabled ? undefined : onClick}
+            onClick={onClick}
             align="center"
             justify="space-between"
-            bg={isDisabled ? "gray.400" : gradient}
+            bg={gradient}
             borderRadius="full"
             pl={5}
             pr={2}
             py={2.5}
             w="full"
-            boxShadow={isDisabled ? "none" : shadow}
+            boxShadow={shadow}
             transition="all 0.2s"
-            _hover={isDisabled ? undefined : { boxShadow: shadowHover, transform: "translateY(-1px)" }}
-            _active={isDisabled ? undefined : { transform: "scale(0.98)" }}
-            cursor={isDisabled ? "not-allowed" : "pointer"}
-            opacity={isDisabled ? 0.7 : 1}
+            _hover={{ boxShadow: shadowHover, transform: "translateY(-1px)" }}
+            _active={{ transform: "scale(0.98)" }}
+            cursor="pointer"
         >
             <Text fontSize="sm" fontWeight="bold" color="white">
-                {isDisabled ? "Procesando..." : label}
+                {label}
             </Text>
             <Flex
                 w="28px" h="28px"
@@ -73,11 +70,7 @@ function ActionButton({ onClick, label, icon, gradient, iconColor, shadow, shado
                 boxShadow="sm"
                 flexShrink={0}
             >
-                {isDisabled ? (
-                    <Spinner size="xs" color="gray.500" />
-                ) : (
-                    <Icon as={icon} boxSize={3.5} color={iconColor} />
-                )}
+                <Icon as={icon} boxSize={3.5} color={iconColor} />
             </Flex>
         </Flex>
     );
@@ -85,7 +78,6 @@ function ActionButton({ onClick, label, icon, gradient, iconColor, shadow, shado
 
 export function VendorOrderCard({
     order,
-    isProcessing,
     onAccept,
     onStartCooking,
     onReady,
@@ -211,7 +203,6 @@ export function VendorOrderCard({
                             iconColor="#2DC6B8"
                             shadow="0 4px 14px rgba(45,198,184,0.35)"
                             shadowHover="0 6px 20px rgba(45,198,184,0.5)"
-                            isDisabled={isProcessing}
                         />
                     )}
                     {onStartCooking && (
@@ -223,7 +214,6 @@ export function VendorOrderCard({
                             iconColor="#D69E2E"
                             shadow="0 4px 14px rgba(214,158,46,0.35)"
                             shadowHover="0 6px 20px rgba(214,158,46,0.5)"
-                            isDisabled={isProcessing}
                         />
                     )}
                     {onReady && (
@@ -235,7 +225,6 @@ export function VendorOrderCard({
                             iconColor="#ED8936"
                             shadow="0 4px 14px rgba(237,137,54,0.35)"
                             shadowHover="0 6px 20px rgba(237,137,54,0.5)"
-                            isDisabled={isProcessing}
                         />
                     )}
                     {onDeliver && (
@@ -247,7 +236,6 @@ export function VendorOrderCard({
                             iconColor="#4299E1"
                             shadow="0 4px 14px rgba(66,153,225,0.35)"
                             shadowHover="0 6px 20px rgba(66,153,225,0.5)"
-                            isDisabled={isProcessing}
                         />
                     )}
                 </Stack>
