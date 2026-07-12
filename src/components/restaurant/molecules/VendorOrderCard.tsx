@@ -194,7 +194,7 @@ export function VendorOrderCard({
                 </Flex>
 
                 <Stack gap={2}>
-                    {onAccept && !isPending && (
+                    {onAccept && (
                         <ActionButton
                             onClick={onAccept}
                             label="Aceptar Pedido"

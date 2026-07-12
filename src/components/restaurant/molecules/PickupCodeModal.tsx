@@ -33,8 +33,8 @@ export const PickupCodeModal = ({
 
     if (!isOpen) return null;
 
-    const formatCode = (v: string) => v.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 6);
-    const isComplete = code.length === 6;
+    const formatCode = (v: string) => v.replace(/[^0-9]/g, "").slice(0, 4);
+    const isComplete = code.length === 4;
 
     const handleConfirm = () => {
         if (!isComplete || isSubmitting) return;
@@ -103,19 +103,19 @@ export const PickupCodeModal = ({
                             </HStack>
 
                             <Text fontSize="sm" color="gray.600">
-                                Ingresa el código alfanumérico de 6 caracteres proporcionado por el estudiante para confirmar la entrega.
+                                Ingresa el código numérico de 4 dígitos proporcionado por el estudiante para confirmar la entrega.
                             </Text>
 
                             <Box>
                                 <input
                                     key={openCount}
                                     ref={inputRef}
-                                    inputMode="text"
-                                    maxLength={6}
+                                    inputMode="numeric"
+                                    maxLength={4}
                                     value={code}
                                     onChange={(e) => setCode(formatCode(e.target.value))}
                                     onKeyDown={handleKeyDown}
-                                    placeholder="••••••"
+                                    placeholder="••••"
                                     style={{
                                         width: "100%",
                                         padding: "14px",
