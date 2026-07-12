@@ -95,15 +95,6 @@ export default function App() {
               }
             />
 
-            <Route
-              path="/edit-menu"
-              element={
-                <ProtectedRoute>
-                  <RegisterMenuPage />
-                </ProtectedRoute>
-              }
-            />
-
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

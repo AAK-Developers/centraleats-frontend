@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { apiClient } from "../api/axiosConfig";
-import { useAuth } from "@clerk/clerk-react";
 import { useSocket } from "./useSocket";
+import { useDebouncedCallback } from "./useDebouncedCallback";
 import type { VendorOrder } from "../components/restaurant/types/vendor.types";
 
 export function useVendorOrders(restaurantId?: string) {
@@ -39,9 +39,9 @@ export function useVendorOrders(restaurantId?: string) {
         };
     }, [restaurantId, fetchOrders]);
 
-    const { getToken } = useAuth();
-    useSocket('orderUpdated', fetchOrders, { getToken });
-    useSocket('orderCreated', fetchOrders, { getToken });
+    const debouncedFetchOrders = useDebouncedCallback(fetchOrders, 300);
+    useSocket('orderUpdated', debouncedFetchOrders);
+    useSocket('orderCreated', debouncedFetchOrders);
 
     const nuevos = orders.filter((o) => o.status === "PENDING_PAYMENT" || o.status === "PAID" || o.status === "RECEIVED");
     const enCocina = orders.filter((o) => o.status === "PREPARING");

@@ -1,92 +1,21 @@
 import { useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { VITE_API_BASE_URL } from '../config/env';
+import { getSocket } from '../lib/socketManager';
 
-export interface UseSocketOptions {
-  getToken?: () => Promise<string | null>;
-  autoConnect?: boolean;
-}
-
-export const useSocket = (
-  eventName: string,
-  callback: (data: any) => void,
-  options: UseSocketOptions = {}
-) => {
-  const { getToken, autoConnect = true } = options;
-  const socketRef = useRef<Socket | null>(null);
-  const getTokenRef = useRef(getToken);
+export const useSocket = (eventName: string, callback: (data: any) => void) => {
+  const callbackRef = useRef(callback);
 
   useEffect(() => {
-    getTokenRef.current = getToken;
-  }, [getToken]);
+    callbackRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const connect = async () => {
-      let token: string | null = null;
-      if (getTokenRef.current) {
-        try {
-          token = await getTokenRef.current();
-        } catch {
-          console.warn('🔌 [Socket.io] No se pudo obtener el token de Clerk');
-        }
-      }
-
-      if (!isMounted) return;
-
-      if (!token) {
-        console.warn('🔌 [Socket.io] Sin token disponible, no se conecta');
-        return;
-      }
-
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current.removeAllListeners();
-        socketRef.current = null;
-      }
-
-      console.log('🔌 [Socket.io] Inicializando socket con token...');
-      const s = io(VITE_API_BASE_URL, {
-        autoConnect: false,
-        transports: ['websocket'],
-        auth: { token },
-      });
-
-      socketRef.current = s;
-
-      s.on('connect', () => console.log('🔌 [Socket.io] Conectado exitosamente'));
-      s.on('disconnect', (reason: string) => console.log('🔌 [Socket.io] Desconectado por:', reason));
-      s.on('connect_error', (error: Error) => console.error('❌ [Socket.io] Error de conexión:', error.message));
-      s.on(eventName, callback);
-
-      if (autoConnect) {
-        console.log('🔌 [Socket.io] Conectando al servidor...');
-        s.connect();
-      }
-    };
-
-    connect();
-
+    const socket = getSocket();
+    const handler = (data: any) => callbackRef.current(data);
+    socket.on(eventName, handler);
     return () => {
-      isMounted = false;
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current.removeAllListeners();
-        socketRef.current = null;
-      }
+      socket.off(eventName, handler);
     };
-  }, [eventName, autoConnect]); // Removed getToken from deps
-
-  useEffect(() => {
-    const s = socketRef.current;
-    if (!s) return;
-    s.off(eventName, callback);
-    s.on(eventName, callback);
-    return () => {
-      s.off(eventName, callback);
-    };
-  }, [callback, eventName]);
+  }, [eventName]);
 };
 
 export default useSocket;
