@@ -22,7 +22,6 @@ export default function NotFoundPage() {
                 </Text>
 
                 <Button
-                    leftIcon={<FaHome />}
                     colorScheme="orange"
                     bg="#E65100"
                     color="white"
@@ -31,6 +30,7 @@ export default function NotFoundPage() {
                     w="full"
                     onClick={() => navigate("/")}
                 >
+                    <FaHome style={{ marginRight: '8px' }} />
                     Volver al inicio
                 </Button>
             </VStack>
