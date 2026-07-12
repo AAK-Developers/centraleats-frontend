@@ -67,7 +67,7 @@ export const useAllProducts = () => {
 
             try {
                 // Fetch all products at once
-                const res = await apiClient.get<any>('/api/products');
+                const res = await apiClient.get<any>('/api/products?limit=1000&size=1000');
                 const list = res.data?.data || res.data || [];
                 
                 return (Array.isArray(list) ? list : []).map((p) => ({
