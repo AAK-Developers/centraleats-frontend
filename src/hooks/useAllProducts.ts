@@ -66,11 +66,19 @@ export const useAllProducts = () => {
             });
 
             try {
-                // Fetch all products at once
-                const res = await apiClient.get<any>('/api/products');
-                const list = res.data?.data || res.data || [];
+                // Fetch products for each restaurant concurrently
+                const promises = restaurants
+                    .filter(r => r.id)
+                    .map(r => apiClient.get<any>(`/api/products?vendorId=${r.id}`));
+                    
+                const responses = await Promise.allSettled(promises);
                 
-                return (Array.isArray(list) ? list : []).map((p) => ({
+                const allProducts = responses
+                    .filter(res => res.status === 'fulfilled')
+                    .map(res => (res as PromiseFulfilledResult<any>).value.data?.data || (res as PromiseFulfilledResult<any>).value.data || [])
+                    .flat();
+                
+                return allProducts.map((p: any) => ({
                     id: p.id,
                     name: p.name,
                     description: p.description || '',
