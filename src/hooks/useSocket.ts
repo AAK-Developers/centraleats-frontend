@@ -14,15 +14,20 @@ export const useSocket = (
 ) => {
   const { getToken, autoConnect = true } = options;
   const socketRef = useRef<Socket | null>(null);
+  const getTokenRef = useRef(getToken);
+
+  useEffect(() => {
+    getTokenRef.current = getToken;
+  }, [getToken]);
 
   useEffect(() => {
     let isMounted = true;
 
     const connect = async () => {
       let token: string | null = null;
-      if (getToken) {
+      if (getTokenRef.current) {
         try {
-          token = await getToken();
+          token = await getTokenRef.current();
         } catch {
           console.warn('🔌 [Socket.io] No se pudo obtener el token de Clerk');
         }
@@ -71,9 +76,7 @@ export const useSocket = (
         socketRef.current = null;
       }
     };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventName, getToken, autoConnect]);
+  }, [eventName, autoConnect]); // Removed getToken from deps
 
   useEffect(() => {
     const s = socketRef.current;
