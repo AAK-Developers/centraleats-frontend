@@ -3,19 +3,28 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { apiClient } from '../../api/axiosConfig';
 
-const BASE_URL = apiClient.defaults.baseURL || 'http://localhost';
+// apiClient.defaults.baseURL depends on VITE_API_BASE_URL, which is only
+// populated locally via .env and is empty in CI. Pin a concrete baseURL here
+// so MSW handlers and the requests Axios actually sends always agree.
+const TEST_BASE_URL = 'http://localhost:3000';
 
 const server = setupServer();
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => {
+    apiClient.defaults.baseURL = TEST_BASE_URL;
+    server.listen({ onUnhandledRequest: 'error' });
+});
 afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+afterAll(() => {
+    server.close();
+    apiClient.defaults.baseURL = '';
+});
 
 describe('apiClient 429 retry interceptor', () => {
     it('retries with backoff and eventually resolves on success', async () => {
         let attempts = 0;
         server.use(
-            http.get(`${BASE_URL}/api/flaky`, () => {
+            http.get(`${TEST_BASE_URL}/api/flaky`, () => {
                 attempts += 1;
                 if (attempts < 3) {
                     return new HttpResponse(null, { status: 429 });
@@ -33,7 +42,7 @@ describe('apiClient 429 retry interceptor', () => {
     it('gives up after MAX_RETRIES and rejects', async () => {
         let attempts = 0;
         server.use(
-            http.get(`${BASE_URL}/api/always-limited`, () => {
+            http.get(`${TEST_BASE_URL}/api/always-limited`, () => {
                 attempts += 1;
                 return new HttpResponse(null, { status: 429 });
             })
