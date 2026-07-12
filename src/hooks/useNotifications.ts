@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@clerk/clerk-react';
 import { apiClient } from '../api/axiosConfig';
 import { useSocket } from './useSocket';
 
@@ -60,7 +59,6 @@ const saveDismissedIds = (storageKey: string, ids: Set<string>) => {
 
 export const useNotifications = (options: UseNotificationsOptions = {}) => {
     const { role = 'student', vendorId } = options;
-    const { getToken } = useAuth();
 
     const storageKey = getDismissedStorageKey(role, vendorId);
     const dismissedIdsRef = useRef<Set<string>>(loadDismissedIds(storageKey));
@@ -136,7 +134,7 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         }
     }, [role, vendorId]);
 
-    useSocket('orderUpdated', fetchNotifications, { getToken });
+    useSocket('orderUpdated', fetchNotifications);
 
     useEffect(() => {
         const timer = setTimeout(() => fetchNotifications(), 0);
