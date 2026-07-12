@@ -1,4 +1,4 @@
-﻿import { Store, Package, ShoppingBag, Wallet, Clock } from 'lucide-react'
+import { FaStore as Store, FaBox as Package, FaShoppingBag as ShoppingBag, FaWallet as Wallet, FaClock as Clock } from 'react-icons/fa'
 import type { DashboardSummary } from '../types'
 import { ACCENTS, money } from '../theme'
 import { IconTile } from './shared'

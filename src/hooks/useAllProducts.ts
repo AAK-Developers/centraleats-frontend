@@ -66,37 +66,27 @@ export const useAllProducts = () => {
             });
 
             try {
-                // Fetch products per restaurant concurrently for maximum reliability
-                const perVendor = await Promise.all(
-                     restaurants
-                        .filter((r) => r.id)
-                        .map((r) =>
-                            apiClient
-                                .get<any>(`/api/products?vendorId=${r.id}`)
-                                .then((res) => {
-                                    const list = res.data?.data || res.data || [];
-                                    return (Array.isArray(list) ? list : []).map((p) => ({
-                                        id: p.id,
-                                        name: p.name,
-                                        description: p.description || '',
-                                        price: p.price,
-                                        stock: p.stock ?? 0,
-                                        imageUrl:
-                                            fixImageUrl(p.imageUrl) ||
-                                            `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
-                                        isAvailable: p.isAvailable,
-                                        vendorId: r.id || '',
-                                        vendorName: r.name,
-                                        categoryName: getCategoryName(p),
-                                        vendorWaitTime: p.vendorWaitTime || (r.id ? waitTimeMap[r.id] : 20),
-                                    }));
-                                })
-                                .catch(() => [] as Product[])
-                        )
-                );
-                return perVendor.flat();
+                // Fetch all products at once
+                const res = await apiClient.get<any>('/api/products');
+                const list = res.data?.data || res.data || [];
+                
+                return (Array.isArray(list) ? list : []).map((p) => ({
+                    id: p.id,
+                    name: p.name,
+                    description: p.description || '',
+                    price: p.price,
+                    stock: p.stock ?? 0,
+                    imageUrl:
+                        fixImageUrl(p.imageUrl) ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=0D8ABC&color=fff&size=200`,
+                    isAvailable: p.isAvailable,
+                    vendorId: p.vendorId || '',
+                    vendorName: p.vendorId ? vendorMap[p.vendorId] || 'Vendor' : 'Vendor',
+                    categoryName: getCategoryName(p),
+                    vendorWaitTime: p.vendorWaitTime || (p.vendorId ? waitTimeMap[p.vendorId] : 20),
+                }));
             } catch (err) {
-                console.warn('Error fetching products per vendor:', err);
+                console.warn('Error fetching products:', err);
                 return [];
             }
         },

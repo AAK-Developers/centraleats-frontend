@@ -1,5 +1,5 @@
 import { Flex, HStack, Text } from "@chakra-ui/react";
-import { Banknote, CreditCard, ArrowRight } from "lucide-react";
+import { FaMoneyBillWave as Banknote, FaCreditCard as CreditCard, FaArrowRight as ArrowRight } from "react-icons/fa";
 
 type PaymentMethod = "efectivo" | "tarjeta" | null;
 

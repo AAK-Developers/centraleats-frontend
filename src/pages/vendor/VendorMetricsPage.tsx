@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Flex, Grid, Heading, Spinner, IconButton, Spacer, Center, Text, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { FaArrowLeft as ArrowLeft } from "react-icons/fa";
 import { WaveLayout } from "../../components/layout/WaveLayout";
 import { AppContainer } from "../../components/layout/AppContainer";
 import { useVendorRestaurant } from "../../hooks/useVendorRestaurant";

@@ -5,11 +5,9 @@ const baseURL = VITE_API_BASE_URL;
 
 export const apiClient = axios.create({
     baseURL,
-    withCredentials: true,
 });
 
-
-console.log('API apiClient initialized with baseURL:', baseURL);
+// console.log('API apiClient initialized with baseURL:', baseURL);
 
 import type { ApiResponse } from '../types/api';
 

@@ -1,4 +1,4 @@
-﻿import { UtensilsCrossed } from 'lucide-react'
+import { FaUtensils as UtensilsCrossed } from 'react-icons/fa'
 import type { TopProduct } from '../types'
 import { accentFor } from '../theme'
 import { BlockHeader } from './shared'
