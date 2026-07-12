@@ -75,11 +75,16 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         setNotifications([]);
     }, [storageKey]);
 
+    const isFetchingRef = useRef(false);
+
     const fetchNotifications = useCallback(async () => {
         if (role === 'vendor' && (!vendorId || vendorId === 'test-restaurant-id')) {
             setIsLoading(false);
             return;
         }
+        
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
 
         try {
             const url = role === 'vendor'
@@ -125,6 +130,9 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
             console.error('Failed to load notifications:', error);
         } finally {
             setIsLoading(false);
+            setTimeout(() => {
+                isFetchingRef.current = false;
+            }, 300);
         }
     }, [role, vendorId]);
 
