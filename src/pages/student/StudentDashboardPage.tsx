@@ -81,17 +81,6 @@ export default function StudentDashboardPage() {
             return;
         }
 
-        const cartItems = useCartStore.getState().items;
-        const alreadyInCart = cartItems.some((i) => i.product.id === product.id);
-
-        if (alreadyInCart) {
-            toast.success("Producto ya en carrito. Si deseas más, ajusta la cantidad desde el carrito.", {
-                icon: '🛒',
-                duration: 4000
-            });
-            return;
-        }
-
         const result = addItem(
             {
                 id: product.id,
