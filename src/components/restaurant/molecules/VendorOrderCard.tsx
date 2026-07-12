@@ -85,6 +85,7 @@ function ActionButton({ onClick, label, icon, gradient, iconColor, shadow, shado
 
 export function VendorOrderCard({
     order,
+    isProcessing,
     onAccept,
     onStartCooking,
     onReady,
